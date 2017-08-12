@@ -1,2 +1,6 @@
 colorlog
+setuptools
+
+# Sinks
+pprintpp
 

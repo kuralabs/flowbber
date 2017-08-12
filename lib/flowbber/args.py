@@ -21,6 +21,8 @@ Argument management module.
 
 import logging
 
+from pathlib import Path
+
 from colorlog import ColoredFormatter
 
 from . import __version__
@@ -59,6 +61,15 @@ def validate_args(args):
 
     log.debug('Raw arguments:\n{}'.format(args))
 
+    # Check if pipeline file exists
+    args.pipeline = Path(args.pipeline)
+
+    if not args.pipeline.is_file():
+        log.error('No such file {}'.format(args.pipeline))
+        exit(1)
+
+    args.pipeline = args.pipeline.resolve()
+
     return args
 
 
@@ -75,7 +86,10 @@ def parse_args(argv=None):
     from argparse import ArgumentParser
 
     parser = ArgumentParser(
-        description='Flowbber is a generic tool and framework that allows to execute custom pipelines for data gathering, publishing and analysis.'
+        description=(
+            'Flowbber is a generic tool and framework that allows to execute '
+            'custom pipelines for data gathering, publishing and analysis.'
+        )
     )
     parser.add_argument(
         '-v', '--verbose',
@@ -87,6 +101,11 @@ def parse_args(argv=None):
         '--version',
         action='version',
         version='Flowbber v{}'.format(__version__)
+    )
+
+    parser.add_argument(
+        'pipeline',
+        help='Pipeline configuration file'
     )
 
     args = parser.parse_args(argv)

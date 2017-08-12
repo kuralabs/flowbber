@@ -1,0 +1,21 @@
+{
+    "sources": [
+        {
+            "type": "process",
+            "key": "process",
+            "config": {}
+        },
+        {
+            "type": "user",
+            "key": "user",
+            "config": {}
+        }
+    ],
+    "aggregators": [],
+    "sinks": [
+        {
+            "type": "pprintpp",
+            "config": {}
+        }
+    ]
+}
