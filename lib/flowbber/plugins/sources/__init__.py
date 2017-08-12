@@ -16,27 +16,5 @@
 # under the License.
 
 """
-Module implementating Aggregator base class.
-
-All custom Flowbber aggregators must extend from the Aggregator class.
+flowbber.plugins.sources module entry point.
 """
-
-import logging
-
-from ..entities import Aggregator
-from .loader import PluginLoader
-
-
-log = logging.getLogger(__name__)
-
-
-class AggregatorsLoader(PluginLoader):
-    """
-    Aggregators plugins loader class.
-    """
-
-    def __init__(self):
-        super().__init__('aggregators', Aggregator)
-
-
-__all__ = ['AggregatorsLoader']

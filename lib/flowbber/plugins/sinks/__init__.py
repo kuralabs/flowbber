@@ -16,9 +16,5 @@
 # under the License.
 
 """
-flowbber example 1.
+flowbber.plugins.sinks module entry point.
 """
-
-import flowbber  # noqa
-
-# Use flowbber in this example

@@ -16,27 +16,20 @@
 # under the License.
 
 """
-Module implementating Aggregator base class.
-
-All custom Flowbber aggregators must extend from the Aggregator class.
+Simple user info source.
 """
 
-import logging
-
-from ..entities import Aggregator
-from .loader import PluginLoader
+from flowbber.entities import Source
 
 
-log = logging.getLogger(__name__)
+class UserSource(Source):
+    def collect(self):
+        from os import getuid, getlogin
+
+        return {
+            'uid': getuid(),
+            'login': getlogin(),
+        }
 
 
-class AggregatorsLoader(PluginLoader):
-    """
-    Aggregators plugins loader class.
-    """
-
-    def __init__(self):
-        super().__init__('aggregators', Aggregator)
-
-
-__all__ = ['AggregatorsLoader']
+__all__ = ['UserSource']

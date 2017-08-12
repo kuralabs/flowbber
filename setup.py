@@ -362,6 +362,18 @@ setup(
     # installation for correct AutoAPI generation.
     zip_safe='READTHEDOCS' not in environ,
 
+    # Entry points
+    entry_points={
+        'flowbber_plugin_sources_1_0': [
+            'user = flowbber.plugins.sources.user:UserSource',
+        ],
+        'flowbber_plugin_aggregators_1_0': [],
+        'flowbber_plugin_sinks_1_0': [
+            'pprintpp = flowbber.plugins.sinks.pprintpp:PPrintPPSink',
+            'archive = flowbber.plugins.sinks.archive:ArchiveSink'
+        ]
+    },
+
     # Multiple packaging options
     **find_packages('lib')
 )

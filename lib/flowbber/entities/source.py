@@ -21,11 +21,41 @@ Module implementating Source base class.
 All custom Flowbber sources must extend from the Source class.
 """
 
+from copy import deepcopy
+from logging import getLogger
+from abc import abstractmethod
+from multiprocessing import Queue
+
 from .base import BaseEntity
 
 
+log = getLogger(__name__)
+
+
 class Source(BaseEntity):
-    pass
+    def __init__(self, type_, key, config):
+        self._type_ = type_
+        self._key = key
+
+        self.config = deepcopy(config)
+        self.result = Queue(maxsize=1)
+
+    @property
+    def key(self):
+        return self._key
+
+    def execute(self):
+        try:
+            self.result.put({
+                self._key: self.collect()
+            })
+        except Exception as e:
+            self.result.put({})
+            raise e
+
+    @abstractmethod
+    def collect(self):
+        pass
 
 
 __all__ = ['Source']

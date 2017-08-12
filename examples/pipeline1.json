@@ -1,11 +1,6 @@
 {
     "sources": [
         {
-            "type": "process",
-            "key": "process",
-            "config": {}
-        },
-        {
             "type": "user",
             "key": "user",
             "config": {}
@@ -16,6 +11,14 @@
         {
             "type": "pprintpp",
             "config": {}
+        },
+        {
+            "type": "archive",
+            "config": {
+                "output": "data.json",
+                "create_parents": true,
+                "override": true
+            }
         }
     ]
 }

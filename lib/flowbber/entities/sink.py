@@ -21,11 +21,21 @@ Module implementating Sink base class.
 All custom Flowbber sinks must extend from the Sink class.
 """
 
+from copy import deepcopy
+from abc import abstractmethod
+
 from .base import BaseEntity
 
 
 class Sink(BaseEntity):
-    pass
+    def __init__(self, type_, config, data):
+        self._type_ = type_
+        self.config = deepcopy(config)
+        self.data = deepcopy(data)
+
+    @abstractmethod
+    def distribute(self):
+        pass
 
 
 __all__ = ['Sink']

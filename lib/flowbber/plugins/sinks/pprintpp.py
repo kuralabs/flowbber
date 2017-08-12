@@ -16,27 +16,16 @@
 # under the License.
 
 """
-Module implementating Aggregator base class.
-
-All custom Flowbber aggregators must extend from the Aggregator class.
+Simple pprintpp sink plugin.
 """
 
-import logging
-
-from ..entities import Aggregator
-from .loader import PluginLoader
+from flowbber.entities import Sink
 
 
-log = logging.getLogger(__name__)
+class PPrintPPSink(Sink):
+    def distribute(self):
+        from pprintpp import pprint
+        pprint(self.data)
 
 
-class AggregatorsLoader(PluginLoader):
-    """
-    Aggregators plugins loader class.
-    """
-
-    def __init__(self):
-        super().__init__('aggregators', Aggregator)
-
-
-__all__ = ['AggregatorsLoader']
+__all__ = ['PPrintPPSink']

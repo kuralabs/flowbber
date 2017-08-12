@@ -19,10 +19,15 @@
 Application entry point module.
 """
 
-import logging
+from ujson import loads
+from logging import getLogger
+from multiprocessing import Process
+from collections import OrderedDict
+
+from .loaders import SourcesLoader, SinksLoader
 
 
-log = logging.getLogger(__name__)
+log = getLogger(__name__)
 
 
 def main(args):
@@ -35,6 +40,51 @@ def main(args):
     :return: Exit code.
     :rtype: int
     """
+    pipeline = loads(args.pipeline.read_text(encoding='utf-8'))
+
+    sources_loader = SourcesLoader()
+    sinks_loader = SinksLoader()
+
+    sources = sources_loader.load_plugins()
+    sinks = sinks_loader.load_plugins()
+
+    print(sources)
+    data = OrderedDict()
+
+    my_sources = [
+        sources[source['type']](
+            source['type'], source['key'], source['config']
+        )
+        for source in pipeline['sources']
+    ]
+
+    my_sources_processes = [
+        (Process(target=my_source.execute), my_source)
+        for my_source in my_sources
+    ]
+
+    for my_process, my_source in my_sources_processes:
+        my_process.start()
+
+    for my_process, my_source in my_sources_processes:
+        result = my_source.result.get()
+        data.update(result)
+
+    for my_process, my_source in my_sources_processes:
+        my_process.join()
+        print('Process {} exited with {}'.format(
+            my_process.pid, my_process.exitcode
+        ))
+
+    my_sinks = [
+        sinks[sink['type']](
+            sink['type'], sink['config'], data
+        )
+        for sink in pipeline['sinks']
+    ]
+    for my_sink in my_sinks:
+        my_sink.distribute()
+
     return 0
 
 

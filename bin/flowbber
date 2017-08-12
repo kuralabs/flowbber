@@ -22,7 +22,6 @@ Flowbber executable script.
 See https://flowbber.readthedocs.io
 """
 
-from sys import exit
 
 if __name__ == '__main__':
 

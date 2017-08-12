@@ -28,7 +28,7 @@ from collections import OrderedDict
 
 from pkg_resources import iter_entry_points
 
-from ..entities import BaseEntity
+from ..entities.base import BaseEntity
 
 
 log = logging.getLogger(__name__)
@@ -50,7 +50,7 @@ class PluginLoader(object):
         super().__init__()
 
         self.entrypoint = 'flowbber_plugin_{entity}_{api_version}'.format(
-            entity=entity, api_version=api_version.replace('.', '')
+            entity=entity, api_version=api_version.replace('.', '_')
         )
 
         self.base_class = base_class
@@ -87,6 +87,8 @@ class PluginLoader(object):
         available = OrderedDict()
 
         # Iterate over entry points
+        log.debug('Loading entrypoint {}'.format(self.entrypoint))
+
         for ep in iter_entry_points(group=self.entrypoint):
 
             name = ep.name
