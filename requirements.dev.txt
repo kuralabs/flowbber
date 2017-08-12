@@ -1,0 +1,28 @@
+#######################
+# Coding style        #
+#######################
+
+flake8
+pep8-naming
+
+#######################
+# Debugging           #
+#######################
+
+ipdb
+
+#######################
+# Testing             #
+#######################
+
+pytest
+pytest-cov
+
+#######################
+# Documentation       #
+#######################
+
+sphinx
+guzzle_sphinx_theme
+autoapi
+plantweb
