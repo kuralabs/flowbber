@@ -2,7 +2,32 @@
     "sources": [
         {
             "type": "user",
-            "key": "user",
+            "key": "user1",
+            "config": {}
+        },
+        {
+            "type": "user",
+            "key": "user2",
+            "config": {}
+        },
+        {
+            "type": "user",
+            "key": "user3",
+            "config": {}
+        },
+        {
+            "type": "user",
+            "key": "user4",
+            "config": {}
+        },
+        {
+            "type": "user",
+            "key": "user5",
+            "config": {}
+        },
+        {
+            "type": "user",
+            "key": "user6",
             "config": {}
         }
     ],

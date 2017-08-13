@@ -34,7 +34,7 @@ log = getLogger(__name__)
 
 class Source(BaseEntity):
     def __init__(self, type_, key, config):
-        self._type_ = type_
+        super().__init__(type_)
         self._key = key
 
         self.config = deepcopy(config)

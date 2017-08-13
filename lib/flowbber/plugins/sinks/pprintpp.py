@@ -23,9 +23,9 @@ from flowbber.entities import Sink
 
 
 class PPrintPPSink(Sink):
-    def distribute(self):
+    def distribute(self, data):
         from pprintpp import pprint
-        pprint(self.data)
+        pprint(data)
 
 
 __all__ = ['PPrintPPSink']

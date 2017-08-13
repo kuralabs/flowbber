@@ -20,12 +20,16 @@ Simple file archiver sink plugin.
 """
 
 from pathlib import Path
+from logging import getLogger
 
 from flowbber.entities import Sink
 
 
+log = getLogger(__name__)
+
+
 class ArchiveSink(Sink):
-    def distribute(self):
+    def distribute(self, data):
         from ujson import dumps
         outfile = Path(self.config['output'])
 
@@ -40,7 +44,8 @@ class ArchiveSink(Sink):
         if not outfile.parent.is_dir():
             raise Exception('No such directory {}'.format(outfile.parent))
 
-        outfile.write_text(dumps(self.data), encoding='utf-8')
+        log.info('Archiving data to {}'.format(outfile))
+        outfile.write_text(dumps(data), encoding='utf-8')
 
 
 __all__ = ['ArchiveSink']

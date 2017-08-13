@@ -28,13 +28,12 @@ from .base import BaseEntity
 
 
 class Sink(BaseEntity):
-    def __init__(self, type_, config, data):
-        self._type_ = type_
+    def __init__(self, type_, config):
+        super().__init__(type_)
         self.config = deepcopy(config)
-        self.data = deepcopy(data)
 
     @abstractmethod
-    def distribute(self):
+    def distribute(self, data):
         pass
 
 

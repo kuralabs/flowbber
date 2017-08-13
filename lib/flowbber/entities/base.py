@@ -35,11 +35,14 @@ class NamedABCMeta(ABCMeta):
 class BaseEntity(metaclass=NamedABCMeta):
 
     @abstractmethod
-    def __init__(self):
-        pass
+    def __init__(self, type_):
+        self._type_ = type_
 
     def __str__(self):
-        return self.__class__.__name__
+        return '{}.{}'.format(
+            self.__class__.__name__,
+            self._type_
+        )
 
     def __repr__(self):
         return str(self)
