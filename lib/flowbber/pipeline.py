@@ -120,6 +120,21 @@ class Pipeline:
         FIXME: Document.
         """
 
+        journal = OrderedDict((
+            ('sources', []),
+            ('aggregators', []),
+            ('sinks', []),
+        ))
+
+        self._run_sources(journal['sources'])
+        self._run_aggregators(journal['aggregators'])
+        self._run_sinks(journal['sinks'])
+
+    def _run_sources(self, journal):
+        """
+        FIXME: Document.
+        """
+
         sources_processes = [
             (Process(target=source.execute), source)
             for source in self._sources
@@ -144,26 +159,48 @@ class Pipeline:
 
         for index, (process, source) in enumerate(sources_processes):
             process.join()
+
+            journal_entry = {
+                'key': source.key,
+                'pid': process.pid,
+                'exitcode': process.exitcode,
+                'duration': source.duration.get(),
+            }
+            journal.append(journal_entry)
+
             log.debug('Process {} exited with {}'.format(
                 process.pid, process.exitcode
             ))
             if process.exitcode != 0:
                 raise RuntimeError(
-                    'Process PID {} for source #{} of type {} '
-                    'crashed with exit code {}'.format(
-                        process.pid, index, source, process.exitcode
+                    'Process PID {pid} for source #{index} of type {source} '
+                    'crashed with exit code {exitcode}'.format(
+                        index=index, source=source, **journal_entry
                     )
                 )
 
-            log.info('Source {} finished collecting data successfully.'.format(
-                source
-            ))
+            log.info(
+                'Source {source} finished collecting data successfully after '
+                '{duration:.4f} seconds'.format(
+                    source=source, **journal_entry
+                )
+            )
+
+    def _run_aggregators(self, journal):
+        """
+        FIXME: Document.
+        """
 
         for index, aggregator in enumerate(self._aggregators):
             log.info('Executing data aggregator #{} of type {}'.format(
                 index, aggregator
             ))
             aggregator.accumulate(self._data)
+
+    def _run_sinks(self, journal):
+        """
+        FIXME: Document.
+        """
 
         for index, sink in enumerate(self._sinks):
             log.info('Executing data sink #{} of type {}'.format(

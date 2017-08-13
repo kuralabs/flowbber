@@ -21,6 +21,7 @@ Module implementating Source base class.
 All custom Flowbber sources must extend from the Source class.
 """
 
+from time import time
 from copy import deepcopy
 from logging import getLogger
 from abc import abstractmethod
@@ -39,19 +40,21 @@ class Source(BaseEntity):
 
         self.config = deepcopy(config)
         self.result = Queue(maxsize=1)
+        self.duration = Queue(maxsize=1)
 
     @property
     def key(self):
         return self._key
 
     def execute(self):
+        start = time()
+        entry = {}
+
         try:
-            self.result.put({
-                self._key: self.collect()
-            })
-        except Exception as e:
-            self.result.put({})
-            raise e
+            entry[self._key] = self.collect()
+        finally:
+            self.result.put(entry)
+            self.duration.put(time() - start)
 
     @abstractmethod
     def collect(self):
