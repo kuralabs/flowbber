@@ -1,33 +1,16 @@
 {
     "sources": [
         {
-            "type": "user",
-            "key": "user1",
-            "config": {}
+            "type": "timestamp",
+            "key": "timestamp",
+            "config": {
+                "epochf": true,
+                "iso8601": true
+            }
         },
         {
             "type": "user",
-            "key": "user2",
-            "config": {}
-        },
-        {
-            "type": "user",
-            "key": "user3",
-            "config": {}
-        },
-        {
-            "type": "user",
-            "key": "user4",
-            "config": {}
-        },
-        {
-            "type": "user",
-            "key": "user5",
-            "config": {}
-        },
-        {
-            "type": "user",
-            "key": "user6",
+            "key": "user",
             "config": {}
         }
     ],

@@ -61,7 +61,7 @@ class Pipeline:
             setattr(self, '_{}s_loader'.format(entity), loader)
             setattr(self, '_{}s_available'.format(entity), available)
 
-            log.debug('{}s available: {}'.format(
+            log.info('{}s available: {}'.format(
                 entity.capitalize(),
                 list(available.keys()))
             )
@@ -100,13 +100,12 @@ class Pipeline:
                     ))
 
                 clss = available[entity_type]
+                instance = clss(*arg_unpacker(entity))
 
-                destination.append(
-                    clss(*arg_unpacker(entity))
-                )
+                destination.append(instance)
 
-                log.debug('Created {} instance of type {}'.format(
-                    entity_name, entity_type
+                log.info('Created {} instance of type {}'.format(
+                    entity_name, instance
                 ))
 
             log.debug('Pipeline {}s created {}'.format(

@@ -21,7 +21,6 @@ Module implementating Aggregator base class.
 All custom Flowbber aggregators must extend from the Aggregator class.
 """
 
-from copy import deepcopy
 from abc import abstractmethod
 
 from .base import BaseEntity
@@ -29,10 +28,8 @@ from .base import BaseEntity
 
 class Aggregator(BaseEntity):
     def __init__(self, type_, key, config):
-        super().__init__(type_)
+        super().__init__(type_, config)
         self._key = key
-
-        self.config = deepcopy(config)
 
     @property
     def key(self):

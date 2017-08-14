@@ -22,7 +22,6 @@ All custom Flowbber sources must extend from the Source class.
 """
 
 from time import time
-from copy import deepcopy
 from logging import getLogger
 from abc import abstractmethod
 from multiprocessing import Queue
@@ -35,10 +34,9 @@ log = getLogger(__name__)
 
 class Source(BaseEntity):
     def __init__(self, type_, key, config):
-        super().__init__(type_)
+        super().__init__(type_, config)
         self._key = key
 
-        self.config = deepcopy(config)
         self.result = Queue(maxsize=1)
         self.duration = Queue(maxsize=1)
 

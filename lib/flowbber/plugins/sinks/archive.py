@@ -29,16 +29,39 @@ log = getLogger(__name__)
 
 
 class ArchiveSink(Sink):
+    def declare_config(self, config):
+        """
+        FIXME: Document.
+        """
+        config.add_option(
+            'output',
+            type=str
+        )
+
+        config.add_option(
+            'override',
+            default=False,
+            optional=True,
+            type=bool
+        )
+
+        config.add_option(
+            'create_parents',
+            default=True,
+            optional=True,
+            type=bool
+        )
+
     def distribute(self, data):
         from ujson import dumps
-        outfile = Path(self.config['output'])
+        outfile = Path(self.config.output.value)
 
         # Check if file exists
-        if outfile.is_file() and not self.config.get('override', False):
+        if outfile.is_file() and not self.config.override.value:
             raise Exception('File {} already exists'.format(outfile))
 
         # Create parent directories
-        if self.config.get('create_parents', True):
+        if self.config.create_parents.value:
             outfile.parent.mkdir(parents=True, exist_ok=True)
 
         if not outfile.parent.is_dir():

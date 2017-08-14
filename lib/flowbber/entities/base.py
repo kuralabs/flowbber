@@ -23,8 +23,14 @@ All Flowbber entities extend from the BaseEntity class.
 
 from abc import ABCMeta, abstractmethod
 
+from ..config import Configurator
+
 
 class NamedABCMeta(ABCMeta):
+    """
+    FIXME: Document.
+    """
+
     def __str__(cls):
         return cls.__name__
 
@@ -33,10 +39,20 @@ class NamedABCMeta(ABCMeta):
 
 
 class BaseEntity(metaclass=NamedABCMeta):
+    """
+    FIXME: Document.
+    """
 
     @abstractmethod
-    def __init__(self, type_):
+    def __init__(self, type_, config):
         self._type_ = type_
+
+        configurator = Configurator()
+        self.declare_config(configurator)
+        self.config = configurator.validate(config)
+
+    def declare_config(self, config):
+        pass
 
     def __str__(self):
         return '{}.{}'.format(

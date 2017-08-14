@@ -366,6 +366,7 @@ setup(
     entry_points={
         'flowbber_plugin_sources_1_0': [
             'user = flowbber.plugins.sources.user:UserSource',
+            'timestamp = flowbber.plugins.sources.timestamp:TimestampSource',
         ],
         'flowbber_plugin_aggregators_1_0': [],
         'flowbber_plugin_sinks_1_0': [
