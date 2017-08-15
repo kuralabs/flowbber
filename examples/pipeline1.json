@@ -36,6 +36,14 @@
                 "create_parents": true,
                 "override": true
             }
+        },
+        {
+            "type": "mongo",
+            "config": {
+                "uri": "mongodb://localhost:27017/",
+                "database": "flowbber",
+                "collection": "pipeline1data"
+            }
         }
     ]
 }

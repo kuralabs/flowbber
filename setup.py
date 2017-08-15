@@ -373,6 +373,7 @@ setup(
             'pprintpp = flowbber.plugins.sinks.pprintpp:PPrintPPSink',
             'archive = flowbber.plugins.sinks.archive:ArchiveSink',
             'template = flowbber.plugins.sinks.template:TemplateSink',
+            'mongo = flowbber.plugins.sinks.mongodb:MongoDBSink',
         ]
     },
 

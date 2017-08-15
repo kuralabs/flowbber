@@ -11,5 +11,11 @@ setuptools
 # Sinks    #
 ############
 
+# PPrintPPSink
 pprintpp
+
+# TemplateSink
 jinja2
+
+# MongoDBSink
+pymongo
