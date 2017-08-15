@@ -19,3 +19,6 @@ jinja2
 
 # MongoDBSink
 pymongo
+
+# InfluxDBSink
+influxdb

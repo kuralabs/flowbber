@@ -374,6 +374,7 @@ setup(
             'archive = flowbber.plugins.sinks.archive:ArchiveSink',
             'template = flowbber.plugins.sinks.template:TemplateSink',
             'mongo = flowbber.plugins.sinks.mongodb:MongoDBSink',
+            'influx = flowbber.plugins.sinks.influxdb:InfluxDBSink',
         ]
     },
 

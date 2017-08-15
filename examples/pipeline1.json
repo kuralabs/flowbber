@@ -44,6 +44,13 @@
                 "database": "flowbber",
                 "collection": "pipeline1data"
             }
+        },
+        {
+            "type": "influx",
+            "config": {
+                "uri": "influxdb://localhost:8086/",
+                "database": "flowbber"
+            }
         }
     ]
 }
