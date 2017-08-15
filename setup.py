@@ -371,7 +371,8 @@ setup(
         'flowbber_plugin_aggregators_1_0': [],
         'flowbber_plugin_sinks_1_0': [
             'pprintpp = flowbber.plugins.sinks.pprintpp:PPrintPPSink',
-            'archive = flowbber.plugins.sinks.archive:ArchiveSink'
+            'archive = flowbber.plugins.sinks.archive:ArchiveSink',
+            'template = flowbber.plugins.sinks.template:TemplateSink',
         ]
     },
 

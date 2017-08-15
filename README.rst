@@ -12,6 +12,14 @@ Documentation
     https://flowbber.readthedocs.io
 
 
+TODO
+====
+
+- Implement a build context and pass it to entities.
+- Implement execution timeout for all entities.
+- Implement optional execution for all entities.
+
+
 License
 =======
 

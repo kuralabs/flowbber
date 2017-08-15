@@ -58,14 +58,18 @@ class ArchiveSink(Sink):
 
         # Check if file exists
         if outfile.is_file() and not self.config.override.value:
-            raise Exception('File {} already exists'.format(outfile))
+            raise FileExistsError(
+                'File {} already exists'.format(outfile)
+            )
 
         # Create parent directories
         if self.config.create_parents.value:
             outfile.parent.mkdir(parents=True, exist_ok=True)
 
         if not outfile.parent.is_dir():
-            raise Exception('No such directory {}'.format(outfile.parent))
+            raise FileNotFoundError(
+                'No such directory {}'.format(outfile.parent)
+            )
 
         log.info('Archiving data to {}'.format(outfile))
         outfile.write_text(dumps(data), encoding='utf-8')

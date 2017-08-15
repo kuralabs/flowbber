@@ -27,6 +27,15 @@
                 "create_parents": true,
                 "override": true
             }
+        },
+        {
+            "type": "template",
+            "config": {
+                "template": "template1.tpl",
+                "output": "render1.html",
+                "create_parents": true,
+                "override": true
+            }
         }
     ]
 }
