@@ -19,8 +19,8 @@
 Simple InfluxDB storage sink plugin.
 """
 
-from time import time
 from logging import getLogger
+from datetime import datetime
 
 from flowbber.entities import Sink
 
@@ -131,7 +131,7 @@ class InfluxDBSink(Sink):
             'key',
             default='timestamp.iso8601',
             optional=True,
-            type=str,
+            type=lambda opt: None if opt is None else str(opt),
         )
 
         # Check if uri is defined and if so then delete other keys
@@ -151,7 +151,7 @@ class InfluxDBSink(Sink):
 
         # Get key
         if self.config.key.value is None:
-            key = time()
+            key = datetime.now().isoformat()
 
         else:
             current = data
@@ -180,7 +180,9 @@ class InfluxDBSink(Sink):
             )
 
         # Insert points
+        log.info('Creating points using timestamp {}'.format(key))
         points = transform_to_points(key, data)
+
         log.info('Inserting points to InfluxDB: {}'.format([
             point['measurement'] for point in points
         ]))

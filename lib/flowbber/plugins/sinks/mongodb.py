@@ -93,7 +93,7 @@ class MongoDBSink(Sink):
             'key',
             default='timestamp.epoch',
             optional=True,
-            type=str,
+            type=lambda opt: None if opt is None else str(opt),
         )
 
         # Check if uri is defined and if so then delete other keys
