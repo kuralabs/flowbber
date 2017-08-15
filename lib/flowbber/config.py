@@ -50,6 +50,8 @@ class Configurator:
 
     def __init__(self):
         self._declared = OrderedDict()
+        self._validators = []
+
         self._configitem = namedtuple(
             'configitem',
             ['key', 'value', 'is_secret']
@@ -75,14 +77,15 @@ class Configurator:
             'secret': secret,
         }
 
+    def add_validator(self, validator):
+        self._validators.append(validator)
+
     def validate(self, userconf):
         """
         FIXME: Document.
         """
-        # Create configuration type for this declared configuration
-        self._configtype = namedtuple('config', self._declared.keys())
-
         if not self._declared:
+            self._configtype = namedtuple('config', [])
             return self._configtype()
 
         # All mandatory keys are present in user config
@@ -107,9 +110,11 @@ class Configurator:
 
         # Check datatypes of the options
         for key, info in self._declared.items():
-            # FIXME: Implement type checking
-            pass
+            type_ = info['type']
+            if key in userconf:
+                userconf[key] = type_(userconf[key])
 
+        # Add missing default values
         validated = deepcopy(userconf)
         validated.update({
             key: info['default']
@@ -117,24 +122,40 @@ class Configurator:
             if key not in available
         })
 
+        # Pass custom validators
+        for validator in self._validators:
+            validator(validated)
+
         # Log configuration
+        def is_secret(key):
+            return self._declared[key]['secret']
+
         log_config = []
-        for key, info in self._declared.items():
-            if info['secret']:
-                log_config.append('{} = {}'.format(key, '*' * 30))
+        for key in self._declared.keys():
+
+            # Allow custom validators to delete keys
+            if key not in validated:
                 continue
+
+            if is_secret(key):
+                log_config.append('{} = {}'.format(key, '*' * 20))
+                continue
+
             log_config.append('{} = {}'.format(key, validated[key]))
 
         log.info('Using configuration:\n    {}'.format(
             '\n    '.join(log_config)
         ))
 
+        # Create configuration type for this declared configuration
+        self._configtype = namedtuple('config', validated.keys())
+
         # Create inmutable configuration object
         return self._configtype(**{
             key: self._configitem(
                 key=key,
                 value=value,
-                is_secret=self._declared[key]['secret']
+                is_secret=is_secret(key)
             )
             for key, value in validated.items()
         })

@@ -32,12 +32,53 @@ class MongoDBSink(Sink):
         """
         FIXME: Document.
         """
+
+        # Connection options
         config.add_option(
             'uri',
+            default=None,
+            optional=True,
             type=str,
             secret=True,
         )
 
+        config.add_option(
+            'host',
+            default='localhost',
+            optional=True,
+            type=str,
+        )
+
+        config.add_option(
+            'port',
+            default=27017,
+            optional=True,
+            type=int,
+        )
+
+        config.add_option(
+            'username',
+            default=None,
+            optional=True,
+            type=str,
+        )
+
+        config.add_option(
+            'password',
+            default=None,
+            optional=True,
+            type=str,
+            secret=True,
+        )
+
+        config.add_option(
+            'ssl',
+            default=False,
+            optional=True,
+            type=bool,
+        )
+
+        # Data options
         config.add_option(
             'database',
             type=str,
@@ -55,6 +96,18 @@ class MongoDBSink(Sink):
             type=str,
         )
 
+        # Check if uri is defined and if so then delete other keys
+        def custom_validator(validated):
+            if validated['uri'] is not None:
+                del validated['host']
+                del validated['port']
+                del validated['username']
+                del validated['password']
+            else:
+                del validated['uri']
+
+        config.add_validator(custom_validator)
+
     def distribute(self, data):
         from pymongo import MongoClient
 
@@ -69,9 +122,21 @@ class MongoDBSink(Sink):
 
             key = current
 
-        # Connect to database
-        client = MongoClient(self.config.uri.value)
+        # Determine connection parameters
+        options = {
+            'ssl': self.config.ssl.value,
+        }
 
+        if self.config.uri.value is not None:
+            options['host'] = self.config.uri.value
+        else:
+            options['host'] = self.config.host.value
+            options['port'] = self.config.port.value
+            options['username'] = self.config.username.value
+            options['password'] = self.config.password.value
+
+        # Connect to database
+        client = MongoClient(**options)
         version = client.server_info()['version']
         log.info('Connected to MongoDB database version {}'.format(version))
 

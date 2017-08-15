@@ -61,6 +61,16 @@ class TimestampSource(Source):
             type=str
         )
 
+        # Check that at least one format is enabled
+        def custom_validator(validated):
+            if not any(validated.values()):
+                raise ValueError(
+                    'The timestamp source requires at least one timestamp '
+                    'format enabled'
+                )
+
+        config.add_validator(custom_validator)
+
     def collect(self):
         from datetime import datetime
 
