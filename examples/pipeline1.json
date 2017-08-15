@@ -5,7 +5,8 @@
             "key": "timestamp",
             "config": {
                 "epochf": true,
-                "iso8601": true
+                "iso8601": true,
+                "strftime": "%Y/%m/%d"
             }
         },
         {

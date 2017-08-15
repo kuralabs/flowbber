@@ -31,7 +31,8 @@ class TimestampSource(Source):
             seconds since the EPOCH as integer
             seconds since the EPOCH as float
             ISO 8601
-            custom format
+            strftime format as in:
+                https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior
         """
         config.add_option(
             'epoch',
@@ -55,7 +56,7 @@ class TimestampSource(Source):
         )
 
         config.add_option(
-            'custom',
+            'strftime',
             default=None,
             optional=True,
             type=str
@@ -88,7 +89,11 @@ class TimestampSource(Source):
             entry[self.config.iso8601.key] = \
                 now.replace(microsecond=0).isoformat()
 
-        # FIXME: Implement custom timestamp.
+        if self.config.strftime.value:
+            entry[self.config.strftime.key] = \
+                now.strftime(self.config.strftime.value)
+
+        # FIXME: Understand and maybe add RFC 3339 timestamp
 
         return entry
 
