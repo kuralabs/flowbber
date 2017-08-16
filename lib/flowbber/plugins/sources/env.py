@@ -101,6 +101,39 @@ Configuration examples:
         "exclude": []
     }
 
+*Using with Jenkins CI*
+
+This source is very helpful to collect information from Jenkins_ CI:
+
+.. _Jenkins: https://wiki.jenkins.io/display/JENKINS/Building+a+software+project#Buildingasoftwareproject-belowJenkinsSetEnvironmentVariables
+
+.. code-block:: json
+
+    {
+        "sources": [
+            {
+                "type": "env",
+                "key": "jenkins",
+                "config": {
+                    "include": [
+                        "BUILD_NUMBER",
+                        "JOB_NAME",
+                        "GIT_COMMIT",
+                        "GIT_URL",
+                        "GIT_BRANCH",
+                        "BUILD_TIMESTAMP"
+                    ],
+                    "lowercase": false
+                }
+            }
+        ]
+    }
+
+.. note::
+
+    In the above example the ``BUILD_TIMESTAMP`` variable is provided by the
+    *Build Timestamp Plugin*.
+
 include
 -------
 
