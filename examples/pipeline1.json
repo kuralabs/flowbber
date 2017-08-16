@@ -6,7 +6,7 @@
             "config": {
                 "epochf": true,
                 "iso8601": true,
-                "strftime": "%Y/%m/%d"
+                "strftime": "%Y-%m-%d %H:%M:%S"
             }
         },
         {

@@ -331,6 +331,19 @@ setup(
 
     # Optional dependencies
     extras_require={
+        ###########
+        # Sources #
+        ###########
+
+        # TimestampSource
+        'timestamp': [],
+        # UserSource
+        'user': [],
+
+        ###########
+        # Sinks   #
+        ###########
+
         # PrintSink
         'print': ['pprintpp'],
         # TemplateSink

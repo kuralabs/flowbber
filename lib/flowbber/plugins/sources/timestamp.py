@@ -16,8 +16,101 @@
 # under the License.
 
 """
-Simple timestamp source.
-"""
+.. contents::
+   :local:
+
+Timestamp
+=========
+
+This source allows to collect timestamps in several formats.
+
+It is recommended to include this block on every pipeline, in particular
+because by default some database sinks may use the data provided by this source
+as the primary key (although this can be changed on those sinks).
+
+**Data collected:**
+
+.. code-block:: json
+
+    {
+        "epoch": 1502852229,
+        "epochf": 1502852229.427491,
+        "iso8601": "2017-08-15T20:57:09",
+        "strftime": "2017-08-15 20:57:09"
+    }
+
+**Dependencies:**
+
+.. code-block:: sh
+
+    pip3 install flowbber[timestamp]
+
+**Usage:**
+
+.. code-block:: json
+
+    {
+        "sources": [
+            {
+                "type": "timestamp",
+                "key": "...",
+                "config": {
+                    "epoch": true,
+                    "epochf": true,
+                    "iso8601": true,
+                    "strftime": "%Y-%m-%d %H:%M:%S"
+                }
+            }
+        ]
+    }
+
+epoch
+-----
+
+Include seconds since the EPOCH, as integer.
+
+- **Default**: ``True``
+- **Optional**: ``True``
+- **Type**: ``bool``
+- **Secret**: ``False``
+
+epochf
+------
+
+Include seconds since the EPOCH, as float.
+
+- **Default**: ``False``
+- **Optional**: ``True``
+- **Type**: ``bool``
+- **Secret**: ``False``
+
+iso8601
+-------
+
+Include current time as a ISO 8601 string using the ``seconds`` time
+specification.
+
+- **Default**: ``False``
+- **Optional**: ``True``
+- **Type**: ``bool``
+- **Secret**: ``False``
+
+strftime
+--------
+
+Include a string timestamp using a custom format supported by Python's
+strftime_ function.
+
+.. _strftime: https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior
+
+For example: ``"%Y-%m-%d %H:%M:%S"``
+
+- **Default**: ``None``
+- **Optional**: ``True``
+- **Type**: ``str``
+- **Secret**: ``False``
+
+"""  # noqa
 
 from flowbber.entities import Source
 

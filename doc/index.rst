@@ -2,6 +2,7 @@
    :hidden:
 
    developer
+   entities
    flowbber/flowbber
 
 ========
@@ -14,6 +15,13 @@ Flowbber
 
 Flowbber is a generic tool and framework that allows to execute custom
 pipelines for data gathering, publishing and analysis.
+
+Flowbber has batteries included with a set of commonly used plugins consisting
+of data sources and sinks:
+
+.. toctree::
+
+   entities
 
 
 Documentation

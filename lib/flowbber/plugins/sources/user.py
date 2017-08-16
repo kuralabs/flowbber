@@ -16,8 +16,44 @@
 # under the License.
 
 """
-Simple user info source.
-"""
+.. contents::
+   :local:
+
+User
+====
+
+This source allows to collect information about the current user.
+
+**Data collected:**
+
+.. code-block:: json
+
+    {
+        "login": "kuralabs",
+        "uid": 1000
+    }
+
+**Dependencies:**
+
+.. code-block:: sh
+
+    pip3 install flowbber[user]
+
+**Usage:**
+
+.. code-block:: json
+
+    {
+        "sources": [
+            {
+                "type": "user",
+                "key": "...",
+                "config": {}
+            }
+        ]
+    }
+
+"""  # noqa
 
 from flowbber.entities import Source
 
