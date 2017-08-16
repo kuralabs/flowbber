@@ -21,7 +21,7 @@ Setup Development Environment
 
    .. code-block:: sh
 
-      sudo apt install python3-dev build-essential cmake
+      sudo apt install python3-dev build-essential cmake graphviz
 
 #. Optionally, it is recommended to install the ``webdev`` package to run a
    development web server from a local directory:

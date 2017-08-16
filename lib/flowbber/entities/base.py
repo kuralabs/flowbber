@@ -31,10 +31,10 @@ class NamedABCMeta(ABCMeta):
     FIXME: Document.
     """
 
-    def __str__(cls):
+    def __str__(cls):  # noqa: False N805
         return cls.__name__
 
-    def __repr__(cls):
+    def __repr__(cls):  # noqa: False N805
         return str(cls)
 
 

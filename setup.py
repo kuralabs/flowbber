@@ -331,7 +331,7 @@ setup(
 
     # Optional dependencies
     extras_require={
-        # PPrintPPSink
+        # PrintSink
         'print': ['pprintpp'],
         # TemplateSink
         'template': ['jinja2'],
