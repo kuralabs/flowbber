@@ -1,24 +1,3 @@
 ujson
 colorlog
 setuptools
-
-############
-# Sources  #
-############
-
-
-############
-# Sinks    #
-############
-
-# PPrintPPSink
-pprintpp
-
-# TemplateSink
-jinja2
-
-# MongoDBSink
-pymongo
-
-# InfluxDBSink
-influxdb

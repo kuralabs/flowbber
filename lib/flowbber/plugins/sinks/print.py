@@ -16,16 +16,19 @@
 # under the License.
 
 """
-Simple pprintpp sink plugin.
+Simple print sink plugin.
+
+This module uses third party pprintpp for better pretty printing of large data
+structures.
 """
 
 from flowbber.entities import Sink
 
 
-class PPrintPPSink(Sink):
+class PrintSink(Sink):
     def distribute(self, data):
         from pprintpp import pprint
         pprint(data)
 
 
-__all__ = ['PPrintPPSink']
+__all__ = ['PrintSink']

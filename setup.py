@@ -329,6 +329,18 @@ setup(
     # Dependencies
     install_requires=find_requirements('requirements.txt'),
 
+    # Optional dependencies
+    extras_require={
+        # PPrintPPSink
+        'print': ['pprintpp'],
+        # TemplateSink
+        'template': ['jinja2'],
+        # MongoDBSink
+        'mongo': ['pymongo'],
+        # InfluxDBSink
+        'influx': ['influxdb']
+    },
+
     # Data files
     package_data={
         'flowbber': find_data(
@@ -370,7 +382,7 @@ setup(
         ],
         'flowbber_plugin_aggregators_1_0': [],
         'flowbber_plugin_sinks_1_0': [
-            'pprintpp = flowbber.plugins.sinks.pprintpp:PPrintPPSink',
+            'print = flowbber.plugins.sinks.print:PrintSink',
             'archive = flowbber.plugins.sinks.archive:ArchiveSink',
             'template = flowbber.plugins.sinks.template:TemplateSink',
             'mongo = flowbber.plugins.sinks.mongodb:MongoDBSink',
