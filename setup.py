@@ -339,6 +339,8 @@ setup(
         'timestamp': [],
         # UserSource
         'user': [],
+        # EnvSource
+        'env': [],
 
         ###########
         # Sinks   #
@@ -392,6 +394,7 @@ setup(
         'flowbber_plugin_sources_1_0': [
             'user = flowbber.plugins.sources.user:UserSource',
             'timestamp = flowbber.plugins.sources.timestamp:TimestampSource',
+            'env = flowbber.plugins.sources.env:EnvSource',
         ],
         'flowbber_plugin_aggregators_1_0': [],
         'flowbber_plugin_sinks_1_0': [

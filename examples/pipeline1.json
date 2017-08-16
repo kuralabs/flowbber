@@ -13,6 +13,28 @@
             "type": "user",
             "key": "user",
             "config": {}
+        },
+        {
+            "type": "env",
+            "key": "env",
+            "config": {
+                "include": [
+                    "LANG"
+                ],
+                "exclude": [],
+                "lowercase": false
+            }
+        },
+        {
+            "type": "env",
+            "key": "env_lower",
+            "config": {
+                "include": [
+                    "PYTHONHASHSEED"
+                ],
+                "exclude": [],
+                "lowercase": true
+            }
         }
     ],
     "aggregators": [],

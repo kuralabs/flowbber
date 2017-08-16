@@ -118,16 +118,6 @@ from flowbber.entities import Source
 class TimestampSource(Source):
 
     def declare_config(self, config):
-        """
-        FIXME: Document.
-
-        seconds since the EPOCH as integer
-        seconds since the EPOCH as float
-        ISO 8601
-        strftime format as in::
-
-            https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior
-        """
         config.add_option(
             'epoch',
             default=True,

@@ -12,3 +12,5 @@ Sources
 .. automodule:: flowbber.plugins.sources.timestamp
 
 .. automodule:: flowbber.plugins.sources.user
+
+.. automodule:: flowbber.plugins.sources.env
