@@ -335,25 +335,29 @@ setup(
         # Sources #
         ###########
 
+        # CoberturaSource
+        'cobertura': ['pycobertura'],
+        # EnvSource
+        'env': [],
         # TimestampSource
         'timestamp': [],
         # UserSource
         'user': [],
-        # EnvSource
-        'env': [],
 
         ###########
         # Sinks   #
         ###########
 
-        # PrintSink
-        'print': ['pprintpp'],
-        # TemplateSink
-        'template': ['jinja2'],
+        # ArchiveSink
+        'archive': [],
+        # InfluxDBSink
+        'influx': ['influxdb'],
         # MongoDBSink
         'mongo': ['pymongo'],
-        # InfluxDBSink
-        'influx': ['influxdb']
+        # PrintSink
+        'print': [],
+        # TemplateSink
+        'template': ['jinja2'],
     },
 
     # Data files
@@ -392,17 +396,18 @@ setup(
     # Entry points
     entry_points={
         'flowbber_plugin_sources_1_0': [
+            'cobertura = flowbber.plugins.sources.cobertura:CoberturaSource',
+            'env = flowbber.plugins.sources.env:EnvSource',
             'user = flowbber.plugins.sources.user:UserSource',
             'timestamp = flowbber.plugins.sources.timestamp:TimestampSource',
-            'env = flowbber.plugins.sources.env:EnvSource',
         ],
         'flowbber_plugin_aggregators_1_0': [],
         'flowbber_plugin_sinks_1_0': [
-            'print = flowbber.plugins.sinks.print:PrintSink',
             'archive = flowbber.plugins.sinks.archive:ArchiveSink',
-            'template = flowbber.plugins.sinks.template:TemplateSink',
-            'mongo = flowbber.plugins.sinks.mongodb:MongoDBSink',
             'influx = flowbber.plugins.sinks.influxdb:InfluxDBSink',
+            'mongo = flowbber.plugins.sinks.mongodb:MongoDBSink',
+            'print = flowbber.plugins.sinks.print:PrintSink',
+            'template = flowbber.plugins.sinks.template:TemplateSink',
         ]
     },
 

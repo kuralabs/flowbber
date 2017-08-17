@@ -16,8 +16,6 @@
 # under the License.
 
 """
-.. contents::
-   :local:
 
 Timestamp
 =========

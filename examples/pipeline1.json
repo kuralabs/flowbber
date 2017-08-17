@@ -35,6 +35,13 @@
                 "exclude": [],
                 "lowercase": true
             }
+        },
+        {
+            "type": "cobertura",
+            "key": "coverage",
+            "config": {
+                "xmlpath": "coverage.xml"
+            }
         }
     ],
     "aggregators": [],
