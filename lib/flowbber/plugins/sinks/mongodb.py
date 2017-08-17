@@ -27,6 +27,26 @@ from flowbber.entities import Sink
 log = getLogger(__name__)
 
 
+def mongodb_safe(data, dotreplace, dolarreplace):
+
+    def safe_key(key):
+        if key.startswith('$'):
+            key = key.replace('$', dolarreplace, 1)
+
+        return key.replace('.', dotreplace)
+
+    def safe_value(value):
+        if not isinstance(value, dict):
+            return value
+
+        return {
+            safe_key(k): safe_value(v)
+            for k, v in value.items()
+        }
+
+    return safe_value(data)
+
+
 class MongoDBSink(Sink):
     def declare_config(self, config):
         """
@@ -96,6 +116,20 @@ class MongoDBSink(Sink):
             type=lambda opt: None if opt is None else str(opt),
         )
 
+        config.add_option(
+            'dotreplace',
+            default=':',
+            optional=True,
+            type=str,
+        )
+
+        config.add_option(
+            'dolarreplace',
+            default='&',
+            optional=True,
+            type=str,
+        )
+
         # Check if uri is defined and if so then delete other keys
         def custom_validator(validated):
             if validated['uri'] is not None:
@@ -144,6 +178,15 @@ class MongoDBSink(Sink):
         database = client[self.config.database.value]
         collection = database[self.config.collection.value]
 
+        # Transform data
+        log.info('Converting data to be safe for MongoDB')
+        data = mongodb_safe(
+            data,
+            self.config.dotreplace.value,
+            self.config.dolarreplace.value,
+        )
+
+        # Set key if available
         if key is not None:
             log.info('Using key {} = {}'.format(self.config.key.value, key))
             data['_id'] = key
