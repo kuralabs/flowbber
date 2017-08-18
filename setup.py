@@ -404,8 +404,8 @@ setup(
         'flowbber_plugin_aggregators_1_0': [],
         'flowbber_plugin_sinks_1_0': [
             'archive = flowbber.plugins.sinks.archive:ArchiveSink',
-            'influx = flowbber.plugins.sinks.influxdb:InfluxDBSink',
-            'mongo = flowbber.plugins.sinks.mongodb:MongoDBSink',
+            'influxdb = flowbber.plugins.sinks.influxdb:InfluxDBSink',
+            'mongodb = flowbber.plugins.sinks.mongodb:MongoDBSink',
             'print = flowbber.plugins.sinks.print:PrintSink',
             'template = flowbber.plugins.sinks.template:TemplateSink',
         ]

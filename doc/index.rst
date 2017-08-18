@@ -1,10 +1,3 @@
-.. toctree::
-   :hidden:
-
-   developer
-   entities
-   flowbber/flowbber
-
 ========
 Flowbber
 ========
@@ -19,22 +12,26 @@ pipelines for data gathering, publishing and analysis.
 Flowbber has batteries included with a set of commonly used plugins consisting
 of data sources and sinks:
 
+
+Plugins
+=======
+
 .. toctree::
+   :maxdepth: 2
 
-   entities
-
-
-Documentation
-=============
-
-- :doc:`Developer Guide. <developer>`
-- :doc:`Internal Documentation Reference. <flowbber/flowbber>`
+   sources
+   sinks
 
 
 Development
 ===========
 
-- `Project repository. <https://github.com/kuralabs/flowbber>`_
+.. toctree::
+   :maxdepth: 2
+
+   developer
+   Reference Documentation <flowbber/flowbber>
+   Project repository <https://github.com/kuralabs/flowbber>
 
 
 License

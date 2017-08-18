@@ -54,8 +54,8 @@
             "type": "archive",
             "config": {
                 "output": "data.json",
-                "create_parents": true,
-                "override": true
+                "override": true,
+                "create_parents": true
             }
         },
         {
@@ -68,7 +68,7 @@
             }
         },
         {
-            "type": "mongo",
+            "type": "mongodb",
             "config": {
                 "uri": "mongodb://localhost:27017/",
                 "database": "flowbber",
@@ -76,7 +76,7 @@
             }
         },
         {
-            "type": "influx",
+            "type": "influxdb",
             "config": {
                 "uri": "influxdb://localhost:8086/",
                 "database": "flowbber"

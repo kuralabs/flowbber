@@ -16,7 +16,13 @@
 # under the License.
 
 """
+
+Template
+========
+
 Simple Jinja2 template rendering sink plugin.
+
+FIXME: Document.
 """
 
 from pathlib import Path

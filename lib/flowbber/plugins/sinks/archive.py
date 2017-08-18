@@ -16,8 +16,66 @@
 # under the License.
 
 """
-Simple file archiver sink plugin.
-"""
+
+Archive
+=======
+
+This sink writes all collected data to a JSON file.
+
+**Dependencies:**
+
+.. code-block:: sh
+
+    pip3 install flowbber[archive]
+
+**Usage:**
+
+.. code-block:: json
+
+    {
+        "sinks": [
+            {
+                "type": "archive",
+                "config": {
+                    "output": "data.json",
+                    "override": true,
+                    "create_parents": true
+                }
+            }
+        ]
+    }
+
+output
+------
+
+Path to JSON file to write the collected data.
+
+- **Default**: ``N/A``
+- **Optional**: ``False``
+- **Type**: ``str``
+- **Secret**: ``False``
+
+override
+--------
+
+Override output file if already exists.
+
+- **Default**: ``False``
+- **Optional**: ``True``
+- **Type**: ``bool``
+- **Secret**: ``False``
+
+create_parents
+--------------
+
+Create output file parent directories if don't exist.
+
+- **Default**: ``False``
+- **Optional**: ``True``
+- **Type**: ``bool``
+- **Secret**: ``False``
+
+"""  # noqa
 
 from pathlib import Path
 from logging import getLogger
@@ -30,9 +88,7 @@ log = getLogger(__name__)
 
 class ArchiveSink(Sink):
     def declare_config(self, config):
-        """
-        FIXME: Document.
-        """
+
         config.add_option(
             'output',
             type=str
@@ -52,11 +108,28 @@ class ArchiveSink(Sink):
             type=bool
         )
 
+        def custom_validator(validated):
+            outfile = Path(validated['output'])
+
+            # Check if file exists
+            if outfile.is_file() and not validated['override']:
+                raise FileExistsError(
+                    'File {} already exists'.format(outfile)
+                )
+
+            # Check archiving directory exists
+            if not validated['create_parents'] and not outfile.parent.is_dir():
+                raise FileNotFoundError(
+                    'No such directory {}'.format(outfile.parent)
+                )
+
+        config.add_validator(custom_validator)
+
     def distribute(self, data):
         from ujson import dumps
         outfile = Path(self.config.output.value)
 
-        # Check if file exists
+        # Re-check no file exists, in case it was created during execution
         if outfile.is_file() and not self.config.override.value:
             raise FileExistsError(
                 'File {} already exists'.format(outfile)

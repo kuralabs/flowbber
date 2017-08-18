@@ -92,6 +92,16 @@ files can be generated for several programming languages, including:
         ]
     }
 
+xmlpath
+-------
+
+Path to the Cobertura ``coverage.xml`` file to be parsed.
+
+- **Default**: ``N/A``
+- **Optional**: ``False``
+- **Type**: ``str``
+- **Secret**: ``False``
+
 """  # noqa
 
 from pathlib import Path

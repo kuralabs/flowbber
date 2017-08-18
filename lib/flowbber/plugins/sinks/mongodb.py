@@ -16,7 +16,13 @@
 # under the License.
 
 """
+
+MongoDB
+=======
+
 Simple MongoDB storage sink plugin.
+
+FIXME: Document.
 """
 
 from logging import getLogger

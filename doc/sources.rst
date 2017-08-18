@@ -1,17 +1,12 @@
 .. toctree::
 
-================
-Official Plugins
-================
-
-This plugins (sources, aggregators and sinks) are included as part of Flowbber.
-
-.. contents:: Table of Contents
-   :local:
-   :depth: 1
-
+=======
 Sources
 =======
+
+Sources are plugins that allow to collect data from different origins.
+
+The following sources plugins are included as part of Flowbber.
 
 .. contents::
    :local:

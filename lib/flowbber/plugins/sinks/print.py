@@ -16,10 +16,16 @@
 # under the License.
 
 """
+
+Print
+=====
+
 Simple print sink plugin.
 
 This module uses third party pprintpp for better pretty printing of large data
 structures.
+
+FIXME: Document.
 """
 
 from flowbber.entities import Sink

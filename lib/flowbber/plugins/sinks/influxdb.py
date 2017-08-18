@@ -16,8 +16,292 @@
 # under the License.
 
 """
-Simple InfluxDB storage sink plugin.
-"""
+
+InfluxDB
+========
+
+This sink writes all collected data to a InfluxDB_ time series database.
+
+.. _InfluxDB: https://www.influxdata.com/time-series-platform/influxdb/
+
+In order to be able to track in time the complex data collected by the sources
+this sink requires to "flatten" the data first. The process will transform an
+arbitrarily deep dictionary tree into a fixed depth dictionary that maps the
+keys of the sources with the measurements they performed.
+
+To accomplish this, the flattening process will:
+
+- Join all dictionaries keys (using the ``keysjoiner`` character) until a leaf
+  value that has a datatype supported by InfluxDB (string, float, integer, or
+  boolean) is found.
+
+- Lists are converted to a dictionary that maps the index of the element
+  with the element previous to the flattening.
+
+So, for example, consider the data collected by the ``Cobertura`` source:
+
+.. code-block:: python
+
+    {
+        'coverage': {
+            'files': {
+                '__init__.py': {
+                    'line_rate': 1.0,
+                    'total_misses': 0,
+                    'total_statements': 10,
+                },
+                '__main__.py': {
+                    'line_rate': 0.5,
+                    'total_misses': 5,
+                    'total_statements': 10,
+                },
+                # ...
+            },
+            'total': {
+                'line_rate': 0.75,
+                'total_misses': 5,
+                'total_statements': 20,
+            }
+        }
+    }
+
+The above structure will be transformed into:
+
+.. code-block:: python
+
+    {
+        'coverage': {
+            'files.__init__:py.line_rate': 1.0,
+            'files.__init__:py.total_misses': 0,
+            'files.__init__:py.total_statements': 10,
+            'files.__main__:py.line_rate': 0.5,
+            'files.__main__:py.total_misses': 5,
+            'files.__main__:py.total_statements': 10,
+            # ...
+            'total.line_rate': 0.75,
+            'total.total_misses': 5,
+            'total.total_statements': 20,
+        }
+    }
+
+.. important::
+
+    Please note the ``.`` in the file name was changed to ``:`` before joining
+    the keys. This replacement and joining is controlled by the
+    ``keysjoinerreplace`` and ``keysjoiner`` options.
+
+    Also note that the leaf keys must map to a value that can be used as field
+    value in InfluxDB (string, float, integer, or boolean), if not, the
+    flattening will fail.
+
+Or in case of lists:
+
+.. code-block:: python
+
+    {
+        'key1': ['a', 'b', 'c'],
+        'key2': [
+            {'a': 1},
+            {'b': 2},
+            {'c': 3},
+        ]
+    }
+
+The flattening results in:
+
+.. code-block:: python
+
+    {
+        'key.0' : 'a',
+        'key.1' : 'b',
+        'key.2' : 'c',
+        'key.0.a' : 1,
+        'key.1.b' : 2,
+        'key.2.c' : 3,
+    }
+
+You may run this sink with ``DEBUG`` verbosity (``-vvv``) to analyze all
+transformations performed.
+
+**Dependencies:**
+
+.. code-block:: sh
+
+    pip3 install flowbber[influxdb]
+
+**Usage:**
+
+.. code-block:: json
+
+    {
+        "sinks": [
+            {
+                "type": "influxdb",
+                "config": {
+                    "uri": "influxdb://localhost:8086/",
+                    "database": "flowbber",
+                    "key": "timestamp.iso8601"
+                }
+            }
+        ]
+    }
+
+uri
+---
+
+URI to connect to InfluxDB.
+
+If this is set, options ``host``, ``port``, ``username``, ``password`` and
+``ssl`` will be ignored.
+
+URI is in the form:
+
+.. code-block:: text
+
+    influxdb://username:password@localhost:8086/
+
+Supported schemes are ``influxdb``, ``https+influxdb`` and ``udp+influxdb``.
+
+Check function from_DSN_ for more information.
+
+.. _from_DSN: http://influxdb-python.readthedocs.io/en/latest/api-documentation.html#influxdb.InfluxDBClient.from_DSN
+
+- **Default**: ``None``
+- **Optional**: ``True``
+- **Type**: ``str``
+- **Secret**: ``False``
+
+host
+----
+
+Hostname or IP to connect to InfluxDB.
+
+- **Default**: ``localhost``
+- **Optional**: ``True``
+- **Type**: ``str``
+- **Secret**: ``False``
+
+port
+----
+
+Port to connect to InfluxDB.
+
+- **Default**: ``8086``
+- **Optional**: ``True``
+- **Type**: ``int``
+- **Secret**: ``False``
+
+username
+--------
+
+User to connect to InfluxDB.
+
+- **Default**: ``root``
+- **Optional**: ``True``
+- **Type**: ``str``
+- **Secret**: ``False``
+
+password
+--------
+
+Password of the user.
+
+- **Default**: ``root``
+- **Optional**: ``True``
+- **Type**: ``str``
+- **Secret**: ``True``
+
+ssl
+---
+
+Use https instead of http to connect to InfluxDB.
+
+- **Default**: ``False``
+- **Optional**: ``True``
+- **Type**: ``bool``
+- **Secret**: ``False``
+
+verify_ssl
+----------
+
+Verify SSL certificates for HTTPS requests.
+
+- **Default**: ``False``
+- **Optional**: ``True``
+- **Type**: ``bool``
+- **Secret**: ``False``
+
+database
+--------
+
+Database name to connect to.
+
+- **Default**: ``N/A``
+- **Optional**: ``False``
+- **Type**: ``str``
+- **Secret**: ``False``
+
+key
+---
+
+Path to a value in the collected data that will be used as key timestamp when
+submitting the flattened data to the database.
+
+The default is ``timestamp.iso8601`` which assumes that your pipeline had
+collected the timestamp in that format using the included ``timestamp`` source.
+
+Specify the path to the value by joining keys path with a ``.`` (dot).
+
+For example given the following structure:
+
+.. code-block:: python
+
+    {
+        'my_key': {
+            'a_sub_key': {
+                'yet_another': 123123123
+            }
+        }
+    }
+
+The corresponding path to use the value ``123123123`` as timestamp is
+``my_key.a_sub_key.yet_another``.
+
+This option is nullable, and if null is provided, the timestamp will be
+determined when submitting the data by calling Python's
+``datetime.now().isoformat()``.
+
+- **Default**: ``timestamp.iso8601``
+- **Optional**: ``True``
+- **Type**: ``nullable(str)``
+- **Secret**: ``False``
+
+keysjoiner
+----------
+
+Character used to join the keys when flattening the collected data (see data
+flattening process above).
+
+- **Default**: ``.``
+- **Optional**: ``True``
+- **Type**: ``str``
+- **Secret**: ``False``
+
+keysjoinerreplace
+-----------------
+
+Character used to replace occurrences of the ``keysjoiner`` character in the
+keys of the collected data previous to flatten it.
+
+This option is nullable, and if null is provided, no character replacement to
+the keys will be done.
+
+- **Default**: ``:``
+- **Optional**: ``True``
+- **Type**: ``nullable(str)``
+- **Secret**: ``False``
+
+"""  # noqa
 
 from logging import getLogger
 from datetime import datetime
@@ -32,6 +316,15 @@ log = getLogger(__name__)
 
 def transform_to_flat(data, keysjoiner, keysjoinerreplace):
     """
+    Flatten the collected data to prepare it for submission to the database.
+
+    The general process is as follow:
+
+    - Join all dictionaries keys in an arbitrarily deep dictionary tree until
+      a leaf value (that has a datatype supported by InfluxDB) is found.
+
+    - Lists are converted to a dictionary that maps the index of the element
+      with the element previous to the flattening.
     """
     influxdb_supported = (str, int, float, bool)
 
@@ -81,10 +374,9 @@ def transform_to_flat(data, keysjoiner, keysjoinerreplace):
 
 def transform_to_points(timestamp, flat):
     """
-    FIXME: Document.
-    FIXME: Transform deeper collected values into flat structure.
+    Transform a dictionary of flattened collected data into a list of points.
 
-    A point is in the form::
+    A Point is a concrete data structure that InfluxDB understand::
 
         {
             "measurement": "cpu_load_short",
@@ -124,7 +416,7 @@ class InfluxDBSink(Sink):
             'uri',
             default=None,
             optional=True,
-            type=str,
+            type=lambda opt: None if opt is None else str(opt),
             secret=True,
         )
 
@@ -205,6 +497,7 @@ class InfluxDBSink(Sink):
                 del validated['port']
                 del validated['username']
                 del validated['password']
+                del validated['ssl']
             else:
                 del validated['uri']
 
@@ -239,7 +532,6 @@ class InfluxDBSink(Sink):
             client = InfluxDBClient.from_DSN(
                 self.config.uri.value,
                 database=self.config.database.value,
-                ssl=self.config.ssl.value,
                 verify_ssl=self.config.verify_ssl.value,
             )
 
