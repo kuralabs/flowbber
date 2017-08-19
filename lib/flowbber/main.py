@@ -23,6 +23,7 @@ from ujson import loads
 from logging import getLogger
 
 from .pipeline import Pipeline
+from .local import load_flowconf
 
 
 log = getLogger(__name__)
@@ -39,6 +40,8 @@ def main(args):
     :rtype: int
     """
     pipeline_definition = loads(args.pipeline.read_text(encoding='utf-8'))
+
+    load_flowconf(args.pipeline.parent)
 
     pipeline = Pipeline(pipeline_definition)
     pipeline.run()

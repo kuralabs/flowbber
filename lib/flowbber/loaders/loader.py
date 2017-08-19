@@ -46,20 +46,62 @@ class PluginLoader(object):
     :param str api_version: Version of the API.
     """
 
-    def __init__(self, entity, base_class, api_version='1.0'):
+    _base_class = None
+    _locally_registered = None
+
+    def __init__(self, entity, api_version='1.0'):
         super().__init__()
 
         self.entrypoint = 'flowbber_plugin_{entity}_{api_version}'.format(
             entity=entity, api_version=api_version.replace('.', '_')
         )
 
-        self.base_class = base_class
-        assert issubclass(self.base_class, BaseEntity)
+        assert issubclass(self.__class__._base_class, BaseEntity)
 
         self._plugins_cache = OrderedDict()
 
     def __call__(self, cache=True):
         return self.load_plugins(cache=cache)
+
+    @classmethod
+    def register(cls, key):
+        """
+        Register a plugin locally.
+
+        This method is expected to be used as a decorator. It allows to
+        register a plugin locally without having to create a full Python
+        package to use entrypoints.
+
+        Usage:
+
+        ::
+
+            from flowbber.loaders import source
+            from flowbber.entities.source import Source
+
+            @source.register('my_source')
+            class MySource(Source):
+                def collect(self):
+                    return {'my_value': 1000}
+
+        Same apply for aggregators and sinks.
+        """
+
+        def decorator(plugin):
+            if not all((
+                isclass(plugin),
+                issubclass(plugin, cls._base_class)
+            )):
+                raise ValueError(
+                    'Plugin {} not a subclass of {}.'.format(
+                        key, cls._base_class.__name__
+                    )
+                )
+
+            cls._locally_registered[key] = plugin
+            return plugin
+
+        return decorator
 
     def load_plugins(self, cache=True):
         """
@@ -101,18 +143,27 @@ class PluginLoader(object):
                 )
                 continue
 
-            if not isclass(plugin) or not issubclass(plugin, self.base_class):
+            if not all((
+                isclass(plugin),
+                issubclass(plugin, self.__class__._base_class)
+            )):
                 log.error(
                     'Ignoring plugin "{}" as it doesn\'t '
                     'match the required interface: '
                     'Plugin not a subclass of {}.'.format(
-                        name, self.base_class.__name__
+                        name, self.__class__._base_class.__name__
                     )
                 )
                 continue
 
             available[name] = plugin
 
+        # Load locally registered
+        available.update(
+            self.__class__._locally_registered
+        )
+
+        # Save cache and return
         self._plugins_cache = available
         return copy(self._plugins_cache)
 

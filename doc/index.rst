@@ -4,17 +4,16 @@ Flowbber
 
 .. container:: float-right
 
-   .. image:: _static/images/logo.png
+   .. image:: _static/images/flowbber.svg
 
-Flowbber is a generic tool and framework that allows to execute custom
-pipelines for data gathering, publishing and analysis.
-
-Flowbber has batteries included with a set of commonly used plugins consisting
-of data sources and sinks:
+Flowbber provides a tool and framework that allows to create and execute
+custom pipelines for data collection, analysis and publishing.
 
 
 Plugins
 =======
+
+Flowbber has batteries included with a set of commonly used plugins:
 
 .. toctree::
    :maxdepth: 2
@@ -31,7 +30,7 @@ Development
 
    developer
    Reference Documentation <flowbber/flowbber>
-   Project repository <https://github.com/kuralabs/flowbber>
+   Source Code <https://github.com/kuralabs/flowbber>
 
 
 License

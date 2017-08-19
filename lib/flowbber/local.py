@@ -16,34 +16,33 @@
 # under the License.
 
 """
-Module implementating Source base class.
-
-All custom Flowbber sources must extend from the Source class.
+Module implementing the load of local flowconf.py files.
 """
 
+from sys import path
 from logging import getLogger
-from collections import OrderedDict
-
-from ..entities import Source
-from .loader import PluginLoader
 
 
 log = getLogger(__name__)
 
 
-class SourcesLoader(PluginLoader):
+def load_flowconf(pipeline_path):
     """
-    Sources plugins loader class.
+    Try to load local pipeline configuration flowconf.py from given directory.
+
+    :param Path pipeline_path: Path to the parent directory of the pipeline to
+     load local configuration from.
     """
+    flowconf = pipeline_path / 'flowconf.py'
 
-    _base_class = Source
-    _locally_registered = OrderedDict()
+    if not flowconf.is_file():
+        log.debug('No local flowconf.py found.')
+        return
 
-    def __init__(self):
-        super().__init__('sources')
+    path.insert(0, str(pipeline_path.resolve()))
+    import flowconf
+
+    log.info('Pipeline\'s flowconf.py loaded successfully.')
 
 
-register = SourcesLoader.register
-
-
-__all__ = ['SourcesLoader', 'register']
+__all__ = ['load_flowconf']

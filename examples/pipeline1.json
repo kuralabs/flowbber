@@ -10,6 +10,11 @@
             }
         },
         {
+            "type": "my_source",
+            "key": "my_source",
+            "config": {}
+        },
+        {
             "type": "user",
             "key": "user",
             "config": {}
