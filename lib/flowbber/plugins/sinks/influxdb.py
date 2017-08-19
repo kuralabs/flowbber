@@ -168,8 +168,8 @@ Check function from_DSN_ for more information.
 
 - **Default**: ``None``
 - **Optional**: ``True``
-- **Type**: ``str``
-- **Secret**: ``False``
+- **Type**: ``nullable(str)``
+- **Secret**: ``True``
 
 host
 ----
@@ -259,13 +259,13 @@ For example given the following structure:
     {
         'my_key': {
             'a_sub_key': {
-                'yet_another': 123123123
+                'yet_another': '2017-08-19T01:26:35.683529'
             }
         }
     }
 
-The corresponding path to use the value ``123123123`` as timestamp is
-``my_key.a_sub_key.yet_another``.
+The corresponding path to use the value ``2017-08-19T01:26:35.683529`` as
+timestamp is ``my_key.a_sub_key.yet_another``.
 
 This option is nullable, and if null is provided, the timestamp will be
 determined when submitting the data by calling Python's
@@ -309,6 +309,7 @@ from datetime import datetime
 from pprintpp import pformat
 
 from flowbber.entities import Sink
+from flowbber.types import nullable
 
 
 log = getLogger(__name__)
@@ -416,7 +417,7 @@ class InfluxDBSink(Sink):
             'uri',
             default=None,
             optional=True,
-            type=lambda opt: None if opt is None else str(opt),
+            type=nullable(str),
             secret=True,
         )
 
@@ -473,7 +474,7 @@ class InfluxDBSink(Sink):
             'key',
             default='timestamp.iso8601',
             optional=True,
-            type=lambda opt: None if opt is None else str(opt),
+            type=nullable(str),
         )
 
         config.add_option(
@@ -487,7 +488,7 @@ class InfluxDBSink(Sink):
             'keysjoinerreplace',
             default=':',
             optional=True,
-            type=lambda opt: None if opt is None else str(opt),
+            type=nullable(str),
         )
 
         # Check if uri is defined and if so then delete other keys
