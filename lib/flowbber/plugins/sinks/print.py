@@ -49,12 +49,13 @@ large data structures.
 """
 
 from flowbber.entities import Sink
+from flowbber.logging import print
 
 
 class PrintSink(Sink):
     def distribute(self, data):
-        from pprintpp import pprint
-        pprint(data)
+        from pprintpp import pformat
+        print(pformat(data))
 
 
 __all__ = ['PrintSink']

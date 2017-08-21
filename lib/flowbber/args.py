@@ -23,24 +23,11 @@ import logging
 
 from pathlib import Path
 
-from colorlog import ColoredFormatter
-
 from . import __version__
+from .logging import setup_logging
 
 
 log = logging.getLogger(__name__)
-
-
-FORMAT = (
-    '  %(log_color)s%(levelname)-8s%(reset)s | '
-    '%(log_color)s%(message)s%(reset)s'
-)
-V_LEVELS = {
-    0: logging.ERROR,
-    1: logging.WARNING,
-    2: logging.INFO,
-    3: logging.DEBUG,
-}
 
 
 def validate_args(args):
@@ -53,12 +40,7 @@ def validate_args(args):
     :return: The validated namespace.
     :rtype: :py:class:`argparse.Namespace`
     """
-    stream = logging.StreamHandler()
-    stream.setFormatter(ColoredFormatter(FORMAT))
-
-    level = V_LEVELS.get(args.verbose, logging.DEBUG)
-    logging.basicConfig(handlers=[stream], level=level)
-
+    setup_logging(args.verbose)
     log.debug('Raw arguments:\n{}'.format(args))
 
     # Check if pipeline file exists

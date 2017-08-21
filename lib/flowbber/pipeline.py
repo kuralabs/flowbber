@@ -117,8 +117,8 @@ class Pipeline:
                     entity_name, instance
                 ))
 
-            log.debug('Pipeline {}s created {}'.format(
-                entity_name, destination
+            log.debug('Pipeline {}s created : {}'.format(
+                entity_name, len(destination)
             ))
 
             setattr(self, '_{}s'.format(entity_name), destination)
