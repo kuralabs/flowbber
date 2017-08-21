@@ -19,8 +19,10 @@
 Application entry point module.
 """
 
-from ujson import loads
+from os import getpid
 from logging import getLogger
+
+from ujson import loads
 
 from .pipeline import Pipeline
 from .local import load_flowconf
@@ -39,10 +41,19 @@ def main(args):
     :return: Exit code.
     :rtype: int
     """
+    log.info(
+        'flowbber PID {} starting for {} ...'.format(
+            getpid(),
+            str(args.pipeline),
+        )
+    )
+
     pipeline_definition = loads(args.pipeline.read_text(encoding='utf-8'))
 
+    log.info('Loading local configuration ...'.format(getpid()))
     load_flowconf(args.pipeline.parent)
 
+    log.info('Creating pipeline ...'.format(getpid()))
     pipeline = Pipeline(pipeline_definition)
     pipeline.run()
 

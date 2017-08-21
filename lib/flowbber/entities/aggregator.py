@@ -21,19 +21,32 @@ Module implementating Aggregator base class.
 All custom Flowbber aggregators must extend from the Aggregator class.
 """
 
+from time import time
 from abc import abstractmethod
+
+from setproctitle import setproctitle
 
 from .base import BaseEntity
 
 
 class Aggregator(BaseEntity):
-    def __init__(self, type_, key, config):
-        super().__init__(type_, config)
+    def __init__(self, index, type_, key, config):
+        super().__init__(index, type_, config)
         self._key = key
 
     @property
     def key(self):
         return self._key
+
+    def execute(self, data):
+        setproctitle(str(self))
+
+        start = time()
+
+        try:
+            self.accumulate(data)
+        finally:
+            self.duration = time() - start
 
     @abstractmethod
     def accumulate(self, data):

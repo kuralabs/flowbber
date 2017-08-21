@@ -21,8 +21,12 @@ flowbber executable module entry point.
 
 from sys import exit
 
+from setproctitle import setproctitle
+
 
 def run():
+    setproctitle('flowbber')
+
     # Parse arguments
     from .args import parse_args
     args = parse_args()

@@ -44,7 +44,8 @@ class BaseEntity(metaclass=NamedABCMeta):
     """
 
     @abstractmethod
-    def __init__(self, type_, config):
+    def __init__(self, index, type_, config):
+        self._index = index
         self._type_ = type_
 
         configurator = Configurator()
@@ -55,7 +56,8 @@ class BaseEntity(metaclass=NamedABCMeta):
         pass
 
     def __str__(self):
-        return '{}.{}'.format(
+        return '#{} {}.{}'.format(
+            self._index,
             self.__class__.__name__,
             self._type_
         )

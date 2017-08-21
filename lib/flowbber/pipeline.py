@@ -20,10 +20,15 @@ Base class for Flowbber pipeline.
 
 """
 
-from copy import deepcopy
+from os import getpid
+from pathlib import Path
 from logging import getLogger
 from collections import OrderedDict
 from multiprocessing import Process
+from tempfile import NamedTemporaryFile, gettempdir
+
+from ujson import dumps
+from setproctitle import setproctitle
 
 from .loaders import SourcesLoader, AggregatorsLoader, SinksLoader
 
@@ -42,7 +47,10 @@ class Pipeline:
         self._pipeline = pipeline
         self._data = OrderedDict()
 
+        log.info('Loading plugins ...')
         self._load_plugins()
+
+        log.info('Building pipeline ...')
         self._build_pipeline()
 
     def _load_plugins(self):
@@ -90,8 +98,9 @@ class Pipeline:
             destination = []
 
             available = getattr(self, '_{}s_available'.format(entity_name))
+            defined = self._pipeline['{}s'.format(entity_name)]
 
-            for entity in self._pipeline['{}s'.format(entity_name)]:
+            for index, entity in enumerate(defined):
                 entity_type = entity['type']
 
                 if entity_type not in available:
@@ -100,7 +109,7 @@ class Pipeline:
                     ))
 
                 clss = available[entity_type]
-                instance = clss(*arg_unpacker(entity))
+                instance = clss(index, *arg_unpacker(entity))
 
                 destination.append(instance)
 
@@ -118,6 +127,7 @@ class Pipeline:
         """
         FIXME: Document.
         """
+        log.info('Running pipeline ...')
 
         journal = OrderedDict((
             ('sources', []),
@@ -125,9 +135,32 @@ class Pipeline:
             ('sinks', []),
         ))
 
+        setproctitle('flowbber - running sources')
+        log.info('Running sources ...')
         self._run_sources(journal['sources'])
+
+        setproctitle('flowbber - running aggregators')
+        log.info('Running aggregators ...')
         self._run_aggregators(journal['aggregators'])
+
+        setproctitle('flowbber - running sinks')
+        log.info('Running sinks ...')
         self._run_sinks(journal['sinks'])
+
+        setproctitle('flowbber - saving journal')
+        log.info('Saving journal ...')
+        journal_dir = Path(gettempdir()) / 'flowbber-journals'
+        journal_dir.mkdir(parents=True, exist_ok=True)
+
+        with NamedTemporaryFile(
+            mode='wt',
+            encoding='utf-8',
+            prefix='journal-{}-'.format(getpid()),
+            dir=str(journal_dir),
+            delete=False
+        ) as jfd:
+            jfd.write(dumps(journal, indent=4))
+        log.info('Journal saved to {}'.format(jfd.name))
 
     def _run_sources(self, journal):
         """
@@ -135,11 +168,18 @@ class Pipeline:
         """
 
         sources_processes = [
-            (Process(target=source.execute), source)
-            for source in self._sources
+            (
+                index,
+                source,
+                Process(
+                    target=source.execute,
+                    name=str(source),
+                ),
+            )
+            for index, source in enumerate(self._sources)
         ]
 
-        for index, (process, source) in enumerate(sources_processes):
+        for index, source, process in sources_processes:
             log.info(
                 'Starting source #{} of type {}'.format(
                     index, source
@@ -147,7 +187,7 @@ class Pipeline:
             )
             process.start()
 
-        for index, (process, source) in enumerate(sources_processes):
+        for index, source, process in sources_processes:
             log.info(
                 'Collecting {} data from source #{} of type {}'.format(
                     source.key, index, source
@@ -156,10 +196,12 @@ class Pipeline:
             result = source.result.get()
             self._data.update(result)
 
-        for index, (process, source) in enumerate(sources_processes):
+        for index, source, process in sources_processes:
             process.join()
 
             journal_entry = {
+                'index': index,
+                'id': str(source),
                 'key': source.key,
                 'pid': process.pid,
                 'exitcode': process.exitcode,
@@ -191,21 +233,74 @@ class Pipeline:
         """
 
         for index, aggregator in enumerate(self._aggregators):
+
             log.info('Executing data aggregator #{} of type {}'.format(
                 index, aggregator
             ))
             aggregator.accumulate(self._data)
+
+            journal_entry = {
+                'index': index,
+                'id': str(aggregator),
+                'duration': aggregator.duration,
+            }
+            journal.append(journal_entry)
 
     def _run_sinks(self, journal):
         """
         FIXME: Document.
         """
 
-        for index, sink in enumerate(self._sinks):
-            log.info('Executing data sink #{} of type {}'.format(
-                index, sink
+        sink_processes = [
+            (
+                index,
+                sink,
+                Process(
+                    target=sink.execute,
+                    args=(self._data, ),
+                    name=str(sink),
+                ),
+            )
+            for index, sink in enumerate(self._sinks)
+        ]
+
+        for index, sink, process in sink_processes:
+            log.info(
+                'Executing data sink #{} of type {}'.format(
+                    index, sink
+                )
+            )
+            process.start()
+
+        for index, sink, process in sink_processes:
+            process.join()
+
+            journal_entry = {
+                'index': index,
+                'id': str(sink),
+                'pid': process.pid,
+                'exitcode': process.exitcode,
+                'duration': sink.duration.get(),
+            }
+            journal.append(journal_entry)
+
+            log.debug('Process {} exited with {}'.format(
+                process.pid, process.exitcode
             ))
-            sink.distribute(deepcopy(self._data))
+            if process.exitcode != 0:
+                raise RuntimeError(
+                    'Process PID {pid} for sink #{index} of type {sink} '
+                    'crashed with exit code {exitcode}'.format(
+                        index=index, sink=sink, **journal_entry
+                    )
+                )
+
+            log.info(
+                'Sink {sink} finished successfully after '
+                '{duration:.4f} seconds'.format(
+                    sink=sink, **journal_entry
+                )
+            )
 
 
 __all__ = ['Pipeline']

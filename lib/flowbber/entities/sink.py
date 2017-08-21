@@ -21,14 +21,30 @@ Module implementating Sink base class.
 All custom Flowbber sinks must extend from the Sink class.
 """
 
+from time import time
 from abc import abstractmethod
+from multiprocessing import Queue
+
+from setproctitle import setproctitle
 
 from .base import BaseEntity
 
 
 class Sink(BaseEntity):
-    def __init__(self, type_, config):
-        super().__init__(type_, config)
+    def __init__(self, index, type_, config):
+        super().__init__(index, type_, config)
+
+        self.duration = Queue(maxsize=1)
+
+    def execute(self, data):
+        setproctitle(str(self))
+
+        start = time()
+
+        try:
+            self.distribute(data)
+        finally:
+            self.duration.put(time() - start)
 
     @abstractmethod
     def distribute(self, data):

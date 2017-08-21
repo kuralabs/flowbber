@@ -22,19 +22,17 @@ All custom Flowbber sources must extend from the Source class.
 """
 
 from time import time
-from logging import getLogger
 from abc import abstractmethod
 from multiprocessing import Queue
+
+from setproctitle import setproctitle
 
 from .base import BaseEntity
 
 
-log = getLogger(__name__)
-
-
 class Source(BaseEntity):
-    def __init__(self, type_, key, config):
-        super().__init__(type_, config)
+    def __init__(self, index, type_, key, config):
+        super().__init__(index, type_, config)
         self._key = key
 
         self.result = Queue(maxsize=1)
@@ -45,6 +43,8 @@ class Source(BaseEntity):
         return self._key
 
     def execute(self):
+        setproctitle(str(self))
+
         start = time()
         entry = {}
 
@@ -57,6 +57,14 @@ class Source(BaseEntity):
     @abstractmethod
     def collect(self):
         pass
+
+    def __str__(self):
+        return '#{} {}.{}.{}'.format(
+            self._index,
+            self.__class__.__name__,
+            self._type_,
+            self._key
+        )
 
 
 __all__ = ['Source']

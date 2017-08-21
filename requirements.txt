@@ -2,3 +2,4 @@ ujson
 colorlog
 pprintpp
 setuptools
+setproctitle
