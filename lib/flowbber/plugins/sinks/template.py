@@ -20,16 +20,175 @@
 Template
 ========
 
-Simple Jinja2 template rendering sink plugin.
+This sink will render specified Jinja2_ template using the collected data as
+payload.
 
-FIXME: Document.
-"""
+For the following collected data:
+
+.. code-block:: python
+
+    OrderedDict([
+        ('timestamp', {
+            'epoch': 1503280511,
+            'epochf': 1503280511.560432,
+            'iso8601': '2017-08-20T19:55:11',
+            'strftime': '2017-08-20 19:55:11',
+        }),
+        ('user', {'login': 'kuralabs', 'uid': 1000}),
+    ])
+
+The following template could be used:
+
+.. code-block:: html+jinja
+
+    <h1>My Rendered Template</h1>
+
+    <h2>Timestamp:</h2>
+
+    <ul>
+        <li>Epoch: {{ data.timestamp.epoch }}</li>
+        <li>ISO8601: {{ data.timestamp.iso8601 }}</li>
+    </ul>
+
+    <h2>User:</h2>
+
+    <ul>
+        <li>UID: {{ data.user.uid }}</li>
+        <li>Login: {{ data.user.login }}</li>
+    </ul>
+
+And rendering it with that data will result in:
+
+.. code-block:: html
+
+    <h1>My Rendered Template</h1>
+
+    <h2>Timestamp:</h2>
+
+    <ul>
+        <li>Epoch: 1503280511</li>
+        <li>ISO8601: 2017-08-20T19:55:11</li>
+    </ul>
+
+    <h2>User:</h2>
+
+    <ul>
+        <li>UID: 1000</li>
+        <li>Login: kuralabs</li>
+    </ul>
+
+.. _Jinja2: http://jinja.pocoo.org/
+
+**Dependencies:**
+
+.. code-block:: sh
+
+    pip3 install flowbber[template]
+
+**Usage:**
+
+.. code-block:: json
+
+    {
+        "sinks": [
+            {
+                "type": "template",
+                "config": {
+                    "template": "template1.tpl",
+                    "output": "render1.html",
+                    "override": true,
+                    "create_parents": true
+                }
+            }
+        ]
+    }
+
+template
+--------
+
+URI to the Jinja2_ template. If no schema is specified, ``file://`` will be
+used.
+
+Supported schemas:
+
+- ``file://`` (the default): File system path to the template.
+
+  ::
+
+      file://path/to/template.tpl
+
+- ``python://``: A Python package and function name to load the content of the
+  template.
+
+  This is particularly useful if your templates are included as
+  ``package_data`` in a package with your custom plugins, or you want to load
+  the template using a custom logic from your ``flowconf.py`` (in which case
+  use ``python://flowconf:yourfunction``).
+
+  Specify the package using a dotted notation and the function name separated
+  by a ``:`` (colon). The function mustn't receive any arguments and must
+  return the content of the template.
+
+  ::
+
+      python://package.subpackage:function
+
+- **Default**: ``N/A``
+- **Optional**: ``False``
+- **Type**: ``str``
+- **Secret**: ``False``
+
+output
+------
+
+Output file.
+
+This option is nullable, if ``None`` is provided (the default), the output file
+name will be auto-determined using the name of the template or the function
+that loaded the template and appending an ``out`` file extension.
+
+For example:
+
+=========================================  =====================
+``template``                               ``output``
+=========================================  =====================
+``file://templates/the_template.tpl``      ``the_template.out``
+``python://mypackage.data:load_template``  ``load_template.out``
+=========================================  =====================
+
+- **Default**: ``None``
+- **Optional**: ``True``
+- **Type**: ``nullable(str)``
+- **Secret**: ``False``
+
+override
+--------
+
+Override output file if already exists.
+
+- **Default**: ``False``
+- **Optional**: ``True``
+- **Type**: ``bool``
+- **Secret**: ``False``
+
+create_parents
+--------------
+
+Create output file parent directories if don't exist.
+
+- **Default**: ``True``
+- **Optional**: ``True``
+- **Type**: ``bool``
+- **Secret**: ``False``
+
+"""  # noqa
 
 from pathlib import Path
 from logging import getLogger
 from importlib import import_module
 
 from flowbber.entities import Sink
+from flowbber.types import nullable
 
 
 log = getLogger(__name__)
@@ -37,9 +196,6 @@ log = getLogger(__name__)
 
 class TemplateSink(Sink):
     def declare_config(self, config):
-        """
-        FIXME: Document.
-        """
         config.add_option(
             'template',
             type=str,
@@ -49,7 +205,7 @@ class TemplateSink(Sink):
             'output',
             default=None,
             optional=True,
-            type=str,
+            type=nullable(str),
         )
 
         config.add_option(

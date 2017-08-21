@@ -73,6 +73,15 @@
             }
         },
         {
+            "type": "template",
+            "config": {
+                "template": "python://flowconf:atemplate",
+                "output": "render2.html",
+                "create_parents": true,
+                "override": true
+            }
+        },
+        {
             "type": "mongodb",
             "config": {
                 "uri": "mongodb://localhost:27017/",

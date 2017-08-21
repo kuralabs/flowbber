@@ -20,12 +20,32 @@
 Print
 =====
 
-Simple print sink plugin.
+This sink plugin will pretty print all collected data to ``stdout``.
 
-This module uses third party pprintpp for better pretty printing of large data
-structures.
+This module uses third party module pprintpp_ for better pretty printing of
+large data structures.
 
-FIXME: Document.
+.. _pprintpp: https://github.com/wolever/pprintpp
+
+**Dependencies:**
+
+.. code-block:: sh
+
+    pip3 install flowbber[print]
+
+**Usage:**
+
+.. code-block:: json
+
+    {
+        "sinks": [
+            {
+                "type": "print",
+                "config": {}
+            }
+        ]
+    }
+
 """
 
 from flowbber.entities import Sink

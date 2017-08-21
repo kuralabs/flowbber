@@ -39,7 +39,7 @@ def load_flowconf(pipeline_path):
         log.debug('No local flowconf.py found.')
         return
 
-    path.insert(0, str(pipeline_path.resolve()))
+    path.append(str(pipeline_path.resolve()))
     import flowconf
 
     log.info('Pipeline\'s flowconf.py loaded successfully.')
