@@ -214,16 +214,16 @@ class Pipeline:
             ))
             if process.exitcode != 0:
                 raise RuntimeError(
-                    'Process PID {pid} for source #{index} of type {source} '
+                    'Process PID {pid} for source #{index} of type {id} '
                     'crashed with exit code {exitcode}'.format(
-                        index=index, source=source, **journal_entry
+                        **journal_entry
                     )
                 )
 
             log.info(
-                'Source {source} finished collecting data successfully after '
+                'Source {id} finished collecting data successfully after '
                 '{duration:.4f} seconds'.format(
-                    source=source, **journal_entry
+                    **journal_entry
                 )
             )
 
@@ -245,6 +245,13 @@ class Pipeline:
                 'duration': aggregator.duration,
             }
             journal.append(journal_entry)
+
+            log.info(
+                'Aggregator {id} finished accumulating data successfully '
+                'after {duration:.4f} seconds'.format(
+                    **journal_entry
+                )
+            )
 
     def _run_sinks(self, journal):
         """
@@ -289,16 +296,16 @@ class Pipeline:
             ))
             if process.exitcode != 0:
                 raise RuntimeError(
-                    'Process PID {pid} for sink #{index} of type {sink} '
+                    'Process PID {pid} for sink #{index} of type {id} '
                     'crashed with exit code {exitcode}'.format(
-                        index=index, sink=sink, **journal_entry
+                        **journal_entry
                     )
                 )
 
             log.info(
-                'Sink {sink} finished successfully after '
+                'Sink {id} finished successfully after '
                 '{duration:.4f} seconds'.format(
-                    sink=sink, **journal_entry
+                    **journal_entry
                 )
             )
 
