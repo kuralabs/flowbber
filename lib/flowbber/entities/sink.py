@@ -31,8 +31,8 @@ from .base import BaseEntity
 
 
 class Sink(BaseEntity):
-    def __init__(self, index, type_, key, config):
-        super().__init__(index, type_, key, config)
+    def __init__(self, index, type_, id_, config):
+        super().__init__(index, type_, id_, config)
 
         self.duration = Queue(maxsize=1)
 

@@ -30,8 +30,8 @@ from .base import BaseEntity
 
 
 class Aggregator(BaseEntity):
-    def __init__(self, index, type_, key, config):
-        super().__init__(index, type_, key, config)
+    def __init__(self, index, type_, id_, config):
+        super().__init__(index, type_, id_, config)
 
     def execute(self, data):
         setproctitle(str(self))

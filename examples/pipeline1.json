@@ -2,7 +2,7 @@
     "sources": [
         {
             "type": "timestamp",
-            "key": "timestamp",
+            "id": "timestamp",
             "config": {
                 "epochf": true,
                 "iso8601": true,
@@ -11,17 +11,17 @@
         },
         {
             "type": "my_source",
-            "key": "my_source",
+            "id": "my_source",
             "config": {}
         },
         {
             "type": "user",
-            "key": "user",
+            "id": "user",
             "config": {}
         },
         {
             "type": "env",
-            "key": "env",
+            "id": "env",
             "config": {
                 "include": [
                     "LANG"
@@ -32,7 +32,7 @@
         },
         {
             "type": "env",
-            "key": "env_lower",
+            "id": "env_lower",
             "config": {
                 "include": [
                     "PYTHONHASHSEED"
@@ -43,7 +43,7 @@
         },
         {
             "type": "cobertura",
-            "key": "coverage",
+            "id": "coverage",
             "config": {
                 "xmlpath": "coverage.xml"
             }
@@ -53,12 +53,12 @@
     "sinks": [
         {
             "type": "print",
-            "key": "print",
+            "id": "print",
             "config": {}
         },
         {
             "type": "archive",
-            "key": "archive",
+            "id": "archive",
             "config": {
                 "output": "data.json",
                 "override": true,
@@ -67,7 +67,7 @@
         },
         {
             "type": "template",
-            "key": "template1",
+            "id": "template1",
             "config": {
                 "template": "template1.tpl",
                 "output": "render1.html",
@@ -77,7 +77,7 @@
         },
         {
             "type": "template",
-            "key": "template2",
+            "id": "template2",
             "config": {
                 "template": "python://flowconf:atemplate",
                 "output": "render2.html",
@@ -87,7 +87,7 @@
         },
         {
             "type": "mongodb",
-            "key": "mongodb",
+            "id": "mongodb",
             "config": {
                 "uri": "mongodb://localhost:27017/",
                 "database": "flowbber",
@@ -96,7 +96,7 @@
         },
         {
             "type": "influxdb",
-            "key": "influxdb",
+            "id": "influxdb",
             "config": {
                 "uri": "influxdb://localhost:8086/",
                 "database": "flowbber"

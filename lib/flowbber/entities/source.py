@@ -31,8 +31,8 @@ from .base import BaseEntity
 
 
 class Source(BaseEntity):
-    def __init__(self, index, type_, key, config):
-        super().__init__(index, type_, key, config)
+    def __init__(self, index, type_, id_, config):
+        super().__init__(index, type_, id_, config)
 
         self.result = Queue(maxsize=1)
         self.duration = Queue(maxsize=1)
@@ -44,7 +44,7 @@ class Source(BaseEntity):
         entry = {}
 
         try:
-            entry[self.key] = self.collect()
+            entry[self.id] = self.collect()
         finally:
             self.result.put(entry)
             self.duration.put(time() - start)

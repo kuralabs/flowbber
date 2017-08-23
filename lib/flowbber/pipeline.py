@@ -96,13 +96,13 @@ class Pipeline:
                 instance = clss(
                     index,
                     entity['type'],
-                    entity['key'],
+                    entity['id'],
                     entity.get('config', {}),
                 )
 
                 destination.append(instance)
 
-                log.info('Created {} instance of type {}'.format(
+                log.info('Created {} instance {}'.format(
                     entity_name, instance
                 ))
 
@@ -170,16 +170,16 @@ class Pipeline:
 
         for index, source, process in sources_processes:
             log.info(
-                'Starting source #{} of type {}'.format(
-                    index, source
+                'Starting source #{} "{}"'.format(
+                    index, source.id
                 )
             )
             process.start()
 
         for index, source, process in sources_processes:
             log.info(
-                'Collecting {} data from source #{} of type {}'.format(
-                    source.key, index, source
+                'Collecting data from source #{} "{}"'.format(
+                    index, source.id
                 )
             )
             result = source.result.get()
@@ -190,9 +190,9 @@ class Pipeline:
 
             journal_entry = {
                 'index': index,
-                'id': str(source),
-                'key': source.key,
+                'id': source.id,
                 'pid': process.pid,
+                'source': str(source),
                 'exitcode': process.exitcode,
                 'duration': source.duration.get(),
             }
@@ -203,15 +203,15 @@ class Pipeline:
             ))
             if process.exitcode != 0:
                 raise RuntimeError(
-                    'Process PID {pid} for source #{index} of type {id} '
-                    'crashed with exit code {exitcode}'.format(
+                    'Process PID {pid} for source #{index} "{id}" crashed '
+                    'with exit code {exitcode}'.format(
                         **journal_entry
                     )
                 )
 
             log.info(
-                'Source {id} finished collecting data successfully after '
-                '{duration:.4f} seconds'.format(
+                'Source #{index} "{id}" finished collecting data successfully '
+                'after {duration:.4f} seconds'.format(
                     **journal_entry
                 )
             )
@@ -223,21 +223,22 @@ class Pipeline:
 
         for index, aggregator in enumerate(self._aggregators):
 
-            log.info('Executing data aggregator #{} of type {}'.format(
-                index, aggregator
+            log.info('Executing data aggregator #{} "{}"'.format(
+                index, aggregator.id
             ))
             aggregator.accumulate(self._data)
 
             journal_entry = {
                 'index': index,
-                'id': str(aggregator),
+                'id': aggregator.id,
+                'aggregator': str(aggregator),
                 'duration': aggregator.duration,
             }
             journal.append(journal_entry)
 
             log.info(
-                'Aggregator {id} finished accumulating data successfully '
-                'after {duration:.4f} seconds'.format(
+                'Aggregator #{index} "{id}" finished accumulating data '
+                'successfully after {duration:.4f} seconds'.format(
                     **journal_entry
                 )
             )
@@ -262,8 +263,8 @@ class Pipeline:
 
         for index, sink, process in sink_processes:
             log.info(
-                'Executing data sink #{} of type {}'.format(
-                    index, sink
+                'Executing data sink #{} "{}"'.format(
+                    index, sink.id
                 )
             )
             process.start()
@@ -273,8 +274,9 @@ class Pipeline:
 
             journal_entry = {
                 'index': index,
-                'id': str(sink),
+                'id': sink.id,
                 'pid': process.pid,
+                'sink': str(sink),
                 'exitcode': process.exitcode,
                 'duration': sink.duration.get(),
             }
@@ -285,14 +287,14 @@ class Pipeline:
             ))
             if process.exitcode != 0:
                 raise RuntimeError(
-                    'Process PID {pid} for sink #{index} of type {id} '
-                    'crashed with exit code {exitcode}'.format(
+                    'Process PID {pid} for sink #{index} "{id}" crashed '
+                    'with exit code {exitcode}'.format(
                         **journal_entry
                     )
                 )
 
             log.info(
-                'Sink {id} finished successfully after '
+                'Sink #{index} "{id}" finished successfully after '
                 '{duration:.4f} seconds'.format(
                     **journal_entry
                 )

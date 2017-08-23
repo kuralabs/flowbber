@@ -1,6 +1,6 @@
 [[sources]]
 type = "timestamp"
-key = "timestamp"
+id = "timestamp"
 
     [sources.config]
     epochf = true
@@ -9,15 +9,15 @@ key = "timestamp"
 
 [[sources]]
 type = "my_source"
-key = "my_source"
+id = "my_source"
 
 [[sources]]
 type = "user"
-key = "user"
+id = "user"
 
 [[sources]]
 type = "env"
-key = "env"
+id = "env"
 
     [sources.config]
     include = ["LANG"]
@@ -26,7 +26,7 @@ key = "env"
 
 [[sources]]
 type = "env"
-key = "env_lower"
+id = "env_lower"
 
     [sources.config]
     include = ["PYTHONHASHSEED"]
@@ -35,17 +35,17 @@ key = "env_lower"
 
 [[sources]]
 type = "cobertura"
-key = "coverage"
+id = "coverage"
 
     [sources.config]
     xmlpath = "coverage.xml"
 
 [[sinks]]
-key = "print"
+id = "print"
 type = "print"
 
 [[sinks]]
-key = "archive"
+id = "archive"
 type = "archive"
 
     [sinks.config]
@@ -54,7 +54,7 @@ type = "archive"
     create_parents = true
 
 [[sinks]]
-key = "template1"
+id = "template1"
 type = "template"
 
     [sinks.config]
@@ -64,7 +64,7 @@ type = "template"
     create_parents = true
 
 [[sinks]]
-key = "template2"
+id = "template2"
 type = "template"
 
     [sinks.config]
@@ -74,7 +74,7 @@ type = "template"
     create_parents = true
 
 [[sinks]]
-key = "mongodb"
+id = "mongodb"
 type = "mongodb"
 
     [sinks.config]
@@ -83,7 +83,7 @@ type = "mongodb"
     collection = "pipeline1data"
 
 [[sinks]]
-key = "influxdb"
+id = "influxdb"
 type = "influxdb"
 
     [sinks.config]
