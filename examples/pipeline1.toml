@@ -3,9 +3,9 @@ type = "timestamp"
 key = "timestamp"
 
     [sources.config]
-    "epochf" = true
-    "iso8601" = true
-    "strftime" = "%Y-%m-%d %H:%M:%S"
+    epochf = true
+    iso8601 = true
+    strftime = "%Y-%m-%d %H:%M:%S"
 
 [[sources]]
 type = "my_source"
@@ -20,25 +20,25 @@ type = "env"
 key = "env"
 
     [sources.config]
-    "include" = ["LANG"]
-    "exclude" = []
-    "lowercase" = false
+    include = ["LANG"]
+    exclude = []
+    lowercase = false
 
 [[sources]]
 type = "env"
 key = "env_lower"
 
     [sources.config]
-    "include" = ["PYTHONHASHSEED"]
-    "exclude" = []
-    "lowercase" = true
+    include = ["PYTHONHASHSEED"]
+    exclude = []
+    lowercase = true
 
 [[sources]]
 type = "cobertura"
 key = "coverage"
 
     [sources.config]
-    "xmlpath" = "coverage.xml"
+    xmlpath = "coverage.xml"
 
 [[sinks]]
 key = "print"
