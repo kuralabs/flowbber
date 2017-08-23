@@ -31,12 +31,7 @@ from .base import BaseEntity
 
 class Aggregator(BaseEntity):
     def __init__(self, index, type_, key, config):
-        super().__init__(index, type_, config)
-        self._key = key
-
-    @property
-    def key(self):
-        return self._key
+        super().__init__(index, type_, key, config)
 
     def execute(self, data):
         setproctitle(str(self))

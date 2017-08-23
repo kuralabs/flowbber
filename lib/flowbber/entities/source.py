@@ -32,15 +32,10 @@ from .base import BaseEntity
 
 class Source(BaseEntity):
     def __init__(self, index, type_, key, config):
-        super().__init__(index, type_, config)
-        self._key = key
+        super().__init__(index, type_, key, config)
 
         self.result = Queue(maxsize=1)
         self.duration = Queue(maxsize=1)
-
-    @property
-    def key(self):
-        return self._key
 
     def execute(self):
         setproctitle(str(self))
@@ -49,7 +44,7 @@ class Source(BaseEntity):
         entry = {}
 
         try:
-            entry[self._key] = self.collect()
+            entry[self.key] = self.collect()
         finally:
             self.result.put(entry)
             self.duration.put(time() - start)
@@ -57,14 +52,6 @@ class Source(BaseEntity):
     @abstractmethod
     def collect(self):
         pass
-
-    def __str__(self):
-        return '#{} {}.{}.{}'.format(
-            self._index,
-            self.__class__.__name__,
-            self._type_,
-            self._key
-        )
 
 
 __all__ = ['Source']

@@ -22,10 +22,9 @@ Application entry point module.
 from os import getpid
 from logging import getLogger
 
-from ujson import loads
-
 from .pipeline import Pipeline
-from .local import load_flowconf
+from .inputs import load_pipeline
+from .local import load_configuration
 
 
 log = getLogger(__name__)
@@ -41,19 +40,21 @@ def main(args):
     :return: Exit code.
     :rtype: int
     """
-    log.info(
-        'flowbber PID {} starting for {} ...'.format(
-            getpid(),
-            str(args.pipeline),
-        )
-    )
+    log.info('flowbber PID {} starting ...'.format(
+        getpid()
+    ))
 
-    pipeline_definition = loads(args.pipeline.read_text(encoding='utf-8'))
+    log.info('Loading pipeline definition from {} ...'.format(
+        args.pipeline
+    ))
+    pipeline_definition = load_pipeline(args.pipeline)
 
-    log.info('Loading local configuration ...'.format(getpid()))
-    load_flowconf(args.pipeline.parent)
+    log.info('Loading local configuration from {} ...'.format(
+        args.pipeline.parent
+    ))
+    load_configuration(args.pipeline.parent)
 
-    log.info('Creating pipeline ...'.format(getpid()))
+    log.info('Creating pipeline ...')
     pipeline = Pipeline(pipeline_definition)
     pipeline.run()
 

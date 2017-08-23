@@ -26,7 +26,7 @@ from logging import getLogger
 log = getLogger(__name__)
 
 
-def load_flowconf(pipeline_path):
+def load_configuration(pipeline_path):
     """
     Try to load local pipeline configuration flowconf.py from given directory.
 
@@ -45,4 +45,4 @@ def load_flowconf(pipeline_path):
     log.info('Pipeline\'s flowconf.py loaded successfully.')
 
 
-__all__ = ['load_flowconf']
+__all__ = ['load_configuration']

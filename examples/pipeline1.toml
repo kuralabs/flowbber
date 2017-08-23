@@ -1,0 +1,91 @@
+[[sources]]
+type = "timestamp"
+key = "timestamp"
+
+    [sources.config]
+    "epochf" = true
+    "iso8601" = true
+    "strftime" = "%Y-%m-%d %H:%M:%S"
+
+[[sources]]
+type = "my_source"
+key = "my_source"
+
+[[sources]]
+type = "user"
+key = "user"
+
+[[sources]]
+type = "env"
+key = "env"
+
+    [sources.config]
+    "include" = ["LANG"]
+    "exclude" = []
+    "lowercase" = false
+
+[[sources]]
+type = "env"
+key = "env_lower"
+
+    [sources.config]
+    "include" = ["PYTHONHASHSEED"]
+    "exclude" = []
+    "lowercase" = true
+
+[[sources]]
+type = "cobertura"
+key = "coverage"
+
+    [sources.config]
+    "xmlpath" = "coverage.xml"
+
+[[sinks]]
+key = "print"
+type = "print"
+
+[[sinks]]
+key = "archive"
+type = "archive"
+
+    [sinks.config]
+    output = "data.json"
+    override = true
+    create_parents = true
+
+[[sinks]]
+key = "template1"
+type = "template"
+
+    [sinks.config]
+    template = "template1.tpl"
+    output = "render1.html"
+    override = true
+    create_parents = true
+
+[[sinks]]
+key = "template2"
+type = "template"
+
+    [sinks.config]
+    template = "python://flowconf:atemplate"
+    output = "render2.html"
+    override = true
+    create_parents = true
+
+[[sinks]]
+key = "mongodb"
+type = "mongodb"
+
+    [sinks.config]
+    uri = "mongodb://localhost:27017/"
+    database = "flowbber"
+    collection = "pipeline1data"
+
+[[sinks]]
+key = "influxdb"
+type = "influxdb"
+
+    [sinks.config]
+    uri = "influxdb://localhost:8086/"
+    database = "flowbber"

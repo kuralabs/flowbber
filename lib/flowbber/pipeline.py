@@ -17,7 +17,6 @@
 
 """
 Base class for Flowbber pipeline.
-
 """
 
 from os import getpid
@@ -79,22 +78,7 @@ class Pipeline:
         FIXME: Document.
         """
 
-        for entity_name, arg_unpacker in (
-            ('source', lambda entity: (
-                entity['type'],
-                entity['key'],
-                entity['config']
-            )),
-            ('aggregator', lambda entity: (
-                entity['type'],
-                entity['key'],
-                entity['config']
-            )),
-            ('sink', lambda entity: (
-                entity['type'],
-                entity['config']
-            )),
-        ):
+        for entity_name in ['source', 'aggregator', 'sink']:
             destination = []
 
             available = getattr(self, '_{}s_available'.format(entity_name))
@@ -109,7 +93,12 @@ class Pipeline:
                     ))
 
                 clss = available[entity_type]
-                instance = clss(index, *arg_unpacker(entity))
+                instance = clss(
+                    index,
+                    entity['type'],
+                    entity['key'],
+                    entity.get('config', {}),
+                )
 
                 destination.append(instance)
 

@@ -398,8 +398,8 @@ setup(
         'flowbber_plugin_sources_1_0': [
             'cobertura = flowbber.plugins.sources.cobertura:CoberturaSource',
             'env = flowbber.plugins.sources.env:EnvSource',
-            'user = flowbber.plugins.sources.user:UserSource',
             'timestamp = flowbber.plugins.sources.timestamp:TimestampSource',
+            'user = flowbber.plugins.sources.user:UserSource',
         ],
         'flowbber_plugin_aggregators_1_0': [],
         'flowbber_plugin_sinks_1_0': [

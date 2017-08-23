@@ -44,22 +44,28 @@ class BaseEntity(metaclass=NamedABCMeta):
     """
 
     @abstractmethod
-    def __init__(self, index, type_, config):
+    def __init__(self, index, type_, key, config):
         self._index = index
         self._type_ = type_
+        self._key = key
 
         configurator = Configurator()
         self.declare_config(configurator)
         self.config = configurator.validate(config)
 
+    @property
+    def key(self):
+        return self._key
+
     def declare_config(self, config):
         pass
 
     def __str__(self):
-        return '#{} {}.{}'.format(
+        return '#{} {}.{}.{}'.format(
             self._index,
             self.__class__.__name__,
-            self._type_
+            self._type_,
+            self._key
         )
 
     def __repr__(self):

@@ -53,10 +53,12 @@
     "sinks": [
         {
             "type": "print",
+            "key": "print",
             "config": {}
         },
         {
             "type": "archive",
+            "key": "archive",
             "config": {
                 "output": "data.json",
                 "override": true,
@@ -65,24 +67,27 @@
         },
         {
             "type": "template",
+            "key": "template1",
             "config": {
                 "template": "template1.tpl",
                 "output": "render1.html",
-                "create_parents": true,
-                "override": true
+                "override": true,
+                "create_parents": true
             }
         },
         {
             "type": "template",
+            "key": "template2",
             "config": {
                 "template": "python://flowconf:atemplate",
                 "output": "render2.html",
-                "create_parents": true,
-                "override": true
+                "override": true,
+                "create_parents": true
             }
         },
         {
             "type": "mongodb",
+            "key": "mongodb",
             "config": {
                 "uri": "mongodb://localhost:27017/",
                 "database": "flowbber",
@@ -91,6 +96,7 @@
         },
         {
             "type": "influxdb",
+            "key": "influxdb",
             "config": {
                 "uri": "influxdb://localhost:8086/",
                 "database": "flowbber"
