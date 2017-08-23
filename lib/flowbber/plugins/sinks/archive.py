@@ -36,6 +36,7 @@ This sink writes all collected data to a JSON file.
         "sinks": [
             {
                 "type": "archive",
+                "id": "...",
                 "config": {
                     "output": "data.json",
                     "override": true,

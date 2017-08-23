@@ -41,6 +41,7 @@ large data structures.
         "sinks": [
             {
                 "type": "print",
+                "id": "...",
                 "config": {}
             }
         ]

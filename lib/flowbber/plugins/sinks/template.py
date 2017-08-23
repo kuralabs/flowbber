@@ -93,6 +93,7 @@ And rendering it with that data will result in:
         "sinks": [
             {
                 "type": "template",
+                "id": "...",
                 "config": {
                     "template": "template1.tpl",
                     "output": "render1.html",

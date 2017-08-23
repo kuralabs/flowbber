@@ -51,7 +51,7 @@ as the primary key (although this can be changed on those sinks).
         "sources": [
             {
                 "type": "timestamp",
-                "key": "...",
+                "id": "...",
                 "config": {
                     "epoch": true,
                     "epochf": true,

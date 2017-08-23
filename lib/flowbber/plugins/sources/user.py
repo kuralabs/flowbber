@@ -45,7 +45,7 @@ This source allows to collect information about the current user.
         "sources": [
             {
                 "type": "user",
-                "key": "...",
+                "id": "...",
                 "config": {}
             }
         ]

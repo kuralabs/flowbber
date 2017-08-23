@@ -58,7 +58,7 @@ to ``true`` (the default).
         "sources": [
             {
                 "type": "env",
-                "key": "...",
+                "id": "...",
                 "config": {
                     "include": [
                         "PYTHONHASHSEED"
@@ -111,7 +111,7 @@ This source is very helpful to collect information from Jenkins_ CI:
         "sources": [
             {
                 "type": "env",
-                "key": "jenkins",
+                "id": "jenkins",
                 "config": {
                     "include": [
                         "BUILD_NUMBER",

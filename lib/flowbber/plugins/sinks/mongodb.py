@@ -46,6 +46,7 @@ used to perform this transformation.
         "sinks": [
             {
                 "type": "mongodb",
+                "id": "...",
                 "config": {
                     "uri": "mongodb://localhost:27017/",
                     "database": "flowbber",

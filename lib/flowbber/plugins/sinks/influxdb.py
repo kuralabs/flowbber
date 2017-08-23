@@ -137,6 +137,7 @@ transformations performed.
         "sinks": [
             {
                 "type": "influxdb",
+                "id": "...",
                 "config": {
                     "uri": "influxdb://localhost:8086/",
                     "database": "flowbber",
