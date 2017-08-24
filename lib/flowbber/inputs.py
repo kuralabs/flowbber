@@ -46,6 +46,30 @@ ENTITY_SCHEMA = {
 
 
 PIPELINE_SCHEMA = {
+    'schedule': {
+        'required': False,
+        'type': 'dict',
+        'schema': {
+            'frequency': {
+                'required': True,
+                'coerce': 'timedelta',
+            },
+            'samples': {
+                'required': False,
+                'type': 'integer',
+                'min': 1,
+                'nullable': True,
+                'default': None,
+            },
+            'start': {
+                'required': False,
+                'type': 'integer',
+                'min': 0,
+                'nullable': True,
+                'default': None,
+            },
+        }
+    },
     'sources': {
         'required': True,
         'type': 'list',
@@ -59,6 +83,7 @@ PIPELINE_SCHEMA = {
         'required': False,
         'type': 'list',
         'empty': True,
+        'default': [],
         'schema': {
             'type': 'dict',
             'schema': ENTITY_SCHEMA,
@@ -77,6 +102,21 @@ PIPELINE_SCHEMA = {
 
 
 log = get_logger(__name__)
+
+
+class PipelineValidator(Validator):
+    """
+    FIXME: Document.
+    """
+
+    def _normalize_coerce_timedelta(self, value):
+        from pytimeparse import parse
+
+        timedelta = parse(value)
+        if timedelta is None:
+            raise ValueError('Unable to parse timedelta {}'.format(value))
+
+        return timedelta
 
 
 def replace_values(definition, path):
@@ -174,8 +214,10 @@ def load_pipeline(path):
     definition = replace_values(definition, path)
 
     # Validate data structure
-    validator = Validator(PIPELINE_SCHEMA)
-    if not validator.validate(definition):
+    validator = PipelineValidator(PIPELINE_SCHEMA)
+    validated = validator.validated(definition)
+
+    if validated is None:
         log.critical(
             'Invalid pipeline definition:\n{}'.format(
                 pformat(validator.errors)
@@ -183,13 +225,9 @@ def load_pipeline(path):
         )
         raise SyntaxError('Invalid pipeline definition')
 
-    # Add an empty aggregators list
-    # Aggregators are the only entities that are allowed empty
-    if 'aggregators' not in definition:
-        definition['aggregators'] = []
-
     log.info('Pipeline definition loaded, realized and validated.')
-    return definition
+    log.debug(pformat(validated))
+    return validated
 
 
 __all__ = ['load_pipeline']

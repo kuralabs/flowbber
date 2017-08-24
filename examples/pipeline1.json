@@ -1,4 +1,9 @@
 {
+    "schedule": {
+        "frequency": "20 seconds",
+        "samples": null,
+        "start": 1503571069
+    },
     "sources": [
         {
             "type": "timestamp",
