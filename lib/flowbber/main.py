@@ -61,18 +61,17 @@ def main(args):
     # Check if scheduling was configured
     schedule = pipeline_definition.get('schedule', None)
 
-    if schedule is not None:
-
-        scheduler = Scheduler(
-            pipeline,
-            schedule['frequency'],
-            samples=schedule['samples'],
-            start=schedule['start'],
-        )
-        scheduler.run()
+    if schedule is None:
+        pipeline.run()
         return 0
 
-    pipeline.run()
+    scheduler = Scheduler(
+        pipeline,
+        schedule['frequency'],
+        samples=schedule['samples'],
+        start=schedule['start'],
+    )
+    scheduler.run()
     return 0
 
 

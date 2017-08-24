@@ -62,10 +62,10 @@ class Pipeline:
     def __str__(self):
         return '\n'.join([
             '[Pipeline:{}]',
-            'executed = {}'
-            'sources = {}'
-            'aggregators = {}'
-            'sinks = {}'
+            'executed = {}',
+            'sources = {}',
+            'aggregators = {}',
+            'sinks = {}',
         ]).format(
             self._name,
             self._executed,
