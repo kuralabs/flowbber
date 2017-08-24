@@ -185,14 +185,14 @@ Create output file parent directories if don't exist.
 """  # noqa
 
 from pathlib import Path
-from logging import getLogger
 from importlib import import_module
 
 from flowbber.entities import Sink
 from flowbber.types import nullable
+from flowbber.logging import get_logger
 
 
-log = getLogger(__name__)
+log = get_logger(__name__)
 
 
 class TemplateSink(Sink):

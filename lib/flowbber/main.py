@@ -20,14 +20,14 @@ Application entry point module.
 """
 
 from os import getpid
-from logging import getLogger
 
 from .pipeline import Pipeline
+from .logging import get_logger
 from .inputs import load_pipeline
 from .local import load_configuration
 
 
-log = getLogger(__name__)
+log = get_logger(__name__)
 
 
 def main(args):

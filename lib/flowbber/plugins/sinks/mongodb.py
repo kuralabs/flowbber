@@ -232,13 +232,12 @@ beginning of any key in the collected data (see MongoDB data safety above).
 
 """  # noqa
 
-from logging import getLogger
-
 from flowbber.entities import Sink
 from flowbber.types import nullable
+from flowbber.logging import get_logger
 
 
-log = getLogger(__name__)
+log = get_logger(__name__)
 
 
 def mongodb_safe(data, dotreplace, dollarreplace):

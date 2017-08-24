@@ -19,15 +19,13 @@
 Argument management module.
 """
 
-import logging
-
 from pathlib import Path
 
 from . import __version__
-from .logging import setup_logging
+from .logging import get_logger, setup_logging
 
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 
 def validate_args(args):

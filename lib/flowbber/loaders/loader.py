@@ -21,17 +21,17 @@ Base class to load Flowbber plugins.
 All Flowbber entity loaders extend from the PluginLoader class.
 """
 
-import logging
 from copy import copy
 from inspect import isclass
 from collections import OrderedDict
 
 from pkg_resources import iter_entry_points
 
+from ..logging import get_logger
 from ..entities.base import BaseEntity
 
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 
 class PluginLoader(object):

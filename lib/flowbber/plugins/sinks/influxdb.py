@@ -304,16 +304,16 @@ the keys will be done.
 
 """  # noqa
 
-from logging import getLogger
 from datetime import datetime
 
 from pprintpp import pformat
 
 from flowbber.entities import Sink
 from flowbber.types import nullable
+from flowbber.logging import get_logger
 
 
-log = getLogger(__name__)
+log = get_logger(__name__)
 
 
 def transform_to_flat(data, keysjoiner, keysjoinerreplace):

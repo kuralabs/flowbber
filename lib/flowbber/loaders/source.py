@@ -21,14 +21,14 @@ Module implementating Source base class.
 All custom Flowbber sources must extend from the Source class.
 """
 
-from logging import getLogger
 from collections import OrderedDict
 
 from ..entities import Source
+from ..logging import get_logger
 from .loader import PluginLoader
 
 
-log = getLogger(__name__)
+log = get_logger(__name__)
 
 
 class SourcesLoader(PluginLoader):

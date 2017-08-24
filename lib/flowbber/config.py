@@ -20,11 +20,12 @@ Module implementating the Configurator class.
 """
 
 from copy import deepcopy
-from logging import getLogger
 from collections import OrderedDict, namedtuple
 
+from .logging import get_logger
 
-log = getLogger(__name__)
+
+log = get_logger(__name__)
 
 
 class MissingOptions(AttributeError):

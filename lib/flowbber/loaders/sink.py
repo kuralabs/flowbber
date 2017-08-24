@@ -21,14 +21,15 @@ Module implementating Sink base class.
 All custom Flowbber sinks must extend from the Sink class.
 """
 
-from logging import getLogger
 from collections import OrderedDict
 
+
 from ..entities import Sink
+from ..logging import get_logger
 from .loader import PluginLoader
 
 
-log = getLogger(__name__)
+log = get_logger(__name__)
 
 
 class SinksLoader(PluginLoader):

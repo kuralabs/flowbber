@@ -21,7 +21,6 @@ Base class for Flowbber pipeline.
 
 from os import getpid
 from pathlib import Path
-from logging import getLogger
 from collections import OrderedDict
 from multiprocessing import Process
 from tempfile import NamedTemporaryFile, gettempdir
@@ -29,10 +28,11 @@ from tempfile import NamedTemporaryFile, gettempdir
 from ujson import dumps
 from setproctitle import setproctitle
 
+from .logging import get_logger
 from .loaders import SourcesLoader, AggregatorsLoader, SinksLoader
 
 
-log = getLogger(__name__)
+log = get_logger(__name__)
 
 
 class Pipeline:

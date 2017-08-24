@@ -20,10 +20,11 @@ Module implementing the load of local flowconf.py files.
 """
 
 from sys import path
-from logging import getLogger
+
+from .logging import get_logger
 
 
-log = getLogger(__name__)
+log = get_logger(__name__)
 
 
 def load_configuration(pipeline_path):
