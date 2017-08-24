@@ -109,6 +109,7 @@ def replace_values(definition, path):
         name=path.stem,
     )
 
+    # Replace all string keys and values
     def replace(obj):
         if isinstance(obj, str):
             return obj.format(
@@ -121,7 +122,7 @@ def replace_values(definition, path):
 
         if isinstance(obj, dict):
             return {
-                key: replace(value)
+                replace(key): replace(value)
                 for key, value in obj.items()
             }
 
@@ -169,6 +170,9 @@ def load_pipeline(path):
         log.critical('Unable to parse pipeline definition {}'.format(path))
         raise e
 
+    # Replace string values that required replacement
+    definition = replace_values(definition, path)
+
     # Validate data structure
     validator = Validator(PIPELINE_SCHEMA)
     if not validator.validate(definition):
@@ -184,10 +188,7 @@ def load_pipeline(path):
     if 'aggregators' not in definition:
         definition['aggregators'] = []
 
-    # Replace string values that required replacement
-    definition = replace_values(definition, path)
-
-    log.info('Pipeline definition loaded, validated and values replaced.')
+    log.info('Pipeline definition loaded, realized and validated.')
     return definition
 
 
