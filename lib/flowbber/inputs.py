@@ -19,6 +19,9 @@
 Input pipeline definition formats parses.
 """
 
+from os import environ
+from collections import namedtuple
+
 from pprintpp import pformat
 from cerberus import Validator
 
@@ -76,6 +79,57 @@ PIPELINE_SCHEMA = {
 log = get_logger(__name__)
 
 
+def replace_values(definition, path):
+    """
+    FIXME: Document.
+    """
+
+    # Get the environment object
+    safe_env = {
+        key: value
+        for key, value in environ.items()
+        if not key.startswith('_')
+    }
+
+    env_type = namedtuple(
+        'env',
+        safe_env.keys()
+    )
+    env = env_type(**safe_env)
+
+    # Get pipeline object
+    pipeline_type = namedtuple(
+        'pipeline',
+        ['dir', 'ext', 'file', 'name']
+    )
+    pipeline = pipeline_type(
+        dir=str(path.parent),
+        ext=path.suffix,
+        file=path.name,
+        name=path.stem,
+    )
+
+    def replace(obj):
+        if isinstance(obj, str):
+            return obj.format(
+                env=env,
+                pipeline=pipeline
+            )
+
+        if isinstance(obj, list):
+            return [replace(element) for element in obj]
+
+        if isinstance(obj, dict):
+            return {
+                key: replace(value)
+                for key, value in obj.items()
+            }
+
+        return obj
+
+    return replace(definition)
+
+
 def load_pipeline_json(path):
     """
     FIXME: Document.
@@ -130,7 +184,10 @@ def load_pipeline(path):
     if 'aggregators' not in definition:
         definition['aggregators'] = []
 
-    log.info('Pipeline definition loaded and validated')
+    # Replace string values that required replacement
+    definition = replace_values(definition, path)
+
+    log.info('Pipeline definition loaded, validated and values replaced.')
     return definition
 
 

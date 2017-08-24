@@ -45,7 +45,7 @@
             "type": "cobertura",
             "id": "coverage",
             "config": {
-                "xmlpath": "coverage.xml"
+                "xmlpath": "{pipeline.dir}/coverage.xml"
             }
         }
     ],
@@ -69,7 +69,7 @@
             "type": "template",
             "id": "template1",
             "config": {
-                "template": "template1.tpl",
+                "template": "file://{pipeline.dir}/template1.tpl",
                 "output": "render1.html",
                 "override": true,
                 "create_parents": true

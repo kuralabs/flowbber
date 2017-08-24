@@ -38,7 +38,7 @@ type = "cobertura"
 id = "coverage"
 
     [sources.config]
-    xmlpath = "coverage.xml"
+    xmlpath = "{pipeline.dir}/coverage.xml"
 
 [[sinks]]
 id = "print"
@@ -58,7 +58,7 @@ id = "template1"
 type = "template"
 
     [sinks.config]
-    template = "template1.tpl"
+    template = "file://{pipeline.dir}/template1.tpl"
     output = "render1.html"
     override = true
     create_parents = true
