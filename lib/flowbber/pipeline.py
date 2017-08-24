@@ -40,10 +40,13 @@ class Pipeline:
     FIXME: Document.
     """
 
-    def __init__(self, pipeline):
+    def __init__(self, pipeline, name):
         super().__init__()
 
         self._pipeline = pipeline
+        self._name = name
+
+        self._executed = 0
         self._data = OrderedDict()
 
         log.info('Loading plugins ...')
@@ -51,6 +54,28 @@ class Pipeline:
 
         log.info('Building pipeline ...')
         self._build_pipeline()
+
+    @property
+    def name(self):
+        return self._name
+
+    def __str__(self):
+        return '\n'.join([
+            '[Pipeline:{}]',
+            'executed = {}'
+            'sources = {}'
+            'aggregators = {}'
+            'sinks = {}'
+        ]).format(
+            self._name,
+            self._executed,
+            len(self._sources),
+            len(self._aggregators),
+            len(self._sinks),
+        )
+
+    def __repr__(self):
+        return str(self)
 
     def _load_plugins(self):
         """
@@ -116,7 +141,12 @@ class Pipeline:
         """
         FIXME: Document.
         """
-        log.info('Running pipeline ...')
+        if self._executed > 0:
+            log.info('Re-running pipeline ...')
+            self._data = OrderedDict()
+        else:
+            log.info('Running pipeline ...')
+            self._executed += 1
 
         journal = OrderedDict((
             ('sources', []),

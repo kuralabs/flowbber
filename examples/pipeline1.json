@@ -1,8 +1,7 @@
 {
     "schedule": {
-        "frequency": "20 seconds",
-        "samples": null,
-        "start": 1503571069
+        "frequency": "10 seconds",
+        "samples": 10
     },
     "sources": [
         {

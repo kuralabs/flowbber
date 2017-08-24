@@ -23,6 +23,7 @@ from os import getpid
 
 from .pipeline import Pipeline
 from .logging import get_logger
+from .scheduler import Scheduler
 from .inputs import load_pipeline
 from .local import load_configuration
 
@@ -55,9 +56,23 @@ def main(args):
     load_configuration(args.pipeline.parent)
 
     log.info('Creating pipeline ...')
-    pipeline = Pipeline(pipeline_definition)
-    pipeline.run()
+    pipeline = Pipeline(pipeline_definition, args.pipeline.stem)
 
+    # Check if scheduling was configured
+    schedule = pipeline_definition.get('schedule', None)
+
+    if schedule is not None:
+
+        scheduler = Scheduler(
+            pipeline,
+            schedule['frequency'],
+            samples=schedule['samples'],
+            start=schedule['start'],
+        )
+        scheduler.run()
+        return 0
+
+    pipeline.run()
     return 0
 
 
