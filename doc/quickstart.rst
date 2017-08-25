@@ -67,9 +67,10 @@ Help is available using the ``--help`` flag:
 Key Concepts
 ============
 
-As an executor, Flowbber provides the ``flowbber`` executable which is
-responsible for loading a textual pipeline definition and execute the data
-**collection**, **analysis** and **publishing** routines as defined.
+As a pipeline executor, Flowbber provides the ``flowbber`` command line
+application which is responsible for loading a textual pipeline definition and
+execute the data **collection**, **analysis** and **publishing** routines as
+defined.
 
 The pipeline definition can be written in a simple JSON_ or TOML_ format, and
 specifies the stages of your pipeline:
@@ -88,3 +89,43 @@ and sinks) for your custom data pipeline.
    :align: center
 
    Execution of a Flowbber pipeline.
+
+
+Glossary
+========
+
+.. glossary::
+
+    Pipeline
+        A chain of data-processing stages. A Flowbber Pipeline must contain at
+        least one :term:`Source` and one :term:`Sink`.
+
+    Pipeline Definition
+        A file or data structure describing the stages and
+        :term:`Components <Component>` of a :term:`Pipeline` and its
+        configuration.
+
+    Pipeline Executor
+        An application responsible of executing a :term:`Pipeline`.
+
+    Source
+        A type of :term:`Component` that is responsible for collecting data
+        from a particular data source.
+
+    Aggregator
+        A type of :term:`Component` that is responsible for analyzing,
+        relating, accumulate or process the data collected by the
+        :term:`Sources <Source>`.
+
+    Sink
+        A type of :term:`Component` that is responsible for publishing the data
+        collected to a particular data store.
+
+    Plugin
+        A modular :term:`Component` that performs a very specific task and was
+        created for a single purpose. It is usually packaged and distributed
+        apart.
+
+    Component
+        A component of a stage in a :term:`Pipeline`. Either a :term:`Source`,
+        an :term:`Aggregator` or a :term:`Sink`.
