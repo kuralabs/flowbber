@@ -85,7 +85,7 @@ def parse_args(argv=None):
 
     parser.add_argument(
         'pipeline',
-        help='Pipeline configuration file'
+        help='Pipeline definition file'
     )
 
     args = parser.parse_args(argv)
