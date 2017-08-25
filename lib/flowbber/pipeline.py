@@ -240,8 +240,8 @@ class Pipeline:
                 )
 
             log.info(
-                'Source #{index} "{id}" finished collecting data successfully '
-                'after {duration:.4f} seconds'.format(
+                'Source #{index} "{id}" (PID {pid}) finished collecting data '
+                'successfully after {duration:.4f} seconds'.format(
                     **journal_entry
                 )
             )
@@ -324,7 +324,7 @@ class Pipeline:
                 )
 
             log.info(
-                'Sink #{index} "{id}" finished successfully after '
+                'Sink #{index} "{id}" (PID {pid}) finished successfully after '
                 '{duration:.4f} seconds'.format(
                     **journal_entry
                 )

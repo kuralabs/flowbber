@@ -1,0 +1,23 @@
+[[sources]]
+type = "timestamp"
+id = "timestamp1"
+
+    [sources.config]
+    epoch = false
+    epochf = true
+
+[[sources]]
+type = "timestamp"
+id = "timestamp2"
+
+    [sources.config]
+    epoch = false
+    epochf = true
+
+[[sources]]
+type = "user"
+id = "user1"
+
+[[sinks]]
+type = "print"
+id = "print1"

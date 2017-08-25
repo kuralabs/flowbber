@@ -41,12 +41,12 @@ id = "coverage"
     xmlpath = "{pipeline.dir}/coverage.xml"
 
 [[sinks]]
-id = "print"
 type = "print"
+id = "print"
 
 [[sinks]]
-id = "archive"
 type = "archive"
+id = "archive"
 
     [sinks.config]
     output = "data.json"
@@ -54,8 +54,8 @@ type = "archive"
     create_parents = true
 
 [[sinks]]
-id = "template1"
 type = "template"
+id = "template1"
 
     [sinks.config]
     template = "file://{pipeline.dir}/template1.tpl"
@@ -64,8 +64,8 @@ type = "template"
     create_parents = true
 
 [[sinks]]
-id = "template2"
 type = "template"
+id = "template2"
 
     [sinks.config]
     template = "python://flowconf:atemplate"
@@ -74,8 +74,8 @@ type = "template"
     create_parents = true
 
 [[sinks]]
-id = "mongodb"
 type = "mongodb"
+id = "mongodb"
 
     [sinks.config]
     uri = "mongodb://localhost:27017/"
@@ -83,8 +83,8 @@ type = "mongodb"
     collection = "pipeline1data"
 
 [[sinks]]
-id = "influxdb"
 type = "influxdb"
+id = "influxdb"
 
     [sinks.config]
     uri = "influxdb://localhost:8086/"

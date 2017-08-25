@@ -26,3 +26,4 @@ sphinx
 guzzle_sphinx_theme
 autoapi
 plantweb
+pygments-github-lexers

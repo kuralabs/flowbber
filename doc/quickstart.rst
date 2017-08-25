@@ -75,9 +75,6 @@ textual :term:`pipeline definition <Pipeline Definition>` and execute the data
 The pipeline definition can be written in a simple JSON_ or TOML_ format, and
 specifies the stages of your pipeline:
 
-.. _JSON: http://www.json.org/
-.. _TOML: https://github.com/toml-lang/toml
-
 - :term:`Sources <Source>`: what data to collect and how.
 - :term:`Aggregators <Aggregator>`: how to accumulate or process the collected
   data.
@@ -98,6 +95,10 @@ As shown in the diagram above, the list of :term:`sources <Source>` will be run
 **concurrently**, each one in its own subprocess. Each source will provide some
 arbitrary data that will be collected into a bundle that maps the identifier
 of each source to the data it provided.
+
+Sources are expected to connect, read, parse or consume a particular data
+source, like a web service, a system statistic, read and / or parse a file,
+fetch variables from the environment, scan a directory, among others examples.
 
 Once all sources have run and all data have been collected into the bundle,
 the list of :term:`aggregators <Aggregator>` will be run **sequentially**.
@@ -121,8 +122,191 @@ will also run **concurrently**, each one in its own subprocess.
 Sinks can modify or transform the passed data at will if required, but those
 modifications will have no impact in the data the others sinks have. It is
 expected that the sinks store or publish the data in some form, for example
-submitting it to a database, writing a file, rendering a template, sending it
-by email, among some examples.
+submitting it to a database, to a web service, writing a file, rendering a
+template, sending it by email, among some examples.
+
+
+Defining a Pipeline
+===================
+
+Let's run the simplest pipeline. Create a file ``pipeline1.toml`` with:
+
+.. code-block:: toml
+
+    [[sources]]
+    type = "timestamp"
+    id = "timestamp1"
+
+    [[sinks]]
+    type = "print"
+    id = "print1"
+
+And execute it with:
+
+.. code-block:: console
+
+    $ flowbber pipeline1.toml
+    OrderedDict([('timestamp1', {'epoch': 1503697771})])
+
+As you can see, the collected data is composed of an
+:py:class:`collections.OrderedDict` that maps the ``id`` of a source to the
+data it collected.
+
+In this example, we use the :ref:`timestamp <sources-timestamp>` source, which
+is a simple plugin that collects the current time. Then, we use the
+:ref:`print <sinks-print>` sink, which is a simple plugin that pretty prints
+the collected data to the standard output.
+
+Let's add a couple more sources:
+
+.. code-block:: toml
+
+    [[sources]]
+    type = "timestamp"
+    id = "timestamp1"
+
+    [[sources]]
+    type = "timestamp"
+    id = "timestamp2"
+
+    [[sources]]
+    type = "user"
+    id = "user1"
+
+    [[sinks]]
+    type = "print"
+    id = "print1"
+
+And let's execute this new pipeline:
+
+.. code-block:: console
+
+    $ flowbber pipeline1.toml
+    OrderedDict([
+        ('timestamp1', {'epoch': 1503698275}),
+        ('timestamp2', {'epoch': 1503698275}),
+        ('user1', {'login': 'kuralabs', 'uid': 1000}),
+    ])
+
+Note that the ``timestamp`` sources picked the same integer timestamp in
+seconds since the epoch. Let's configure them to use a floating point timestamp
+that takes into account milliseconds:
+
+.. code-block:: toml
+
+    [[sources]]
+    type = "timestamp"
+    id = "timestamp1"
+
+        [sources.config]
+        epoch = false
+        epochf = true
+
+    [[sources]]
+    type = "timestamp"
+    id = "timestamp2"
+
+        [sources.config]
+        epoch = false
+        epochf = true
+
+    [[sources]]
+    type = "user"
+    id = "user1"
+
+    [[sinks]]
+    type = "print"
+    id = "print1"
+
+According to the :ref:`timestamp <sources-timestamp>` source you can use
+several timestamp formats, and with the above options we toggle them.
+
+When executed, the pipeline shows:
+
+.. code-block:: console
+
+    $ flowbber pipeline1.toml
+    OrderedDict([
+        ('timestamp1', {'epochf': 1503698656.83944}),
+        ('timestamp2', {'epochf': 1503698656.840055}),
+        ('user1', {'login': 'kuralabs', 'uid': 1000}),
+    ])
+
+Now, we can see that, as expected, both ``timestamp`` sources picked the
+current time at slight different times.
+
+As a final exercise, let's run the same pipeline again but with a bit of
+verbosity:
+
+.. code-block:: console
+
+    $ flowbber -vv pipeline1.toml
+      INFO     | flowbber PID 8574 starting ...
+      INFO     | Loading pipeline definition from /home/kuralabs/flowbber/pipeline1.toml ...
+      INFO     | Pipeline definition loaded, realized and validated.
+      INFO     | Loading local configuration from /home/kuralabs/flowbber ...
+      INFO     | Creating pipeline ...
+      INFO     | Loading plugins ...
+      INFO     | Sources available: ['cobertura', 'env', 'user', 'timestamp']
+      INFO     | Aggregators available: []
+      INFO     | Sinks available: ['template', 'influxdb', 'archive', 'print', 'mongodb']
+      INFO     | Building pipeline ...
+      INFO     | Using configuration:
+        epoch = False
+        epochf = True
+        iso8601 = False
+        strftime = None
+      INFO     | Created source instance #0 TimestampSource.timestamp.timestamp1
+      INFO     | Using configuration:
+        epoch = False
+        epochf = True
+        iso8601 = False
+        strftime = None
+      INFO     | Created source instance #1 TimestampSource.timestamp.timestamp2
+      INFO     | Created source instance #2 UserSource.user.user1
+      INFO     | Created sink instance #0 PrintSink.print.print1
+      INFO     | Running pipeline ...
+      INFO     | Running sources ...
+      INFO     | Starting source #0 "timestamp1"
+      INFO     | Starting source #1 "timestamp2"
+      INFO     | Starting source #2 "user1"
+      INFO     | Collecting data from source #0 "timestamp1"
+      INFO     | Collecting data from source #1 "timestamp2"
+      INFO     | Collecting data from source #2 "user1"
+      INFO     | Source #0 "timestamp1" (PID 8579) finished collecting data successfully after 0.0003 seconds
+      INFO     | Source #1 "timestamp2" (PID 8580) finished collecting data successfully after 0.0005 seconds
+      INFO     | Source #2 "user1" (PID 8583) finished collecting data successfully after 0.0005 seconds
+      INFO     | Running aggregators ...
+      INFO     | Running sinks ...
+      INFO     | Executing data sink #0 "print1"
+    OrderedDict([
+        ('timestamp1', {'epochf': 1503699801.471691}),
+        ('timestamp2', {'epochf': 1503699801.472847}),
+        ('user1', {'login': 'kuralabs', 'uid': 1000}),
+    ])
+      INFO     | Sink #0 "print1" (PID 8588) finished successfully after 0.0010 seconds
+      INFO     | Saving journal ...
+      INFO     | Journal saved to /tmp/flowbber-journals/journal-8574-2bwi6onn
+
+As we can see, a lot of information is provided, including configuration and
+duration of each source, plugins available, PIDs, etc.
+
+At this point we have covered the basics. Any pipeline is composed of:
+
+- A list of :term:`sources <Source>`.
+- An optional list of :term:`aggregators <Aggregator>`.
+- And a list of  :term:`sinks <Sink>`.
+
+Each one with a **type** and an **id** and a **configuration** (if any).
+
+In this example we used TOML_ to define the pipeline, but JSON_ can also be
+used, as explained in the following section.
+
+
+Pipeline Definition format
+==========================
+
+FIXME: TODO.
 
 
 Glossary
@@ -163,3 +347,7 @@ Glossary
     Component
         A component of a stage in a :term:`Pipeline`. Either a :term:`Source`,
         an :term:`Aggregator` or a :term:`Sink`.
+
+
+.. _JSON: http://www.json.org/
+.. _TOML: https://github.com/toml-lang/toml

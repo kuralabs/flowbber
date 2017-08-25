@@ -11,17 +11,24 @@ The following sources plugins are included as part of Flowbber.
 .. contents::
    :local:
 
+.. _sources-cobertura:
+
 .. automodule:: flowbber.plugins.sources.cobertura
 
 -------------------------------------------------------------------------
+
+.. _sources-env:
 
 .. automodule:: flowbber.plugins.sources.env
 
 -------------------------------------------------------------------------
 
+.. _sources-timestamp:
+
 .. automodule:: flowbber.plugins.sources.timestamp
 
 -------------------------------------------------------------------------
 
-.. automodule:: flowbber.plugins.sources.user
+.. _sources-user:
 
+.. automodule:: flowbber.plugins.sources.user
