@@ -23,7 +23,7 @@ All custom Flowbber sources must extend from the Source class.
 
 from collections import OrderedDict
 
-from ..entities import Source
+from ..components import Source
 from ..logging import get_logger
 from .loader import PluginLoader
 

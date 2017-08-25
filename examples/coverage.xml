@@ -4,7 +4,7 @@
 	<!-- Based on https://raw.githubusercontent.com/cobertura/web/master/htdocs/xml/coverage-04.dtd -->
 	<sources/>
 	<packages>
-		<package branch-rate="0" complexity="0" line-rate="0.3169" name=".home.jenkins.Hacking.flowbber..tox.env.lib.python3.5.site-packages.flowbber">
+		<package branch-rate="0" complexity="0" line-rate="0.3169" name="flowbber">
 			<classes>
 				<class branch-rate="0" complexity="0" filename="__init__.py" line-rate="1" name="__init__.py">
 					<methods/>
@@ -221,9 +221,9 @@
 				</class>
 			</classes>
 		</package>
-		<package branch-rate="0" complexity="0" line-rate="0.6197" name=".home.jenkins.Hacking.flowbber..tox.env.lib.python3.5.site-packages.flowbber.entities">
+		<package branch-rate="0" complexity="0" line-rate="0.6197" name="flowbber.components">
 			<classes>
-				<class branch-rate="0" complexity="0" filename="entities/__init__.py" line-rate="1" name="__init__.py">
+				<class branch-rate="0" complexity="0" filename="components/__init__.py" line-rate="1" name="__init__.py">
 					<methods/>
 					<lines>
 						<line hits="1" number="18"/>
@@ -232,7 +232,7 @@
 						<line hits="1" number="24"/>
 					</lines>
 				</class>
-				<class branch-rate="0" complexity="0" filename="entities/aggregator.py" line-rate="0.6667" name="aggregator.py">
+				<class branch-rate="0" complexity="0" filename="components/aggregator.py" line-rate="0.6667" name="aggregator.py">
 					<methods/>
 					<lines>
 						<line hits="1" number="18"/>
@@ -249,7 +249,7 @@
 						<line hits="1" number="43"/>
 					</lines>
 				</class>
-				<class branch-rate="0" complexity="0" filename="entities/base.py" line-rate="0.5714" name="base.py">
+				<class branch-rate="0" complexity="0" filename="components/base.py" line-rate="0.5714" name="base.py">
 					<methods/>
 					<lines>
 						<line hits="1" number="18"/>
@@ -275,7 +275,7 @@
 						<line hits="1" number="67"/>
 					</lines>
 				</class>
-				<class branch-rate="0" complexity="0" filename="entities/sink.py" line-rate="0.7778" name="sink.py">
+				<class branch-rate="0" complexity="0" filename="components/sink.py" line-rate="0.7778" name="sink.py">
 					<methods/>
 					<lines>
 						<line hits="1" number="18"/>
@@ -289,7 +289,7 @@
 						<line hits="1" number="38"/>
 					</lines>
 				</class>
-				<class branch-rate="0" complexity="0" filename="entities/source.py" line-rate="0.52" name="source.py">
+				<class branch-rate="0" complexity="0" filename="components/source.py" line-rate="0.52" name="source.py">
 					<methods/>
 					<lines>
 						<line hits="1" number="18"/>
@@ -321,7 +321,7 @@
 				</class>
 			</classes>
 		</package>
-		<package branch-rate="0" complexity="0" line-rate="0.5873" name=".home.jenkins.Hacking.flowbber..tox.env.lib.python3.5.site-packages.flowbber.loaders">
+		<package branch-rate="0" complexity="0" line-rate="0.5873" name="flowbber.loaders">
 			<classes>
 				<class branch-rate="0" complexity="0" filename="loaders/__init__.py" line-rate="1" name="__init__.py">
 					<methods/>
@@ -413,7 +413,7 @@
 				</class>
 			</classes>
 		</package>
-		<package branch-rate="0" complexity="0" line-rate="1" name=".home.jenkins.Hacking.flowbber..tox.env.lib.python3.5.site-packages.flowbber.plugins">
+		<package branch-rate="0" complexity="0" line-rate="1" name="flowbber.plugins">
 			<classes>
 				<class branch-rate="0" complexity="0" filename="plugins/__init__.py" line-rate="1" name="__init__.py">
 					<methods/>
@@ -423,7 +423,7 @@
 				</class>
 			</classes>
 		</package>
-		<package branch-rate="0" complexity="0" line-rate="0.2575" name=".home.jenkins.Hacking.flowbber..tox.env.lib.python3.5.site-packages.flowbber.plugins.sinks">
+		<package branch-rate="0" complexity="0" line-rate="0.2575" name="flowbber.plugins.sinks">
 			<classes>
 				<class branch-rate="0" complexity="0" filename="plugins/sinks/__init__.py" line-rate="1" name="__init__.py">
 					<methods/>
@@ -624,7 +624,7 @@
 				</class>
 			</classes>
 		</package>
-		<package branch-rate="0" complexity="0" line-rate="0.3425" name=".home.jenkins.Hacking.flowbber..tox.env.lib.python3.5.site-packages.flowbber.plugins.sources">
+		<package branch-rate="0" complexity="0" line-rate="0.3425" name="flowbber.plugins.sources">
 			<classes>
 				<class branch-rate="0" complexity="0" filename="plugins/sources/__init__.py" line-rate="1" name="__init__.py">
 					<methods/>

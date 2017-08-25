@@ -35,7 +35,7 @@ SLUG_SCHEMA = {
 }
 
 
-ENTITY_SCHEMA = {
+COMPONENT_SCHEMA = {
     'type': SLUG_SCHEMA,
     'id': SLUG_SCHEMA,
     'config': {
@@ -76,7 +76,7 @@ PIPELINE_SCHEMA = {
         'empty': False,
         'schema': {
             'type': 'dict',
-            'schema': ENTITY_SCHEMA,
+            'schema': COMPONENT_SCHEMA,
         },
     },
     'aggregators': {
@@ -86,7 +86,7 @@ PIPELINE_SCHEMA = {
         'default': [],
         'schema': {
             'type': 'dict',
-            'schema': ENTITY_SCHEMA,
+            'schema': COMPONENT_SCHEMA,
         },
     },
     'sinks': {
@@ -95,7 +95,7 @@ PIPELINE_SCHEMA = {
         'empty': False,
         'schema': {
             'type': 'dict',
-            'schema': ENTITY_SCHEMA,
+            'schema': COMPONENT_SCHEMA,
         },
     },
 }

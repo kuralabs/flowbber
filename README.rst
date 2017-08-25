@@ -15,7 +15,7 @@ Documentation
 TODO
 ====
 
-- Implement execution timeout for all entities.
+- Implement execution timeout for all components.
 
 
 License

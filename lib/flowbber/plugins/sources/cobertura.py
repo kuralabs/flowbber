@@ -106,7 +106,7 @@ Path to the Cobertura ``coverage.xml`` file to be parsed.
 
 from pathlib import Path
 
-from flowbber.entities import Source
+from flowbber.components import Source
 
 
 class CoberturaSource(Source):

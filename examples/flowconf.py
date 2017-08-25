@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from flowbber.loaders import source
-from flowbber.entities.source import Source
+from flowbber.components.source import Source
 
 
 @source.register('my_source')

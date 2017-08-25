@@ -16,9 +16,9 @@
 # under the License.
 
 """
-Module implementating Source base class.
+Module implementating Sink base class.
 
-All custom Flowbber sources must extend from the Source class.
+All custom Flowbber sinks must extend from the Sink class.
 """
 
 from time import time
@@ -27,31 +27,28 @@ from multiprocessing import Queue
 
 from setproctitle import setproctitle
 
-from .base import BaseEntity
+from .base import Component
 
 
-class Source(BaseEntity):
+class Sink(Component):
     def __init__(self, index, type_, id_, config):
         super().__init__(index, type_, id_, config)
 
-        self.result = Queue(maxsize=1)
         self.duration = Queue(maxsize=1)
 
-    def execute(self):
+    def execute(self, data):
         setproctitle(str(self))
 
         start = time()
-        entry = {}
 
         try:
-            entry[self.id] = self.collect()
+            self.distribute(data)
         finally:
-            self.result.put(entry)
             self.duration.put(time() - start)
 
     @abstractmethod
-    def collect(self):
+    def distribute(self, data):
         pass
 
 
-__all__ = ['Source']
+__all__ = ['Sink']

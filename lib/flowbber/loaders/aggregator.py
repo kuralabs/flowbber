@@ -25,7 +25,7 @@ from collections import OrderedDict
 
 from .loader import PluginLoader
 from ..logging import get_logger
-from ..entities import Aggregator
+from ..components import Aggregator
 
 
 log = get_logger(__name__)

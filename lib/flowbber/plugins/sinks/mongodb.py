@@ -232,7 +232,7 @@ beginning of any key in the collected data (see MongoDB data safety above).
 
 """  # noqa
 
-from flowbber.entities import Sink
+from flowbber.components import Sink
 from flowbber.types import nullable
 from flowbber.logging import get_logger
 

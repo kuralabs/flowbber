@@ -16,7 +16,7 @@
 # under the License.
 
 """
-flowbber.entities module entry point.
+flowbber.components module entry point.
 """
 
 from .source import Source  # noqa

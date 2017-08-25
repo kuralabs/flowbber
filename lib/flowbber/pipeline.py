@@ -82,7 +82,7 @@ class Pipeline:
         FIXME: Document.
         """
 
-        for entity, loader_clss in (
+        for component, loader_clss in (
             ('source', SourcesLoader),
             ('aggregator', AggregatorsLoader),
             ('sink', SinksLoader),
@@ -90,11 +90,11 @@ class Pipeline:
             loader = loader_clss()
             available = loader.load_plugins()
 
-            setattr(self, '_{}s_loader'.format(entity), loader)
-            setattr(self, '_{}s_available'.format(entity), available)
+            setattr(self, '_{}s_loader'.format(component), loader)
+            setattr(self, '_{}s_available'.format(component), available)
 
             log.info('{}s available: {}'.format(
-                entity.capitalize(),
+                component.capitalize(),
                 list(available.keys()))
             )
 
@@ -103,39 +103,39 @@ class Pipeline:
         FIXME: Document.
         """
 
-        for entity_name in ['source', 'aggregator', 'sink']:
+        for component_name in ['source', 'aggregator', 'sink']:
             destination = []
 
-            available = getattr(self, '_{}s_available'.format(entity_name))
-            defined = self._pipeline['{}s'.format(entity_name)]
+            available = getattr(self, '_{}s_available'.format(component_name))
+            defined = self._pipeline['{}s'.format(component_name)]
 
-            for index, entity in enumerate(defined):
-                entity_type = entity['type']
+            for index, component in enumerate(defined):
+                component_type = component['type']
 
-                if entity_type not in available:
+                if component_type not in available:
                     raise ValueError('Unknown {} {}'.format(
-                        entity_name, entity_type
+                        component_name, component_type
                     ))
 
-                clss = available[entity_type]
+                clss = available[component_type]
                 instance = clss(
                     index,
-                    entity['type'],
-                    entity['id'],
-                    entity.get('config', {}),
+                    component['type'],
+                    component['id'],
+                    component.get('config', {}),
                 )
 
                 destination.append(instance)
 
                 log.info('Created {} instance {}'.format(
-                    entity_name, instance
+                    component_name, instance
                 ))
 
             log.debug('Pipeline {}s created : {}'.format(
-                entity_name, len(destination)
+                component_name, len(destination)
             ))
 
-            setattr(self, '_{}s'.format(entity_name), destination)
+            setattr(self, '_{}s'.format(component_name), destination)
 
     def run(self):
         """

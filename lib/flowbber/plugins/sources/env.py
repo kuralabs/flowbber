@@ -172,7 +172,7 @@ Store variables names in lowercase.
 
 """  # noqa
 
-from flowbber.entities import Source
+from flowbber.components import Source
 
 
 class EnvSource(Source):

@@ -308,7 +308,7 @@ from datetime import datetime
 
 from pprintpp import pformat
 
-from flowbber.entities import Sink
+from flowbber.components import Sink
 from flowbber.types import nullable
 from flowbber.logging import get_logger
 

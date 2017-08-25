@@ -187,7 +187,7 @@ Create output file parent directories if don't exist.
 from pathlib import Path
 from importlib import import_module
 
-from flowbber.entities import Sink
+from flowbber.components import Sink
 from flowbber.types import nullable
 from flowbber.logging import get_logger
 

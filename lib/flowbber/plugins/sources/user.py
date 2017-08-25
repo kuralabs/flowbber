@@ -53,7 +53,7 @@ This source allows to collect information about the current user.
 
 """  # noqa
 
-from flowbber.entities import Source
+from flowbber.components import Source
 
 
 class UserSource(Source):

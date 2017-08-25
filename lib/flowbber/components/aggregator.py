@@ -26,10 +26,10 @@ from abc import abstractmethod
 
 from setproctitle import setproctitle
 
-from .base import BaseEntity
+from .base import Component
 
 
-class Aggregator(BaseEntity):
+class Aggregator(Component):
     def __init__(self, index, type_, id_, config):
         super().__init__(index, type_, id_, config)
 

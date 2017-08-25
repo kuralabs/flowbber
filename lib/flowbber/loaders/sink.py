@@ -24,7 +24,7 @@ All custom Flowbber sinks must extend from the Sink class.
 from collections import OrderedDict
 
 
-from ..entities import Sink
+from ..components import Sink
 from ..logging import get_logger
 from .loader import PluginLoader
 

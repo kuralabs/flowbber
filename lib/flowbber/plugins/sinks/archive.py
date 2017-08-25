@@ -80,7 +80,7 @@ Create output file parent directories if don't exist.
 
 from pathlib import Path
 
-from flowbber.entities import Sink
+from flowbber.components import Sink
 from flowbber.logging import get_logger
 
 

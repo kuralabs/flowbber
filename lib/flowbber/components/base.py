@@ -16,9 +16,9 @@
 # under the License.
 
 """
-Base class for all Flowbber entities.
+Base class for all Flowbber components.
 
-All Flowbber entities extend from the BaseEntity class.
+All Flowbber components extend from the Component class.
 """
 
 from abc import ABCMeta, abstractmethod
@@ -38,7 +38,7 @@ class NamedABCMeta(ABCMeta):
         return str(cls)
 
 
-class BaseEntity(metaclass=NamedABCMeta):
+class Component(metaclass=NamedABCMeta):
     """
     FIXME: Document.
     """
@@ -72,4 +72,4 @@ class BaseEntity(metaclass=NamedABCMeta):
         return str(self)
 
 
-__all__ = ['BaseEntity']
+__all__ = ['Component']

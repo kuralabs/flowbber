@@ -110,7 +110,7 @@ For example: ``"%Y-%m-%d %H:%M:%S"``
 
 """  # noqa
 
-from flowbber.entities import Source
+from flowbber.components import Source
 
 
 class TimestampSource(Source):

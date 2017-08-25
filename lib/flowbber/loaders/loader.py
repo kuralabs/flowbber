@@ -18,7 +18,7 @@
 """
 Base class to load Flowbber plugins.
 
-All Flowbber entity loaders extend from the PluginLoader class.
+All Flowbber component loaders extend from the PluginLoader class.
 """
 
 from copy import copy
@@ -28,7 +28,7 @@ from collections import OrderedDict
 from pkg_resources import iter_entry_points
 
 from ..logging import get_logger
-from ..entities.base import BaseEntity
+from ..components.base import Component
 
 
 log = get_logger(__name__)
@@ -40,23 +40,23 @@ class PluginLoader(object):
 
     This class allows to load plugins using Python entry points.
 
-    :param str entity: Name of the entity.
+    :param str component: Name of the component.
     :param class base_class: Base class to check against. Any class specified
-     here must comply with the :class:`BaseEntity`.
+     here must comply with the :class:`Component`.
     :param str api_version: Version of the API.
     """
 
     _base_class = None
     _locally_registered = None
 
-    def __init__(self, entity, api_version='1.0'):
+    def __init__(self, component, api_version='1.0'):
         super().__init__()
 
-        self.entrypoint = 'flowbber_plugin_{entity}_{api_version}'.format(
-            entity=entity, api_version=api_version.replace('.', '_')
+        self.entrypoint = 'flowbber_plugin_{component}_{api_version}'.format(
+            component=component, api_version=api_version.replace('.', '_')
         )
 
-        assert issubclass(self.__class__._base_class, BaseEntity)
+        assert issubclass(self.__class__._base_class, Component)
 
         self._plugins_cache = OrderedDict()
 
@@ -77,7 +77,7 @@ class PluginLoader(object):
         ::
 
             from flowbber.loaders import source
-            from flowbber.entities.source import Source
+            from flowbber.components.source import Source
 
             @source.register('my_source')
             class MySource(Source):
@@ -116,7 +116,7 @@ class PluginLoader(object):
          force reload of all plugins registered for the entry point.
 
         :return: An ordered dictionary associating the name of the plugin and
-         the class (subclass of :class:`flowbber.entities.BaseEntity`)
+         the class (subclass of :class:`flowbber.components.Component`)
          implementing it.
         :rtype: OrderedDict
         """
