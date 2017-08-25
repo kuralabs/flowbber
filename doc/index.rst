@@ -9,6 +9,11 @@ Flowbber
 Flowbber provides a tool and framework that allows to create and execute
 custom pipelines for data collection, analysis and publishing.
 
+.. toctree::
+   :maxdepth: 2
+
+   quickstart
+
 
 Plugins
 =======

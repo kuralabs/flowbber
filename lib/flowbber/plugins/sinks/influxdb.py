@@ -40,7 +40,7 @@ To accomplish this, the flattening process will:
 
 So, for example, consider the data collected by the ``Cobertura`` source:
 
-.. code-block:: python
+.. code-block:: python3
 
     {
         'coverage': {
@@ -67,7 +67,7 @@ So, for example, consider the data collected by the ``Cobertura`` source:
 
 The above structure will be transformed into:
 
-.. code-block:: python
+.. code-block:: python3
 
     {
         'coverage': {
@@ -96,7 +96,7 @@ The above structure will be transformed into:
 
 Or in case of lists:
 
-.. code-block:: python
+.. code-block:: python3
 
     {
         'key1': ['a', 'b', 'c'],
@@ -109,7 +109,7 @@ Or in case of lists:
 
 The flattening results in:
 
-.. code-block:: python
+.. code-block:: python3
 
     {
         'key.0' : 'a',
@@ -255,7 +255,7 @@ Specify the path to the value by joining keys path with a ``.`` (dot).
 
 For example given the following structure:
 
-.. code-block:: python
+.. code-block:: python3
 
     {
         'my_key': {

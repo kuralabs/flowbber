@@ -25,7 +25,7 @@ payload.
 
 For the following collected data:
 
-.. code-block:: python
+.. code-block:: python3
 
     OrderedDict([
         ('timestamp', {

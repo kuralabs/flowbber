@@ -73,7 +73,7 @@ URI is in the form:
 Except that for username and password reserved characters like ``:``, ``/``,
 ``+`` and ``@`` must be percent encoded following RFC 2396:
 
-.. code-block:: python
+.. code-block:: python3
 
     from urllib.parse import quote_plus
 
@@ -86,7 +86,7 @@ Except that for username and password reserved characters like ``:``, ``/``,
 ``host`` can be a hostname or IP address. Unix domain sockets are also
 supported but must be percent encoded:
 
-.. code-block:: python
+.. code-block:: python3
 
     uri = 'mongodb://{}:{}@{}/'.format(
         quote_plus(user),
@@ -187,7 +187,7 @@ Specify the path to the value by joining keys path with a ``.`` (dot).
 
 For example given the following structure:
 
-.. code-block:: python
+.. code-block:: python3
 
     {
         'my_key': {
