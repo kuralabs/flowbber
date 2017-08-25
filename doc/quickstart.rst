@@ -2,6 +2,9 @@
 Quickstart
 ==========
 
+.. contents::
+   :local:
+
 Introduction
 ============
 
@@ -32,15 +35,17 @@ Flowbber can be easily installed from PyPI_ using pip_:
 .. _PyPI: https://pypi.python.org/pypi/flowbber
 .. _pip: https://pip.pypa.io/en/stable/installing/
 
-Verifying your installation:
+Verifying installation
+----------------------
 
-The first check you can make is to make sure you can launch the flowbber
-executable:
+Check that you can launch the flowbber executable:
 
 .. code-block:: console
 
     $ flowbber --version
     Flowbber v1.0.0
+
+Help is available using the ``--help`` flag:
 
 .. code-block:: console
 
@@ -51,7 +56,7 @@ executable:
     pipelines for data gathering, publishing and analysis.
 
     positional arguments:
-      pipeline       Pipeline configuration file
+      pipeline       Pipeline definition file
 
     optional arguments:
       -h, --help     show this help message and exit
@@ -62,22 +67,24 @@ executable:
 Key Concepts
 ============
 
-As an pipeline executor, Flowbber provides the ``flowbber`` executable that
-receives the definition of your data **collection-analyze-publish** pipeline.
+As an executor, Flowbber provides the ``flowbber`` executable which is
+responsible for loading a textual pipeline definition and execute the data
+**collection**, **analysis** and **publishing** routines as defined.
 
-This definition can be written in a simple JSON_ or TOML_ format, and specifies
-the stages of your pipeline:
+The pipeline definition can be written in a simple JSON_ or TOML_ format, and
+specifies the stages of your pipeline:
+
+.. _JSON: http://www.json.org/
+.. _TOML: https://github.com/toml-lang/toml
 
 - **Sources**: what data to collect and how.
 - **Aggregators**: how to accumulate or process the collected data.
 - **Sinks**: How to publish, store or transmit the resulting data.
 
-The ``flowbber`` executable can then create and run all components.
-
 As a framework, Flowbber allows to create the components (sources, aggregators
 and sinks) for your custom data pipeline.
 
-.. _JSON: http://www.json.org/
-.. _TOML: https://github.com/toml-lang/toml
+.. figure:: _static/images/arch.svg
+   :align: center
 
-.. image:: _static/images/arch.svg
+   Execution of a Flowbber pipeline.
