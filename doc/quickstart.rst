@@ -16,7 +16,7 @@ and framework written in Python 3 that allows to:
 #. Publish the data to many different data stores.
 
 This can be accomplish in a very easy and flexible way, and enables many use
-cases from many different domains.
+cases from several different domains.
 
 
 Quick Installation
@@ -112,7 +112,7 @@ next aggregator, making the order in which the aggregators run very important.
 
 This behavior makes the aggregator the more flexible and powerful component of
 the pipeline. Nevertheless, in many use cases only sources and sinks are
-required. A valid pipeline requires at least one source and one sink, a thus
+required. A valid pipeline requires at least one source and one sink, and thus
 aggregators are optional.
 
 Finally, when the last aggregator has run, the data will be considered done and
@@ -120,7 +120,7 @@ become read-only. The data is then passed to each :term:`sink <Sink>`, which
 will also run **concurrently**, each one in its own subprocess.
 
 Sinks can modify or transform the passed data at will if required, but those
-modifications will have no impact in the data the others sinks have. It is
+modifications will have no effect in the data the others sinks have. It is
 expected that the sinks store or publish the data in some form, for example
 submitting it to a database, to a web service, writing a file, rendering a
 template, sending it by email, among some examples.
@@ -324,7 +324,7 @@ Available replacement namespaces:
     .. warning::
 
         From a security perspective, if secrets are passed as environment
-        variables this namespace may constitue a way to expose them.
+        variables this namespace may constitutes a way to expose them.
 
 ``pipeline``
     Information related to the input :term:`Pipeline Definition` file. This is
@@ -373,8 +373,8 @@ Available replacement namespaces:
             [sources.config]
             directory = "{git.root}/src/"
 
-    In case the input pipeline defition file isn't in a git repository, this
-    namespace will be set to ``None``, causing any reference to a attribute in
+    In case the input pipeline definition file isn't in a git repository, this
+    namespace will be set to ``None``, causing any reference to an attribute in
     it to fail.
 
     ``root``
