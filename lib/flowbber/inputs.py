@@ -26,7 +26,7 @@ from .logging import get_logger
 from .namespaces import get_namespaces
 
 
-SLUG_REGEX = r'^[a-zA-Z_][a-zA-Z0-9_]+$'
+SLUG_REGEX = r'^[a-zA-Z_][a-zA-Z0-9_]*$'
 
 
 SLUG_SCHEMA = {
@@ -50,30 +50,33 @@ COMPONENT_SCHEMA = {
 }
 
 
+SCHEDULER_SCHEMA = {
+    'frequency': {
+        'required': True,
+        'coerce': 'timedelta',
+    },
+    'samples': {
+        'required': False,
+        'type': 'integer',
+        'min': 1,
+        'nullable': True,
+        'default': None,
+    },
+    'start': {
+        'required': False,
+        'type': 'integer',
+        'min': 0,
+        'nullable': True,
+        'default': None,
+    },
+}
+
+
 PIPELINE_SCHEMA = {
     'schedule': {
         'required': False,
         'type': 'dict',
-        'schema': {
-            'frequency': {
-                'required': True,
-                'coerce': 'timedelta',
-            },
-            'samples': {
-                'required': False,
-                'type': 'integer',
-                'min': 1,
-                'nullable': True,
-                'default': None,
-            },
-            'start': {
-                'required': False,
-                'type': 'integer',
-                'min': 0,
-                'nullable': True,
-                'default': None,
-            },
-        }
+        'schema': SCHEDULER_SCHEMA,
     },
     'sources': {
         'required': True,
