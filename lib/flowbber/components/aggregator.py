@@ -16,7 +16,7 @@
 # under the License.
 
 """
-Module implementating Aggregator base class.
+Module implementating the Aggregator base class.
 
 All custom Flowbber aggregators must extend from the Aggregator class.
 """

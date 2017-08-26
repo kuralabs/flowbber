@@ -16,7 +16,7 @@
 # under the License.
 
 """
-Module implementating Sink base class.
+Module implementating the Sink base class.
 
 All custom Flowbber sinks must extend from the Sink class.
 """

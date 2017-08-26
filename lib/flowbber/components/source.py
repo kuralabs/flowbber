@@ -16,7 +16,7 @@
 # under the License.
 
 """
-Module implementating Source base class.
+Module implementating the Source base class.
 
 All custom Flowbber sources must extend from the Source class.
 """
