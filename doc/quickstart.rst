@@ -35,7 +35,7 @@ Flowbber can be easily installed from PyPI_ using pip_:
 .. _PyPI: https://pypi.python.org/pypi/flowbber
 .. _pip: https://pip.pypa.io/en/stable/installing/
 
-Verifying installation
+Verifying Installation
 ----------------------
 
 Check that you can launch the ``flowbber`` command line application:
@@ -303,10 +303,25 @@ In this example we used TOML_ to define the pipeline, but JSON_ can also be
 used, as explained in the following section.
 
 
-Pipeline Definition format
+Pipeline Definition Format
 ==========================
 
-Available replacement namespaces:
+FIXME: TODO.
+
+
+Substitutions
+=============
+
+Key - value settings in a :term:`Pipeline Definition` file can make use of
+value substitution through the ``{namespace.value}`` string-substitution
+pattern. Substitutions can only be applied to **strings**.
+
+If the ``{`` or ``}`` characters are required they can be escaped using a
+double bracket. For example ``{{{env.HOME}}}{{`` will result in
+``{/home/kuralabs}{``.
+
+Available Namespaces
+--------------------
 
 ``env``
     You may retrieve any environment variable from this namespace.
@@ -403,6 +418,78 @@ Available replacement namespaces:
         .. code-block:: sh
 
             git -C pipeline.parent rev-parse --short --verify HEAD
+
+Scheduling
+==========
+
+In many use cases it is required to keep running the pipeline with some
+frequency.
+
+For example, consider you want to monitor your internet speed. You want to
+collect a sample once per hour and send it to a time series database for later
+retrieval and visualization.
+
+The obvious solution is to configure your system's cron to call the
+``flowbber`` command line application once per hour. While this approach is
+useful, effective and supported, Flowbber has a built-in scheduler that allows
+to configure scheduling directly from the pipeline definition file and provides
+more advanced features that cron can't provide.
+
+To use the scheduling feature just include a ``schedule`` section as follows:
+
+In TOML_:
+
+.. code-block:: toml
+
+    [schedule]
+    frequency = "10 seconds"
+    start = 1503741210
+    samples = 4
+
+In JSON_:
+
+.. code-block:: json
+
+    {
+        "schedule": {
+            "frequency": "10 seconds",
+            "samples": 4,
+            "start": 1503741210
+        }
+    }
+
+Options are:
+
+``frequency``
+    String expression denoting a time frequency. This string is parsed using
+    the pytimeparse_ library and thus the following expressions can be used:
+
+    .. code-block:: text
+
+        0.1 second
+        1s
+        10 minutes
+        10:20:10
+        2 days, 4:13:02
+        5 hours, 34 minutes, 56 seconds
+
+    For a complete list of time expressions please visit the pytimeparse_
+    library.
+
+    .. _pytimeparse: https://github.com/wroberts/pytimeparse
+
+``samples``
+    Number of samples (successful executions of the pipeline) to take before
+    shutting down.
+
+    If missing or ``None``, the scheduler will continue taking samples forever.
+
+``start``
+    An absolute timestamp in seconds since the epoch that mark when the
+    scheduler should start executing the pipeline. This timestamp must be in
+    the future.
+
+    If missing or ``None``, the scheduler will start immediately.
 
 
 Glossary
