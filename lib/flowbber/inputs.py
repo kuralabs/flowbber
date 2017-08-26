@@ -25,13 +25,17 @@ from collections import namedtuple
 from pprintpp import pformat
 from cerberus import Validator
 
+from .utils.command import run
 from .logging import get_logger
+
+
+SLUG_REGEX = r'^[a-zA-Z_][a-zA-Z0-9_]+$'
 
 
 SLUG_SCHEMA = {
     'required': True,
     'type': 'string',
-    'regex': r'^[a-zA-Z0-9_-]+$',
+    'regex': SLUG_REGEX,
 }
 
 
@@ -41,6 +45,10 @@ COMPONENT_SCHEMA = {
     'config': {
         'required': False,
         'type': 'dict',
+        'keyschema': {
+            'type': 'string',
+            'regex': SLUG_REGEX,
+        },
     },
 }
 
@@ -119,11 +127,7 @@ class PipelineValidator(Validator):
         return timedelta
 
 
-def replace_values(definition, path):
-    """
-    FIXME: Document.
-    """
-
+def namespace_env(path):
     # Get the environment object
     safe_env = {
         key: value
@@ -137,6 +141,13 @@ def replace_values(definition, path):
     )
     env = env_type(**safe_env)
 
+    log.debug('env namespace: {}'.format(env._replace(
+        **{key: '****' for key in safe_env.keys()}
+    )))
+    return env
+
+
+def namespace_pipeline(path):
     # Get pipeline object
     pipeline_type = namedtuple(
         'pipeline',
@@ -149,13 +160,85 @@ def replace_values(definition, path):
         name=path.stem,
     )
 
+    log.debug('pipeline namespace: {}'.format(pipeline))
+    return pipeline
+
+
+def namespace_git(path):
+
+    from shutil import which
+
+    gitcmd = which('git')
+    if gitcmd is None:
+        log.debug('git executable not found')
+        return None
+
+    parent = str(path.parent)
+
+    # Get repository root
+    cmd_root = run([
+        gitcmd, '-C', parent,
+        'rev-parse', '--show-toplevel'
+    ])
+    if cmd_root.returncode != 0:
+        log.debug('Unable to determine git repository root: {}'.format(
+            cmd_root.stderr
+        ))
+        return None
+
+    # Get current branch
+    cmd_branch = run([
+        gitcmd, '-C', parent,
+        'rev-parse', '--abbrev-ref', 'HEAD'
+    ])
+    if cmd_branch.returncode != 0:
+        log.debug('Unable to determine git branch: {}'.format(
+            cmd_branch.stderr
+        ))
+        return None
+
+    # Get current revision
+    cmd_rev = run([
+        gitcmd, '-C', parent,
+        'rev-parse', '--short', '--verify', 'HEAD'
+    ])
+    if cmd_rev.returncode != 0:
+        log.debug('Unable to determine git revision: {}'.format(
+            cmd_rev.stderr
+        ))
+        return None
+
+    # Get git object
+    git_type = namedtuple(
+        'git',
+        ['root', 'branch', 'rev']
+    )
+
+    git = git_type(
+        root=cmd_root.stdout,
+        branch=cmd_branch.stdout,
+        rev=cmd_rev.stdout,
+    )
+
+    log.debug('git namespace: {}'.format(git))
+    return git
+
+
+def replace_values(definition, path):
+    """
+    FIXME: Document.
+    """
+
+    namespaces = {
+        'env': namespace_env(path),
+        'pipeline': namespace_pipeline(path),
+        'git': namespace_git(path),
+    }
+
     # Replace all string keys and values
     def replace(obj):
         if isinstance(obj, str):
-            return obj.format(
-                env=env,
-                pipeline=pipeline
-            )
+            return obj.format(**namespaces)
 
         if isinstance(obj, list):
             return [replace(element) for element in obj]

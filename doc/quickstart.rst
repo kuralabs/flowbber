@@ -306,7 +306,103 @@ used, as explained in the following section.
 Pipeline Definition format
 ==========================
 
-FIXME: TODO.
+Available replacement namespaces:
+
+``env``
+    You may retrieve any environment variable from this namespace.
+
+    For example::
+
+        {env.HOME}
+
+    .. warning::
+
+        Because :py:func:`collections.namedtuple` doesn't support
+        attributes that start with a `_` (underscore), any environment
+        variable that starts with it will be filtered out.
+
+    .. warning::
+
+        From a security perspective, if secrets are passed as environment
+        variables this namespace may constitue a way to expose them.
+
+``pipeline``
+    Information related to the input :term:`Pipeline Definition` file. This is
+    particularly useful for specifying paths that must remain relative to the
+    pipeline definition file.
+
+    For example, a template:
+
+    .. code-block:: toml
+
+        [[sinks]]
+        type = "template"
+        id = "template1"
+
+            [sinks.config]
+            template = "file://{pipeline.dir}/template1.tpl"
+
+    ``dir``
+        Parent directory of the input pipeline definition file.
+
+    ``ext``
+        Extension of the input pipeline definition file. Should be
+        either ``.toml`` or ``.json``.
+
+    ``file``
+        Filename of the pipeline definition file.
+        For example ``pipeline1.toml``.
+
+    ``name``
+        Filename of the pipeline definition file without extension.
+        For example, ``pipeline1`` for a input file ``pipeline1.toml``.
+
+``git``
+    Information related to git repository the input :term:`Pipeline Definition`
+    file is commited to, if any. This is particularly useful for specifying
+    paths that must remain relative to git root repository.
+
+    For example, a path to a code directory:
+
+    .. code-block:: toml
+
+        [[sources]]
+        type = "linesofcode"
+        id = "linesofcode1"
+
+            [sources.config]
+            directory = "{git.root}/src/"
+
+    In case the input pipeline defition file isn't in a git repository, this
+    namespace will be set to ``None``, causing any reference to a attribute in
+    it to fail.
+
+    ``root``
+        Repository root directory.
+
+        This is determined by:
+
+        .. code-block:: sh
+
+            git -C pipeline.parent rev-parse --show-toplevel
+
+    ``branch``
+        Name of the current branch. For example: ``master``.
+
+        This is determined by:
+
+        .. code-block:: sh
+
+            git -C pipeline.parent rev-parse --abbrev-ref HEAD
+
+    ``rev``
+        Current revision hash in short format.
+
+        This is determined by:
+
+        .. code-block:: sh
+
+            git -C pipeline.parent rev-parse --short --verify HEAD
 
 
 Glossary
