@@ -291,22 +291,122 @@ verbosity:
 As we can see, a lot of information is provided, including configuration and
 duration of each source, plugins available, PIDs, etc.
 
-At this point we have covered the basics. Any pipeline is composed of:
-
-- A list of :term:`sources <Source>`.
-- An optional list of :term:`aggregators <Aggregator>`.
-- And a list of  :term:`sinks <Sink>`.
-
-Each one with a **type** and an **id** and a **configuration** (if any).
-
-In this example we used TOML_ to define the pipeline, but JSON_ can also be
-used, as explained in the following section.
+At this point we have covered the basics. In this example we used TOML_ to
+define the pipeline, but JSON_ can also be used, as explained in the following
+section.
 
 
 Pipeline Definition Format
 ==========================
 
-FIXME: TODO.
+Flowbber supports both TOML_ and JSON_ formats for pipeline definition. For the
+format to be recognized by Flowbber, use either a ``.toml`` or ``.json`` file
+extension.
+
+In both formats, what is expected is that the pipeline is described in terms
+of:
+
+- A list of :term:`sources <Source>`.
+- An optional list of :term:`aggregators <Aggregator>`.
+- And a list of  :term:`sinks <Sink>`.
+
+And each element of those lists, to have:
+
+- A **type**, that identifies the component implementation.
+- An unique **id** to identify the instance.
+- A **config**, if any, as required by the component implementation.
+
+All keys, and in particular those of the configuration options must be able to
+be used as Python variables, so they are checked against the following regular
+expression:
+
+.. code-block:: python3
+
+    r'^[a-zA-Z_][a-zA-Z0-9_]*$'
+
+JSON
+----
+
+.. code-block:: json
+
+  {
+      "sources": [
+          {
+              "type": "type1",
+              "id": "id1",
+              "config": {
+                  "opt1": true,
+                  "opt2": "string",
+                  "opt3": 1000
+              }
+          },
+          {
+              "type": "type2",
+              "id": "id2",
+              "config": {}
+          }
+      ],
+      "aggregators": [
+          {
+              "type": "type1",
+              "id": "id1"
+          }
+      ],
+      "sinks": [
+          {
+              "type": "type1",
+              "id": "id1",
+              "config": {}
+          },
+          {
+              "type": "type2",
+              "id": "id2",
+              "config": {
+                  "opt1": true,
+                  "opt2": "string",
+                  "opt3": 1000
+              }
+          }
+      ]
+  }
+
+TOML
+----
+
+Please note that in TOML, lists of objects are represented with a double square
+bracket ``[[ElementInList]]``.
+
+.. code-block:: toml
+
+    [[sources]]
+    type = "type1"
+    id = "id1"
+
+        [sources.config]
+        opt1 = true
+        opt2 = "string"
+        opt3 = 1000
+
+    [[sources]]
+    type = "type2"
+    id = "id2"
+
+    [[aggregators]]
+    type = "type1"
+    id = "id1"
+
+    [[sinks]]
+    type = "type1"
+    id = "id1"
+
+    [[sinks]]
+    type = "type2"
+    id = "id2"
+
+        [sources.config]
+        opt1 = true
+        opt2 = "string"
+        opt3 = 1000
 
 
 Substitutions
@@ -315,6 +415,35 @@ Substitutions
 Key - value settings in a :term:`Pipeline Definition` file can make use of
 value substitution through the ``{namespace.value}`` string-substitution
 pattern. Substitutions can only be applied to **strings**.
+
+For example:
+
+In JSON:
+
+.. code-block:: json
+
+    {
+        "sinks": [
+            {
+                "type": "template",
+                "id": "template1",
+                "config": {
+                    "template": "file://{pipeline.dir}/template1.tpl"
+                }
+            }
+        ]
+    }
+
+In TOML:
+
+.. code-block:: toml
+
+    [[sinks]]
+    type = "template"
+    id = "template1"
+
+        [sinks.config]
+        template = "file://{pipeline.dir}/template1.tpl"
 
 If the ``{`` or ``}`` characters are required they can be escaped using a
 double bracket. For example ``{{{env.HOME}}}{{`` will result in
@@ -437,7 +566,7 @@ more advanced features that cron can't provide.
 
 To use the scheduling feature just include a ``schedule`` section as follows:
 
-In TOML_:
+In TOML:
 
 .. code-block:: toml
 
@@ -446,15 +575,15 @@ In TOML_:
     start = 1503741210
     samples = 4
 
-In JSON_:
+In JSON:
 
 .. code-block:: json
 
     {
         "schedule": {
             "frequency": "10 seconds",
-            "samples": 4,
-            "start": 1503741210
+            "start": 1503741210,
+            "samples": 4
         }
     }
 
