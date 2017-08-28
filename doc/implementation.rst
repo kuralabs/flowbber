@@ -429,6 +429,9 @@ at ``/etc/cpud.toml`` and look like this:
 
 .. code-block:: toml
 
+    [cpud]
+    verbosity = 3
+
     [sampling]
     # Take a sample each 10 seconds
     frequency = 10
