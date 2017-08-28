@@ -53,7 +53,15 @@ Path to JSON file to write the collected data.
 
 - **Default**: ``N/A``
 - **Optional**: ``False``
-- **Type**: ``str``
+- **Schema**:
+
+  .. code-block:: python3
+
+     {
+         'type': 'string',
+         'empty': False,
+     }
+
 - **Secret**: ``False``
 
 override
@@ -63,7 +71,14 @@ Override output file if already exists.
 
 - **Default**: ``False``
 - **Optional**: ``True``
-- **Type**: ``bool``
+- **Schema**:
+
+  .. code-block:: python3
+
+     {
+         'type': 'boolean',
+     }
+
 - **Secret**: ``False``
 
 create_parents
@@ -73,7 +88,14 @@ Create output file parent directories if don't exist.
 
 - **Default**: ``False``
 - **Optional**: ``True``
-- **Type**: ``bool``
+- **Schema**:
+
+  .. code-block:: python3
+
+     {
+         'type': 'boolean',
+     }
+
 - **Secret**: ``False``
 
 """  # noqa

@@ -99,7 +99,15 @@ Path to the Cobertura ``coverage.xml`` file to be parsed.
 
 - **Default**: ``N/A``
 - **Optional**: ``False``
-- **Type**: ``str``
+- **Schema**:
+
+  .. code-block:: python3
+
+     {
+         'type': 'string',
+         'empty': False,
+     }
+
 - **Secret**: ``False``
 
 """  # noqa

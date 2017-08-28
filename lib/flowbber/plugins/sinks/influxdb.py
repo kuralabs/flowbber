@@ -169,7 +169,16 @@ Check function from_DSN_ for more information.
 
 - **Default**: ``None``
 - **Optional**: ``True``
-- **Type**: ``nullable(str)``
+- **Schema**:
+
+  .. code-block:: python3
+
+     {
+         'type': 'string',
+         'empty': False,
+         'nullable': True,
+     }
+
 - **Secret**: ``True``
 
 host
@@ -179,7 +188,15 @@ Hostname or IP to connect to InfluxDB.
 
 - **Default**: ``localhost``
 - **Optional**: ``True``
-- **Type**: ``str``
+- **Schema**:
+
+  .. code-block:: python3
+
+     {
+         'type': 'string',
+         'empty': False,
+     }
+
 - **Secret**: ``False``
 
 port
@@ -189,7 +206,16 @@ Port to connect to InfluxDB.
 
 - **Default**: ``8086``
 - **Optional**: ``True``
-- **Type**: ``int``
+- **Schema**:
+
+  .. code-block:: python3
+
+     {
+         'type': 'integer',
+         'min': 0,
+         'max': 65535,
+     }
+
 - **Secret**: ``False``
 
 username
@@ -199,7 +225,15 @@ User to connect to InfluxDB.
 
 - **Default**: ``root``
 - **Optional**: ``True``
-- **Type**: ``str``
+- **Schema**:
+
+  .. code-block:: python3
+
+     {
+         'type': 'string',
+         'empty': False,
+     }
+
 - **Secret**: ``False``
 
 password
@@ -209,7 +243,14 @@ Password of the user.
 
 - **Default**: ``root``
 - **Optional**: ``True``
-- **Type**: ``str``
+- **Schema**:
+
+  .. code-block:: python3
+
+     {
+         'type': 'string',
+     }
+
 - **Secret**: ``True``
 
 ssl
@@ -219,7 +260,14 @@ Use https instead of http to connect to InfluxDB.
 
 - **Default**: ``False``
 - **Optional**: ``True``
-- **Type**: ``bool``
+- **Schema**:
+
+  .. code-block:: python3
+
+     {
+         'type': 'boolean',
+     }
+
 - **Secret**: ``False``
 
 verify_ssl
@@ -229,7 +277,14 @@ Verify SSL certificates for HTTPS requests.
 
 - **Default**: ``False``
 - **Optional**: ``True``
-- **Type**: ``bool``
+- **Schema**:
+
+  .. code-block:: python3
+
+     {
+         'type': 'boolean',
+     }
+
 - **Secret**: ``False``
 
 database
@@ -239,7 +294,15 @@ Database name to connect to.
 
 - **Default**: ``N/A``
 - **Optional**: ``False``
-- **Type**: ``str``
+- **Schema**:
+
+  .. code-block:: python3
+
+     {
+         'type': 'string',
+         'empty': False,
+     }
+
 - **Secret**: ``False``
 
 key
@@ -274,7 +337,16 @@ determined when submitting the data by calling Python's
 
 - **Default**: ``timestamp.iso8601``
 - **Optional**: ``True``
-- **Type**: ``nullable(str)``
+- **Schema**:
+
+  .. code-block:: python3
+
+     {
+         'type': 'string',
+         'empty': False,
+         'nullable': True,
+     }
+
 - **Secret**: ``False``
 
 keysjoiner
@@ -285,7 +357,14 @@ flattening process above).
 
 - **Default**: ``.``
 - **Optional**: ``True``
-- **Type**: ``str``
+- **Schema**:
+
+  .. code-block:: python3
+
+     {
+         'type': 'string',
+     }
+
 - **Secret**: ``False``
 
 keysjoinerreplace
@@ -299,7 +378,15 @@ the keys will be done.
 
 - **Default**: ``:``
 - **Optional**: ``True``
-- **Type**: ``nullable(str)``
+- **Schema**:
+
+  .. code-block:: python3
+
+     {
+         'type': 'string',
+         'nullable': True,
+     }
+
 - **Secret**: ``False``
 
 """  # noqa

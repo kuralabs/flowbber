@@ -69,7 +69,14 @@ Include seconds since the EPOCH, as integer.
 
 - **Default**: ``True``
 - **Optional**: ``True``
-- **Type**: ``bool``
+- **Schema**:
+
+  .. code-block:: python3
+
+     {
+         'type': 'boolean',
+     }
+
 - **Secret**: ``False``
 
 epochf
@@ -79,7 +86,14 @@ Include seconds since the EPOCH, as float.
 
 - **Default**: ``False``
 - **Optional**: ``True``
-- **Type**: ``bool``
+- **Schema**:
+
+  .. code-block:: python3
+
+     {
+         'type': 'boolean',
+     }
+
 - **Secret**: ``False``
 
 iso8601
@@ -90,7 +104,14 @@ specification.
 
 - **Default**: ``False``
 - **Optional**: ``True``
-- **Type**: ``bool``
+- **Schema**:
+
+  .. code-block:: python3
+
+     {
+         'type': 'boolean',
+     }
+
 - **Secret**: ``False``
 
 strftime
@@ -105,7 +126,15 @@ For example: ``"%Y-%m-%d %H:%M:%S"``
 
 - **Default**: ``None``
 - **Optional**: ``True``
-- **Type**: ``str``
+- **Schema**:
+
+  .. code-block:: python3
+
+     {
+         'type': 'string',
+         'empty': False,
+     }
+
 - **Secret**: ``False``
 
 """  # noqa

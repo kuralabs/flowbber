@@ -143,7 +143,18 @@ Matching is performed using Python's fnmatch_.
 
 - **Default**: ``[]``
 - **Optional**: ``True``
-- **Type**: ``list``
+- **Schema**:
+
+  .. code-block:: python3
+
+     {
+         'type': 'list',
+         'schema': {
+             'type': 'string',
+             'empty': False,
+         },
+     }
+
 - **Secret**: ``False``
 
 exclude
@@ -157,7 +168,18 @@ Matching is performed using Python's fnmatch_.
 
 - **Default**: ``[]``
 - **Optional**: ``True``
-- **Type**: ``list``
+- **Schema**:
+
+  .. code-block:: python3
+
+     {
+         'type': 'list',
+         'schema': {
+             'type': 'string',
+             'empty': False,
+         },
+     }
+
 - **Secret**: ``False``
 
 lowercase
@@ -167,7 +189,14 @@ Store variables names in lowercase.
 
 - **Default**: ``True``
 - **Optional**: ``True``
-- **Type**: ``bool``
+- **Schema**:
+
+  .. code-block:: python3
+
+     {
+         'type': 'boolean',
+     }
+
 - **Secret**: ``False``
 
 """  # noqa
