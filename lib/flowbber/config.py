@@ -65,22 +65,13 @@ class Configurator:
     def add_option(
             self, key,
             default=None, optional=False,
-            type=None, schema=None,
-            secret=False):
+            schema=None, secret=False):
 
         if not key:
             raise ValueError('Missing configuration key')
 
         if not isinstance(optional, bool):
             raise ValueError('optional must be a boolean')
-
-        if type is not None:
-            log.warning(
-                'type keyword is deprecated. '
-                'Called with {} for key {}'.format(
-                    type, key
-                )
-            )
 
         if schema is not None and not isinstance(schema, dict):
             raise ValueError('schema must be a dict')

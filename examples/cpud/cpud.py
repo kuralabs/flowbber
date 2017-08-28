@@ -4,9 +4,13 @@ from toml import loads
 
 from flowbber.pipeline import Pipeline
 from flowbber.scheduler import Scheduler
+from flowbber.logging import setup_logging
 
 
 CONFIG = """
+[cpud]
+verbosity = 3
+
 [sampling]
 # Take a sample each 10 seconds
 frequency = 10
@@ -30,7 +34,8 @@ def build_definition(config):
         'sources': [
             {'type': 'cpu', 'id': 'cpu'},
         ],
-        'sinks': []
+        'sinks': [],
+        'aggregators': [],
     }
 
     if config['influxdb']:
@@ -40,6 +45,7 @@ def build_definition(config):
             'config': {
                 'uri': config['influxdb']['uri'],
                 'database': config['influxdb']['database'],
+                'key': None,
             }
         })
 
@@ -51,6 +57,7 @@ def build_definition(config):
                 'uri': config['mongodb']['uri'],
                 'database': config['mongodb']['database'],
                 'collection': config['mongodb']['collection'],
+                'key': None,
             }
         })
 
@@ -64,6 +71,9 @@ def main():
 
     # Read configuration
     config = loads(CONFIG)
+
+    # Setup multiprocess logging
+    setup_logging(config['cpud']['verbosity'])
 
     # Build pipeline definition
     definition = build_definition(config)
@@ -79,8 +89,8 @@ def main():
     # Build and run scheduler
     scheduler = Scheduler(
         pipeline,
-        config['frequency'],
-        stop_on_error=True
+        config['sampling']['frequency'],
+        stop_on_failure=True
     )
 
     scheduler.run()

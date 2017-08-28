@@ -450,6 +450,7 @@ A basic and naive implementation of such daemon could looks like this:
 
     from flowbber.pipeline import Pipeline
     from flowbber.scheduler import Scheduler
+    from flowbber.logging import setup_logging
 
 
     def build_definition(config):
@@ -460,7 +461,8 @@ A basic and naive implementation of such daemon could looks like this:
             'sources': [
                 {'type': 'cpu', 'id': 'cpu'},
             ],
-            'sinks': []
+            'sinks': [],
+            'aggregators': [],
         }
 
         if config['influxdb']:
@@ -470,6 +472,7 @@ A basic and naive implementation of such daemon could looks like this:
                 'config': {
                     'uri': config['influxdb']['uri'],
                     'database': config['influxdb']['database'],
+                    'key': None,
                 }
             })
 
@@ -481,6 +484,7 @@ A basic and naive implementation of such daemon could looks like this:
                     'uri': config['mongodb']['uri'],
                     'database': config['mongodb']['database'],
                     'collection': config['mongodb']['collection'],
+                    'key': None,
                 }
             })
 
@@ -496,6 +500,9 @@ A basic and naive implementation of such daemon could looks like this:
         with open('/etc/cpud.toml') as fd:
             config = loads(fd.read())
 
+        # Setup multiprocess logging
+        setup_logging(config['cpud']['verbosity'])
+
         # Build pipeline definition
         definition = build_definition(config)
 
@@ -510,8 +517,8 @@ A basic and naive implementation of such daemon could looks like this:
         # Build and run scheduler
         scheduler = Scheduler(
             pipeline,
-            config['frequency'],
-            stop_on_error=True
+            config['sampling']['frequency'],
+            stop_on_failure=True
         )
 
         scheduler.run()
@@ -527,6 +534,7 @@ The most relevant parts of this example is that:
 
 #. We create an instance of :class:`flowbber.pipeline.Pipeline` with the
    definition.
+
    For one time execution applications we can use
    :meth:`flowbber.pipeline.Pipeline.run` method.
 
@@ -539,4 +547,15 @@ The most relevant parts of this example is that:
 
    .. autoclass:: flowbber.scheduler.Scheduler
       :members:
+      :noindex:
+
+#. We first thing we do is call :func:`flowbber.logging.setup_logging` with the
+   configured verbosity level to setup Flowbber's multiprocess safe logging and
+   printing.
+
+   If this function isn't called as soon as possible or not called at all then
+   logging performed from sources and sinks that run in their own subprocess
+   will mangle the logging output.
+
+   .. autofunction:: flowbber.logging.setup_logging
       :noindex:
