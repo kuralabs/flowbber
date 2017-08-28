@@ -337,6 +337,8 @@ setup(
 
         # CoberturaSource
         'cobertura': ['pycobertura'],
+        # CPUSource
+        'cpu': ['psutil'],
         # EnvSource
         'env': [],
         # TimestampSource
@@ -397,6 +399,7 @@ setup(
     entry_points={
         'flowbber_plugin_sources_1_0': [
             'cobertura = flowbber.plugins.sources.cobertura:CoberturaSource',
+            'cpu = flowbber.plugins.sources.cpu:CPUSource',
             'env = flowbber.plugins.sources.env:EnvSource',
             'timestamp = flowbber.plugins.sources.timestamp:TimestampSource',
             'user = flowbber.plugins.sources.user:UserSource',

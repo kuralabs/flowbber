@@ -1,5 +1,7 @@
 .. toctree::
 
+.. _sources:
+
 =======
 Sources
 =======
@@ -14,6 +16,12 @@ The following sources plugins are included as part of Flowbber.
 .. _sources-cobertura:
 
 .. automodule:: flowbber.plugins.sources.cobertura
+
+-------------------------------------------------------------------------
+
+.. _sources-cpu:
+
+.. automodule:: flowbber.plugins.sources.cpu
 
 -------------------------------------------------------------------------
 
