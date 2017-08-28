@@ -1,5 +1,7 @@
 .. toctree::
 
+.. _sinks:
+
 =====
 Sinks
 =====

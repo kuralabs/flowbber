@@ -14,6 +14,11 @@ custom pipelines for data collection, analysis and publishing.
 
    quickstart
 
+.. toctree::
+   :maxdepth: 3
+
+   implementation
+
 
 Plugins
 =======
