@@ -22,6 +22,9 @@ Module implementating the Configurator class.
 from copy import deepcopy
 from collections import OrderedDict, namedtuple
 
+from pprintpp import pformat
+from cerberus import Validator
+
 from .logging import get_logger
 
 
@@ -61,12 +64,26 @@ class Configurator:
 
     def add_option(
             self, key,
-            default=None, optional=False, type=None, secret=False):
+            default=None, optional=False,
+            type=None, schema=None,
+            secret=False):
+
         if not key:
             raise ValueError('Missing configuration key')
 
         if not isinstance(optional, bool):
             raise ValueError('optional must be a boolean')
+
+        if type is not None:
+            log.warning(
+                'type keyword is deprecated. '
+                'Called with {} for key {}'.format(
+                    type, key
+                )
+            )
+
+        if schema is not None and not isinstance(schema, dict):
+            raise ValueError('schema must be a dict')
 
         if not isinstance(secret, bool):
             raise ValueError('secret must be a boolean')
@@ -74,7 +91,7 @@ class Configurator:
         self._declared[key] = {
             'default': default,
             'optional': optional,
-            'type': type,
+            'schema': schema,
             'secret': secret,
         }
 
@@ -109,11 +126,32 @@ class Configurator:
                 sorted(available - declared)
             )
 
-        # Check datatypes of the options
+        # Check schema of the options
         for key, info in self._declared.items():
-            type_ = info['type']
-            if key in userconf:
-                userconf[key] = type_(userconf[key])
+            schema = info['schema']
+
+            if key in userconf and schema is not None:
+                validator = Validator({
+                    key: schema
+                })
+                validated = validator.validated({
+                    key: userconf[key]
+                })
+
+                if validated is None:
+                    log.critical(
+                        'Invalid config option {} = {}:\n{}'.format(
+                            key, userconf[key],
+                            pformat(validator.errors)
+                        )
+                    )
+                    raise SyntaxError(
+                        'Invalid config option {} = {}'.format(
+                            key, userconf[key]
+                        )
+                    )
+
+                userconf[key] = validated[key]
 
         # Add missing default values
         validated = deepcopy(userconf)

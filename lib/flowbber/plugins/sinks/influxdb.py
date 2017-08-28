@@ -309,7 +309,6 @@ from datetime import datetime
 from pprintpp import pformat
 
 from flowbber.components import Sink
-from flowbber.types import nullable
 from flowbber.logging import get_logger
 
 
@@ -418,7 +417,11 @@ class InfluxDBSink(Sink):
             'uri',
             default=None,
             optional=True,
-            type=nullable(str),
+            schema={
+                'type': 'string',
+                'empty': False,
+                'nullable': True,
+            },
             secret=True,
         )
 
@@ -426,28 +429,40 @@ class InfluxDBSink(Sink):
             'host',
             default='localhost',
             optional=True,
-            type=str,
+            schema={
+                'type': 'string',
+                'empty': False,
+            },
         )
 
         config.add_option(
             'port',
             default=8086,
             optional=True,
-            type=int,
+            schema={
+                'type': 'integer',
+                'min': 0,
+                'max': 65535,
+            },
         )
 
         config.add_option(
             'username',
             default='root',
             optional=True,
-            type=str,
+            schema={
+                'type': 'string',
+                'empty': False,
+            },
         )
 
         config.add_option(
             'password',
             default='root',
             optional=True,
-            type=str,
+            schema={
+                'type': 'string',
+            },
             secret=True,
         )
 
@@ -455,41 +470,57 @@ class InfluxDBSink(Sink):
             'ssl',
             default=False,
             optional=True,
-            type=bool,
+            schema={
+                'type': 'boolean',
+            },
         )
 
         config.add_option(
             'verify_ssl',
             default=False,
             optional=True,
-            type=bool,
+            schema={
+                'type': 'boolean',
+            },
         )
 
         # Data options
         config.add_option(
             'database',
-            type=str,
+            schema={
+                'type': 'string',
+                'empty': False,
+            },
         )
 
         config.add_option(
             'key',
             default='timestamp.iso8601',
             optional=True,
-            type=nullable(str),
+            schema={
+                'type': 'string',
+                'empty': False,
+                'nullable': True,
+            },
         )
 
         config.add_option(
             'keysjoiner',
             default='.',
             optional=True,
-            type=str,
+            schema={
+                'type': 'string',
+            },
         )
 
         config.add_option(
             'keysjoinerreplace',
             default=':',
             optional=True,
-            type=nullable(str),
+            schema={
+                'type': 'string',
+                'nullable': True,
+            },
         )
 
         # Check if uri is defined and if so then delete other keys

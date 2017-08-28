@@ -233,7 +233,6 @@ beginning of any key in the collected data (see MongoDB data safety above).
 """  # noqa
 
 from flowbber.components import Sink
-from flowbber.types import nullable
 from flowbber.logging import get_logger
 
 
@@ -271,7 +270,11 @@ class MongoDBSink(Sink):
             'uri',
             default=None,
             optional=True,
-            type=nullable(str),
+            schema={
+                'type': 'string',
+                'empty': False,
+                'nullable': True,
+            },
             secret=True,
         )
 
@@ -279,28 +282,40 @@ class MongoDBSink(Sink):
             'host',
             default='localhost',
             optional=True,
-            type=str,
+            schema={
+                'type': 'string',
+                'empty': False,
+            },
         )
 
         config.add_option(
             'port',
             default=27017,
             optional=True,
-            type=int,
+            schema={
+                'type': 'integer',
+                'min': 0,
+                'max': 65535,
+            },
         )
 
         config.add_option(
             'username',
             default=None,
             optional=True,
-            type=nullable(str),
+            schema={
+                'type': 'string',
+                'empty': False,
+            },
         )
 
         config.add_option(
             'password',
             default=None,
             optional=True,
-            type=nullable(str),
+            schema={
+                'type': 'string',
+            },
             secret=True,
         )
 
@@ -308,39 +323,55 @@ class MongoDBSink(Sink):
             'ssl',
             default=False,
             optional=True,
-            type=bool,
+            schema={
+                'type': 'boolean',
+            },
         )
 
         # Data options
         config.add_option(
             'database',
-            type=str,
+            schema={
+                'type': 'string',
+                'empty': False,
+            },
         )
 
         config.add_option(
             'collection',
-            type=str,
+            schema={
+                'type': 'string',
+                'empty': False,
+            },
         )
 
         config.add_option(
             'key',
             default='timestamp.epoch',
             optional=True,
-            type=nullable(str),
+            schema={
+                'type': 'string',
+                'empty': False,
+                'nullable': True,
+            },
         )
 
         config.add_option(
             'dotreplace',
             default=':',
             optional=True,
-            type=str,
+            schema={
+                'type': 'string',
+            },
         )
 
         config.add_option(
             'dollarreplace',
             default='&',
             optional=True,
-            type=str,
+            schema={
+                'type': 'string',
+            },
         )
 
         # Check if uri is defined and if so then delete other keys

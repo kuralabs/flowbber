@@ -120,28 +120,37 @@ class TimestampSource(Source):
             'epoch',
             default=True,
             optional=True,
-            type=bool
+            schema={
+                'type': 'boolean',
+            },
         )
 
         config.add_option(
             'epochf',
             default=False,
             optional=True,
-            type=bool
+            schema={
+                'type': 'boolean',
+            },
         )
 
         config.add_option(
             'iso8601',
             default=False,
             optional=True,
-            type=bool
+            schema={
+                'type': 'boolean',
+            },
         )
 
         config.add_option(
             'strftime',
             default=None,
             optional=True,
-            type=str
+            schema={
+                'type': 'string',
+                'empty': False,
+            },
         )
 
         # Check that at least one format is enabled

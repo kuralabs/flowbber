@@ -188,7 +188,6 @@ from pathlib import Path
 from importlib import import_module
 
 from flowbber.components import Sink
-from flowbber.types import nullable
 from flowbber.logging import get_logger
 
 
@@ -199,28 +198,39 @@ class TemplateSink(Sink):
     def declare_config(self, config):
         config.add_option(
             'template',
-            type=str,
+            schema={
+                'type': 'string',
+                'empty': False,
+            },
         )
 
         config.add_option(
             'output',
             default=None,
             optional=True,
-            type=nullable(str),
+            schema={
+                'type': 'string',
+                'empty': False,
+                'nullable': True
+            },
         )
 
         config.add_option(
             'override',
             default=False,
             optional=True,
-            type=bool,
+            schema={
+                'type': 'boolean',
+            },
         )
 
         config.add_option(
             'create_parents',
             default=True,
             optional=True,
-            type=bool,
+            schema={
+                'type': 'boolean',
+            },
         )
 
     def distribute(self, data):

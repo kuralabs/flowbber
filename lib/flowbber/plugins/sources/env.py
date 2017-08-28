@@ -182,21 +182,35 @@ class EnvSource(Source):
             'include',
             default=[],
             optional=True,
-            type=list
+            schema={
+                'type': 'list',
+                'schema': {
+                    'type': 'string',
+                    'empty': False,
+                },
+            },
         )
 
         config.add_option(
             'exclude',
             default=[],
             optional=True,
-            type=list
+            schema={
+                'type': 'list',
+                'schema': {
+                    'type': 'string',
+                    'empty': False,
+                },
+            },
         )
 
         config.add_option(
             'lowercase',
             default=True,
             optional=True,
-            type=bool
+            schema={
+                'type': 'boolean',
+            },
         )
 
     def collect(self):

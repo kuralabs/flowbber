@@ -114,7 +114,10 @@ class CoberturaSource(Source):
     def declare_config(self, config):
         config.add_option(
             'xmlpath',
-            type=str
+            schema={
+                'type': 'string',
+                'empty': False,
+            },
         )
 
         # Check if file exists

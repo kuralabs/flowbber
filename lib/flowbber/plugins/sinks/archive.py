@@ -92,21 +92,28 @@ class ArchiveSink(Sink):
 
         config.add_option(
             'output',
-            type=str
+            schema={
+                'type': 'string',
+                'empty': False,
+            },
         )
 
         config.add_option(
             'override',
             default=False,
             optional=True,
-            type=bool
+            schema={
+                'type': 'boolean',
+            },
         )
 
         config.add_option(
             'create_parents',
             default=True,
             optional=True,
-            type=bool
+            schema={
+                'type': 'boolean',
+            },
         )
 
         def custom_validator(validated):
