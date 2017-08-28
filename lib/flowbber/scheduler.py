@@ -35,11 +35,16 @@ class Scheduler:
     FIXME: Document.
     """
 
-    def __init__(self, pipeline, frequency, samples=None, start=None):
+    def __init__(
+            self, pipeline, frequency,
+            samples=None, start=None,
+            stop_on_error=False):
+
         self._pipeline = pipeline
         self._frequency = frequency
         self._samples = samples
         self._start = start
+        self._stop_on_error = stop_on_error
 
         self._runs_passed = 0
         self._runs_failed = 0
@@ -112,6 +117,9 @@ class Scheduler:
                 )
             )
             self._runs_failed += 1
+
+            if self._stop_on_error:
+                return
 
         finally:
             self._sched_next()
