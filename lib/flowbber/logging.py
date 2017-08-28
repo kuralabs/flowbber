@@ -23,14 +23,62 @@ import sys
 import logging
 from queue import Empty
 from atexit import register
+from functools import wraps
 from collections import namedtuple
 from logging.handlers import QueueHandler
 from multiprocessing import Queue, Process
 
 from colorlog import ColoredFormatter
 
+log = logging.getLogger(__name__)
 
-PrintRequest = namedtuple('PrintRequest', ['string'])
+PrintRequest = namedtuple('PrintRequest', ['string', 'fd'])
+
+
+class QueueListener:
+
+    def __init__(self, queue, handler):
+        self._queue = queue
+        self._handler = handler
+        self._fds = {
+            'stdout': sys.stdout,
+            'stderr': sys.stderr,
+        }
+
+    def start(self):
+        # Start listening for records
+        self._run_loop(True)
+        # There might still be records in the queue.
+        self._run_loop(False)
+
+    def _run_loop(self, block):
+
+        while True:
+            try:
+                # Handle stop
+                record = self._queue.get(False)
+                if record is None:
+                    break
+
+                # Handle printing
+                if isinstance(record, PrintRequest):
+                    if record.fd not in self._fds.keys():
+                        log.error(
+                            'Unknown fd to print to: {}'.format(record.fd)
+                        )
+                        continue
+
+                    fd = self._fds[record.fd]
+                    fd.write(record.string)
+                    fd.write('\n')
+                    continue
+
+                # Handle logging
+                self._handler.handle(record)
+            except Empty:
+                if not block:
+                    break
+                pass
 
 
 class LoggingManager:
@@ -79,37 +127,27 @@ class LoggingManager:
 
         logging.basicConfig(handlers=[handler], level=level)
 
-        # Start listening for records
-        while True:
-            try:
-                record = self._log_queue.get(True)
-                if record is None:
-                    break
-                if isinstance(record, PrintRequest):
-                    sys.stdout.write(record.string)
-                    sys.stdout.write('\n')
-                    continue
-                handler.handle(record)
-            except Empty:
-                pass
-
-        # There might still be records in the queue.
-        while True:
-            try:
-                record = self._log_queue.get(False)
-                if record is None:
-                    break
-                if isinstance(record, PrintRequest):
-                    sys.stdout.write(record.string)
-                    sys.stdout.write('\n')
-                    continue
-                handler.handle(record)
-            except Empty:
-                break
+        listener = QueueListener(self._log_queue, handler)
+        listener.start()
 
     def setup_logging(self, verbosity=0):
         """
-        FIXME: Document.
+        Setup logging for this process.
+
+        The first time it is called it will create a subprocess to manage the
+        logging and printing, setup the subprocess for stream logging to stdout
+        and setup the main process to queue logging.
+
+        In consequence, any subprocess of the main process will inherit the
+        queue logging and become multiprocess logging safe.
+
+        This method can be called from subprocesses, but if at least one
+        logging has been performed it will fail as the handler will already
+        exists.
+
+        :param str string: String to print.
+        :param str fd: Name of the file descriptor.
+         Either stdout or stderr only.
         """
 
         # Perform first time setup in main process and start the logging
@@ -141,18 +179,42 @@ class LoggingManager:
         self._log_queue.put_nowait(None)
         self._log_subprocess.join()
 
-    def enqueue_print(self, string):
+    def enqueue_print(self, string, fd='stdout'):
         """
-        FIXME: Document.
+        Enqueue a print to the given fd.
+
+        :param str string: String to print.
+        :param str fd: Name of the file descriptor.
+         Either stdout or stderr only.
         """
-        self._log_queue.put_nowait(PrintRequest(string=string))
+        self._log_queue.put_nowait(
+            PrintRequest(string=string, fd=fd)
+        )
 
 
-_instance = LoggingManager()
+_INSTANCE = LoggingManager()
 
-setup_logging = _instance.setup_logging
-print = _instance.enqueue_print
-get_logger = logging.getLogger
+
+@wraps(_INSTANCE.setup_logging)
+def setup_logging(verbosity=0):
+    _INSTANCE.setup_logging(verbosity=verbosity)
+
+
+@wraps(_INSTANCE.enqueue_print)
+def print(string, fd='stdout'):
+    _INSTANCE.enqueue_print(string, fd=fd)
+
+
+def get_logger(name):
+    """
+    Return a multiprocess safe logger.
+
+    :param str name: Name of the logger.
+
+    :return: A multiprocess safe logger.
+    :rtype: :py:class:`logging.Logger`.
+    """
+    return logging.getLogger(name)
 
 
 __all__ = ['setup_logging', 'print', 'get_logger']

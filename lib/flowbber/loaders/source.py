@@ -21,6 +21,7 @@ Module implementating Source base class.
 All custom Flowbber sources must extend from the Source class.
 """
 
+from functools import wraps
 from collections import OrderedDict
 
 from ..components import Source
@@ -43,7 +44,9 @@ class SourcesLoader(PluginLoader):
         super().__init__('sources')
 
 
-register = SourcesLoader.register
+@wraps(SourcesLoader.register)
+def register(key):
+    return SourcesLoader.register(key)
 
 
 __all__ = ['SourcesLoader', 'register']

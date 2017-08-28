@@ -21,6 +21,7 @@ Module implementating Sink base class.
 All custom Flowbber sinks must extend from the Sink class.
 """
 
+from functools import wraps
 from collections import OrderedDict
 
 
@@ -44,7 +45,9 @@ class SinksLoader(PluginLoader):
         super().__init__('sinks')
 
 
-register = SinksLoader.register
+@wraps(SinksLoader.register)
+def register(key):
+    return SinksLoader.register(key)
 
 
 __all__ = ['SinksLoader', 'register']

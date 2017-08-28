@@ -30,8 +30,13 @@ from .base import Component
 
 
 class Aggregator(Component):
+    """
+    Main base class to implement an Aggregator.
+    """
+
     def __init__(self, index, type_, id_, config):
         super().__init__(index, type_, id_, config)
+        self.duration = None
 
     def execute(self, data):
         setproctitle(str(self))
@@ -45,6 +50,34 @@ class Aggregator(Component):
 
     @abstractmethod
     def accumulate(self, data):
+        """
+        Perform analysis or accumulate from the given data.
+
+        The aggregator can:
+
+        #. Add values:
+
+           .. code-block:: python3
+
+              data['some_key'] = {'value': 1000}
+
+        #. Delete values:
+
+           .. code-block:: python3
+
+              del data['some_key']
+
+        #. Modify values:
+
+           .. code-block:: python3
+
+              data['some_key']['value'] = 2000
+
+        All aggregators subclasses must implement this abstract method.
+
+        :param OrderedDict data: The data collected by the sources. Any
+         modifications performed will be reflected on the final collected data.
+        """
         pass
 
 

@@ -59,14 +59,14 @@ files can be generated for several programming languages, including:
             },
             "another_source.c": {
                 "total_statements": 40,
-                "total_misses": 0,
+                "total_misses": 40,
                 "line_rate": 0.0
             }
         },
         "total": {
             "total_statements": 80,
             "total_misses": 20,
-            "line_rate": 0.25
+            "line_rate": 0.75
         }
     }
 

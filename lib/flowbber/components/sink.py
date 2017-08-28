@@ -31,6 +31,10 @@ from .base import Component
 
 
 class Sink(Component):
+    """
+    Main base class to implement a Sink.
+    """
+
     def __init__(self, index, type_, id_, config):
         super().__init__(index, type_, id_, config)
 
@@ -48,6 +52,14 @@ class Sink(Component):
 
     @abstractmethod
     def distribute(self, data):
+        """
+        Distribute the collected data.
+
+        All sinks subclasses must implement this abstract method.
+
+        :param OrderedDict data: The collected data. This dictionary can be
+         modified as required without consequences for the pipeline.
+        """
         pass
 
 

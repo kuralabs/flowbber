@@ -21,6 +21,7 @@ Module implementating Aggregator base class.
 All custom Flowbber aggregators must extend from the Aggregator class.
 """
 
+from functools import wraps
 from collections import OrderedDict
 
 from .loader import PluginLoader
@@ -43,7 +44,9 @@ class AggregatorsLoader(PluginLoader):
         super().__init__('aggregators')
 
 
-register = AggregatorsLoader.register
+@wraps(AggregatorsLoader.register)
+def register(key):
+    return AggregatorsLoader.register(key)
 
 
 __all__ = ['AggregatorsLoader', 'register']

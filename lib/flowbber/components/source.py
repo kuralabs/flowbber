@@ -31,6 +31,10 @@ from .base import Component
 
 
 class Source(Component):
+    """
+    Main base class to implement a Source.
+    """
+
     def __init__(self, index, type_, id_, config):
         super().__init__(index, type_, id_, config)
 
@@ -51,6 +55,14 @@ class Source(Component):
 
     @abstractmethod
     def collect(self):
+        """
+        Collect some arbitrary data.
+
+        All sources subclasses must implement this abstract method.
+
+        :return: A dictionary with the data collected by this source.
+        :rtype: dict
+        """
         pass
 
 
