@@ -35,6 +35,13 @@ log = logging.getLogger(__name__)
 PrintRequest = namedtuple('PrintRequest', ['string', 'fd'])
 
 
+def multiprocess_except_hook(exctype, value, traceback):
+    log.critical(
+        'Uncaught exception',
+        exc_info=(exctype, value, traceback)
+    )
+
+
 class QueueListener:
 
     def __init__(self, queue, handler):
@@ -125,8 +132,10 @@ class LoggingManager:
         handler = logging.StreamHandler()
         handler.setFormatter(formatter)
 
+        # # Configure baisc logging
         logging.basicConfig(handlers=[handler], level=level)
 
+        # Start listening for logs and prints
         listener = QueueListener(self._log_queue, handler)
         listener.start()
 
@@ -153,6 +162,11 @@ class LoggingManager:
         # Perform first time setup in main process and start the logging
         # subprocess
         if self._log_queue is None:
+
+            # Change system exception hook
+            sys.excepthook = multiprocess_except_hook
+
+            # Create logging subprocess
             self._verbosity = verbosity
             self._log_queue = Queue()
             self._log_subprocess = Process(
