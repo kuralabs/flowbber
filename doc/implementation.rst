@@ -378,9 +378,8 @@ Any :term:`component <Component>` can implement the method
 .. automethod:: flowbber.components.base.Component.declare_config
    :noindex:
 
-In this method it is expected that for each option the component requires to
-declare, a call to :meth:`flowbber.config.Configurator.add_option` is
-performed.
+It is expected that for each option the component requires to declare, a call
+to :meth:`flowbber.config.Configurator.add_option` is performed.
 
 .. automethod:: flowbber.config.Configurator.add_option
    :noindex:
@@ -450,6 +449,9 @@ as follows:
 
 
     class MySink(Sink):
+        def declare_config(self, config):
+            # Declare options ...
+
         def distribute(self, data):
             from pymongo import MongoClient
 
@@ -458,6 +460,60 @@ as follows:
             collection = database[self.config.collection.value]
 
             # ...
+
+Finally, in some situations a basic option by option validation is
+insufficient, for example, if two options are incompatible between them.
+
+In this situations the component can register a custom validation function
+using the :meth:`flowbber.config.Configurator.add_validator` method:
+
+.. automethod:: flowbber.config.Configurator.add_validator
+   :noindex:
+
+The function registered will receive the validated data as a dictionary just
+before its freezing and can perform any modification required on the data.
+
+For example, consider the :ref:`MongoDBSink <sinks-mongodb>` that allows to
+define the connection parameters either as a single string or as multiple
+values:
+
+.. code-block:: python3
+
+    def declare_config(self, config):
+
+        # ... calls to add_option()
+
+        # Check if uri is defined and if so then delete other keys
+        def custom_validator(validated):
+            if validated['uri'] is not None:
+                del validated['host']
+                del validated['port']
+                del validated['username']
+                del validated['password']
+            else:
+                del validated['uri']
+
+        config.add_validator(custom_validator)
+
+This validation function could perform checks against values, for example in
+:ref:`TimestampSource <sources-timestamp>` where at least one format needs to
+be enabled:
+
+.. code-block:: python3
+
+    def declare_config(self, config):
+
+        # ... calls to add_option()
+
+        # Check that at least one format is enabled
+        def custom_validator(validated):
+            if not any(validated.values()):
+                raise ValueError(
+                    'The timestamp source requires at least one timestamp '
+                    'format enabled'
+                )
+
+        config.add_validator(custom_validator)
 
 
 Logging Considerations
