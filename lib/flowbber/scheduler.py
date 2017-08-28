@@ -51,20 +51,20 @@ class Scheduler:
      mark when the scheduler should start executing the pipeline. This
      timestamp must be in the future.
      If missing or ``None``, the scheduler will start immediately.
-    :param bool stop_on_error: Stop the the scheduler if the pipeline fails
+    :param bool stop_on_failure: Stop the the scheduler if the pipeline fails
      one execution. Else keep scheduling run even on failure.
     """
 
     def __init__(
             self, pipeline, frequency,
             samples=None, start=None,
-            stop_on_error=False):
+            stop_on_failure=False):
 
         self._pipeline = pipeline
         self._frequency = frequency
         self._samples = samples
         self._start = start
-        self._stop_on_error = stop_on_error
+        self._stop_on_failure = stop_on_failure
 
         self._runs_passed = 0
         self._runs_failed = 0
@@ -77,7 +77,7 @@ class Scheduler:
     @property
     def runs(self):
         """
-        Returns a dictionary with the numbers of categorized runs of the
+        Read-only dictionary with the numbers of categorized runs of the
         pipeline:
 
         ::
@@ -97,8 +97,7 @@ class Scheduler:
     @property
     def last_run(self):
         """
-        Return timestamp in seconds since the epoch of the last run of the
-        pipeline.
+        Timestamp in seconds since the epoch of the last run of the pipeline.
         """
         return self._last_run
 
@@ -166,7 +165,7 @@ class Scheduler:
             )
             self._runs_failed += 1
 
-            if self._stop_on_error:
+            if self._stop_on_failure:
                 return
 
         finally:

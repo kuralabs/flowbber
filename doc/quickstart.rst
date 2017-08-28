@@ -574,6 +574,7 @@ In TOML:
     frequency = "10 seconds"
     start = 1503741210
     samples = 4
+    stop_on_failure = true
 
 In JSON:
 
@@ -583,7 +584,8 @@ In JSON:
         "schedule": {
             "frequency": "10 seconds",
             "start": 1503741210,
-            "samples": 4
+            "samples": 4,
+            "stop_on_failure": true
         }
     }
 
@@ -619,6 +621,9 @@ Options are:
     the future.
 
     If missing or ``None``, the scheduler will start immediately.
+
+``stop_on_failure``
+    Stop the execution of the scheduler if the pipeline execution fails.
 
 
 Glossary

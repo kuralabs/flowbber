@@ -70,6 +70,7 @@ def main(args):
         schedule['frequency'],
         samples=schedule['samples'],
         start=schedule['start'],
+        stop_on_failure=schedule['stop_on_failure'],
     )
     scheduler.run()
     return 0

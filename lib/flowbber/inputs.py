@@ -69,6 +69,11 @@ SCHEDULER_SCHEMA = {
         'nullable': True,
         'default': None,
     },
+    'stop_on_failure': {
+        'required': False,
+        'type': 'boolean',
+        'default': False,
+    }
 }
 
 
