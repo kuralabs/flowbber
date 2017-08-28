@@ -193,6 +193,8 @@ passing all aggregators) and returns nothing.
 For example, consider a basic and naive implementation of the built-in
 :ref:`MongoDBSink <sinks-mongodb>` that submits data to a MongoDB database:
 
+.. _example-sink-mongodb:
+
 .. code-block:: python3
 
     from flowbber.components import Sink
@@ -206,12 +208,12 @@ For example, consider a basic and naive implementation of the built-in
         def distribute(self, data):
             from pymongo import MongoClient
 
-        client = MongoClient('mongodb://localhost:27017/')
-        database = client['mydatabase']
-        collection = database['mycollection']
+            client = MongoClient('mongodb://localhost:27017/')
+            database = client['mydatabase']
+            collection = database['mycollection']
 
-        data_id = collection.insert_one(data).inserted_id
-        log.info('Inserted data to MongoDB with id {}'.format(data_id))
+            data_id = collection.insert_one(data).inserted_id
+            log.info('Inserted data to MongoDB with id {}'.format(data_id))
 
 In this example we hardwired the connection URI, database name and collection
 name. This can be parametrized as described in :ref:`options`. Check the
@@ -370,7 +372,92 @@ The resulting collected data will be:
 Specifying Options
 ==================
 
-FIXME: TODO.
+Any :term:`component <Component>` can implement the method
+:meth:`flowbber.components.base.Component.declare_config`:
+
+.. automethod:: flowbber.components.base.Component.declare_config
+   :noindex:
+
+In this method it is expected that for each option the component requires to
+declare, a call to :meth:`flowbber.config.Configurator.add_option` is
+performed.
+
+.. automethod:: flowbber.config.Configurator.add_option
+   :noindex:
+
+For example, let's retake our previous simple
+:ref:`MongoDB sink example <example-sink-mongodb>`. We want to parametrize,
+among other things, the ``uri``, ``database`` and the ``collection``.
+
+.. code-block:: python3
+
+    def declare_config(self, config):
+        config.add_option(
+            'uri',
+            default=None,
+            optional=True,
+            schema={
+                'type': 'string',
+                'empty': False,
+                'nullable': True,
+            },
+            secret=True,
+        )
+
+        config.add_option(
+            'database',
+            schema={
+                'type': 'string',
+                'empty': False,
+            },
+        )
+
+        config.add_option(
+            'collection',
+            schema={
+                'type': 'string',
+                'empty': False,
+            },
+        )
+
+The ``schema`` keyword argument receives a dictionary that describes the schema
+for which the value will be validated. Validation is performed using the
+awesome Cerberus_ library, and allows to create schemas for complex data types
+and values. If the schema is set to ``None``, no validation will be performed.
+
+.. _Cerberus: http://docs.python-cerberus.org/en/stable/
+
+Once validated and normalized, configuration options will be available under
+the read only ``self.config`` attribute. The keys of the configuration options
+are mapped to an object with three attributes:
+
+:key: Key of the configuration option. Same as given as first argument to
+ ``add_option``.
+:value: The validated and normalized or default value of the option.
+:is_secret: Boolean indicating that the option is a secret and thus shouldn't
+ be printed, logged, stored in plain text, etc. Same as ``add_option``'s
+ ``secret`` keyword argument.
+
+ In this sense, it is important to note that Flowbber won't log or store any
+ option marked as secret.
+
+Following our simple MongoDB example, we could use the configurations options
+as follows:
+
+.. code-block:: python3
+
+    from flowbber.components import Sink
+
+
+    class MySink(Sink):
+        def distribute(self, data):
+            from pymongo import MongoClient
+
+            client = MongoClient(self.config.uri.value)
+            database = client[self.config.database.value]
+            collection = database[self.config.collection.value]
+
+            # ...
 
 
 Logging Considerations

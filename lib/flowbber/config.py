@@ -49,7 +49,7 @@ class UnknownOptions(AttributeError):
 
 class Configurator:
     """
-    FIXME: Document.
+    A Component configuration options manager.
     """
 
     def __init__(self):
@@ -66,7 +66,18 @@ class Configurator:
             self, key,
             default=None, optional=False,
             schema=None, secret=False):
+        """
+        Declare an option.
 
+        :param str key: Key of the configuration option.
+        :param default: Default value for this option if optional and no value
+         was provided.
+        :param bool optional: Is this option mandatory or optional. Default is
+         mandatory.
+        :param dict schema: Schema to validate the user value against.
+        :param bool secret: Boolean indicating that the options is a secret and
+         thus shouldn't be printed, logged, stored in plain text, etc.
+        """
         if not key:
             raise ValueError('Missing configuration key')
 
@@ -87,6 +98,11 @@ class Configurator:
         }
 
     def add_validator(self, validator):
+        """
+        Add a custom validation function.
+
+        :param function validator: A custom validator function.
+        """
         self._validators.append(validator)
 
     def validate(self, userconf):

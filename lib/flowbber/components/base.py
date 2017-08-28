@@ -40,7 +40,14 @@ class NamedABCMeta(ABCMeta):
 
 class Component(metaclass=NamedABCMeta):
     """
-    FIXME: Document.
+    Base Component class.
+
+    All Component classes (Sink, Aggregator, Source) extend from this class.
+
+    :param int index: Position of this component in the pipeline definition.
+    :param str type_: Type key used to fetch this component.
+    :param str id_: Unique identifier for this component.
+    :param dict config: User configuration for this component.
     """
 
     @abstractmethod
@@ -55,9 +62,18 @@ class Component(metaclass=NamedABCMeta):
 
     @property
     def id(self):
+        """
+        Component unique identifier.
+        """
         return self._id
 
     def declare_config(self, config):
+        """
+        Declare the configuration options of this component.
+
+        :param config: The configuration manager for this component.
+        :type config: :class:`flowbber.config.Configurator`
+        """
         pass
 
     def __str__(self):
