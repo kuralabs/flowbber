@@ -1,0 +1,15 @@
+[[sources]]
+type = "my_source"
+id = "my_source1"
+
+[[sources]]
+type = "my_source"
+id = "my_source2"
+
+[[aggregators]]
+type = "my_aggregator"
+id = "my_aggregator1"
+
+[[sinks]]
+type = "my_sink"
+id = "my_sink1"
