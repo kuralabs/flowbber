@@ -40,11 +40,13 @@ class Pipeline:
     FIXME: Document.
     """
 
-    def __init__(self, pipeline, name):
+    def __init__(self, pipeline, name, app='flowbber', save_journal=True):
         super().__init__()
 
         self._pipeline = pipeline
         self._name = name
+        self._app = app
+        self._save_journal = save_journal
 
         self._executed = 0
         self._data = OrderedDict()
@@ -154,21 +156,24 @@ class Pipeline:
             ('sinks', []),
         ))
 
-        setproctitle('flowbber - running sources')
+        setproctitle('{} - running sources'.format(self._app))
         log.info('Running sources ...')
         self._run_sources(journal['sources'])
 
-        setproctitle('flowbber - running aggregators')
+        setproctitle('{} - running aggregators'.format(self._app))
         log.info('Running aggregators ...')
         self._run_aggregators(journal['aggregators'])
 
-        setproctitle('flowbber - running sinks')
+        setproctitle('{} - running sinks'.format(self._app))
         log.info('Running sinks ...')
         self._run_sinks(journal['sinks'])
 
-        setproctitle('flowbber - saving journal')
+        if not self._save_journal:
+            return journal
+
+        setproctitle('{} - saving journal'.format(self._app))
         log.info('Saving journal ...')
-        journal_dir = Path(gettempdir()) / 'flowbber-journals'
+        journal_dir = Path(gettempdir()) / '{}-journals'.format(self._app)
         journal_dir.mkdir(parents=True, exist_ok=True)
 
         with NamedTemporaryFile(
@@ -180,6 +185,8 @@ class Pipeline:
         ) as jfd:
             jfd.write(dumps(journal, indent=4))
         log.info('Journal saved to {}'.format(jfd.name))
+
+        return journal
 
     def _run_sources(self, journal):
         """
@@ -256,7 +263,7 @@ class Pipeline:
             log.info('Executing data aggregator #{} "{}"'.format(
                 index, aggregator.id
             ))
-            aggregator.accumulate(self._data)
+            aggregator.execute(self._data)
 
             journal_entry = {
                 'index': index,
