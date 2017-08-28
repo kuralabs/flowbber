@@ -35,7 +35,7 @@ To implement a :term:`Source` component, subclass the Flowbber's
 
 Source's ``collect()`` method must return a dictionary with the collected data,
 using key as label and value as value of the label. Collected data structure
-can be more complicated a nested as required, as long a JSON serializable
+can be more complicated and nested as required, as long as JSON serializable
 objects are used, for example built-in datatypes like integers, booleans,
 floats, strings, and data structures like dictionaries and lists.
 

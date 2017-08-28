@@ -503,7 +503,7 @@ Available Namespaces
 
 ``git``
     Information related to git repository the input :term:`Pipeline Definition`
-    file is commited to, if any. This is particularly useful for specifying
+    file is committed to, if any. This is particularly useful for specifying
     paths that must remain relative to git root repository.
 
     For example, a path to a code directory:
@@ -554,7 +554,7 @@ Scheduling
 In many use cases it is required to keep running the pipeline with some
 frequency.
 
-For example, consider you want to monitor your internet speed. You want to
+For example, consider you want to monitor your Internet speed. You want to
 collect a sample once per hour and send it to a time series database for later
 retrieval and visualization.
 
