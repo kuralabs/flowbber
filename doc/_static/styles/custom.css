@@ -9,7 +9,7 @@ dl.exception,
 dl.data {
     background: #fafafa;
     border: 1px solid #e0e0e0;
-    padding: 1em;
+    padding: 1em 1em 0 1em;
 }
 
 dl.class em,
@@ -32,8 +32,8 @@ dl.class dd,
 dl.function dd,
 dl.exception dd,
 dl.data dd {
-    margin: 0 !important;
-    padding: 15px !important;
+    /* margin: 0 !important;
+    padding: 15px !important; */
 }
 
 /* Remove namespace in reference, we know where we are thank you */
@@ -44,7 +44,7 @@ dl.data dt code.descclassname {
     display: none !important;
 }
 
-/* Make mages responsive */
+/* Make images responsive */
 .container-wrapper img {
     max-width: 100%;
 }

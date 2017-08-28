@@ -110,8 +110,7 @@ todo_include_todos = False
 
 # -- Options for HTML output ----------------------------------------------
 
-# Adds an HTML table visitor to apply Bootstrap table classes
-html_translator_class = 'guzzle_sphinx_theme.HTMLTranslator'
+# Set theme
 html_theme = 'guzzle_sphinx_theme'
 
 # Register the theme as an extension to generate a sitemap.xml
