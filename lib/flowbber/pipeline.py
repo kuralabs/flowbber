@@ -37,7 +37,21 @@ log = get_logger(__name__)
 
 class Pipeline:
     """
-    FIXME: Document.
+    Pipeline executor class.
+
+    This class will fetch all components from locally declared components and
+    entrypoint plugins, create instance of all of them and execute the pipeline
+    in order, creating subprocesses when needed.
+
+    Execution of the pipeline is registered in a journal that is returned
+    and / or saved when the execution of the pipeline ends.
+
+    :param dict pipeline: A pipeline definition data structure.
+    :param str name: Name of the pipeline. Used only for pretty printing only.
+    :param str app: Name of the application running the pipeline. This name
+     is used mainly to set the process name and the journals directory.
+    :param bool save_journal: Save the journal to a temporal location when the
+     pipeline execution ends.
     """
 
     def __init__(self, pipeline, name, app='flowbber', save_journal=True):
@@ -59,7 +73,17 @@ class Pipeline:
 
     @property
     def name(self):
+        """
+        Name of this pipeline.
+        """
         return self._name
+
+    @property
+    def executed(self):
+        """
+        Number of times this pipeline has been executed.
+        """
+        return self._executed
 
     def __str__(self):
         return '\n'.join([
@@ -81,7 +105,24 @@ class Pipeline:
 
     def _load_plugins(self):
         """
-        FIXME: Document.
+        Load all plugins available.
+
+        This method will set the following attributes with the loader classes:
+
+        ::
+
+            self._sources_loader
+            self._aggregators_loader
+            self._sinks_loader
+
+        And also will set the following attributes with the loaded plugin
+        classes:
+
+        ::
+
+            self._sources_available
+            self._aggregators_available
+            self._sinks_available
         """
 
         for component, loader_clss in (
@@ -102,7 +143,17 @@ class Pipeline:
 
     def _build_pipeline(self):
         """
-        FIXME: Document.
+        Create instances of all components as defined in the pipeline
+        definition.
+
+        This method will set the following attributes with the list of
+        component instances as declared in the pipeline definition:
+
+        ::
+
+            self._sources
+            self._aggregators
+            self._sinks
         """
 
         for component_name in ['source', 'aggregator', 'sink']:
@@ -141,7 +192,13 @@ class Pipeline:
 
     def run(self):
         """
-        FIXME: Document.
+        Execute pipeline.
+
+        This method can be called several times after instantiating the
+        pipeline.
+
+        :return: The journal of the execution.
+        :rtype: dict
         """
         if self._executed > 0:
             log.info('Re-running pipeline ...')
@@ -190,7 +247,7 @@ class Pipeline:
 
     def _run_sources(self, journal):
         """
-        FIXME: Document.
+        Run the sources of the pipeline.
         """
 
         sources_processes = [
@@ -255,7 +312,7 @@ class Pipeline:
 
     def _run_aggregators(self, journal):
         """
-        FIXME: Document.
+        Run the aggregators of the pipeline.
         """
 
         for index, aggregator in enumerate(self._aggregators):
@@ -282,7 +339,7 @@ class Pipeline:
 
     def _run_sinks(self, journal):
         """
-        FIXME: Document.
+        Run the sinks of the pipeline.
         """
 
         sink_processes = [

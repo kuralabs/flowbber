@@ -19,6 +19,10 @@ dl.data em {
     font-style: normal;
 }
 
+dl.method {
+    border-bottom: none;
+}
+
 /* Extend reference heads to the width */
 dl.class dt,
 dl.function dt,

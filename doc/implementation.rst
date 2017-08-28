@@ -294,7 +294,7 @@ pipeline.
 In the ``flowconf.py`` file, you can register your components using function
 ``register`` for each loader:
 
-*Sources:*
+**Sources:**
 
 .. code-block:: python3
 
@@ -307,7 +307,7 @@ In the ``flowconf.py`` file, you can register your components using function
         def collect(self):
             return {'my_value': 1000}
 
-*Aggregators:*
+**Aggregators:**
 
 .. code-block:: python3
 
@@ -320,7 +320,7 @@ In the ``flowconf.py`` file, you can register your components using function
         def accumulate(self, data):
             data['num_sources'] = {'total': len(data.keys())}
 
-*Sinks:*
+**Sinks:**
 
 .. code-block:: python3
 
@@ -367,7 +367,7 @@ The resulting collected data will be:
 
 .. _options:
 
-Specifying options
+Specifying Options
 ==================
 
 FIXME: TODO.
@@ -531,10 +531,12 @@ The most relevant parts of this example is that:
    :meth:`flowbber.pipeline.Pipeline.run` method.
 
    .. autoclass:: flowbber.pipeline.Pipeline
+      :members:
       :noindex:
 
 #. We create an instance of :class:`flowbber.scheduler.Scheduler` that will
-   control the constant execution of the pipeline.
+   control the continuous execution of the pipeline.
 
    .. autoclass:: flowbber.scheduler.Scheduler
+      :members:
       :noindex:

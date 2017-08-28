@@ -32,7 +32,27 @@ log = get_logger(__name__)
 
 class Scheduler:
     """
-    FIXME: Document.
+    Schedule the execution of a pipeline.
+
+    The scheduler will try to run the pipeline on schedule. If the pipeline
+    takes too long, longer that the programmed frequency, the scheduler will
+    increment the ``runs_missed`` counter for each execution that failed to
+    run at the expected schedule because the previous run was still running and
+    will start the missed pipeline execution right away.
+
+    :param pipeline: The pipeline to execute.
+    :type pipeline: :class:`flowbber.pipeline.Pipeline`.
+    :param float frequency: Sampling frequency in seconds.
+    :param int samples: Number of samples (successful executions of the
+     pipeline) to take before stopping the scheduler.
+     If missing or ``None``, the scheduler will continue taking samples
+     forever.
+    :param int start: An absolute timestamp in seconds since the epoch that
+     mark when the scheduler should start executing the pipeline. This
+     timestamp must be in the future.
+     If missing or ``None``, the scheduler will start immediately.
+    :param bool stop_on_error: Stop the the scheduler if the pipeline fails
+     one execution. Else keep scheduling run even on failure.
     """
 
     def __init__(
@@ -52,7 +72,35 @@ class Scheduler:
         self._last_run = None
         self._scheduler = scheduler(time, sleep)
 
-        log.info('Create scheduler for pipeline:\n{}'.format(self._pipeline))
+        log.info('Scheduler created for pipeline :\n{}'.format(self._pipeline))
+
+    @property
+    def runs(self):
+        """
+        Returns a dictionary with the numbers of categorized runs of the
+        pipeline:
+
+        ::
+
+            {
+                'passed': 10,
+                'failed': 2,
+                'missed': 0,
+            }
+        """
+        return {
+            'passed': self._runs_passed,
+            'failed': self._runs_failed,
+            'missed': self._runs_missed,
+        }
+
+    @property
+    def last_run(self):
+        """
+        Return timestamp in seconds since the epoch of the last run of the
+        pipeline.
+        """
+        return self._last_run
 
     def _sched_next(self):
         """
@@ -126,7 +174,7 @@ class Scheduler:
 
     def run(self):
         """
-        FIXME: Document.
+        Start the scheduler.
         """
         now = time()
 
