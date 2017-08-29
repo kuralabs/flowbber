@@ -119,7 +119,12 @@ log = get_logger(__name__)
 
 class PipelineValidator(Validator):
     """
-    FIXME: Document.
+    Cerberus validator that allows to coerce a string to a positive integer as
+    a timedelta in seconds.
+
+    For this transformation the pytimeparse library is used.
+
+    .. _pytimeparse: https://github.com/wroberts/pytimeparse
     """
 
     def _normalize_coerce_timedelta(self, value):
@@ -134,7 +139,18 @@ class PipelineValidator(Validator):
 
 def replace_values(definition, path):
     """
-    FIXME: Document.
+    Perform string replacement on both keys and values of an arbitrarily nested
+    dictionary data structure.
+
+    The namespaces for the replacements are loaded with
+    :func:`flowbber.namespaces.get_namespaces`.
+
+    :param dict definition: the pipeline definition data structure.
+    :param Path path: Path to the pipeline definition file.
+
+    :return: The pipeline definition data structure with all string keys and
+     values replaced with values in the namespace.
+    :rtype: dict
     """
 
     namespaces = get_namespaces(path)
@@ -160,7 +176,12 @@ def replace_values(definition, path):
 
 def load_pipeline_json(path):
     """
-    FIXME: Document.
+    Load pipeline definition file in JSON format.
+
+    :param Path path: Path to the JSON file.
+
+    :return: A dictionary data structure with the pipeline definition.
+    :rtype: dict
     """
     from ujson import loads
     return loads(path.read_text(encoding='utf-8'))
@@ -168,7 +189,12 @@ def load_pipeline_json(path):
 
 def load_pipeline_toml(path):
     """
-    FIXME: Document.
+    Load pipeline definition file in TOML format.
+
+    :param Path path: Path to the TOML file.
+
+    :return: A dictionary data structure with the pipeline definition.
+    :rtype: dict
     """
     from toml import loads
     return loads(path.read_text(encoding='utf-8'))
@@ -176,7 +202,16 @@ def load_pipeline_toml(path):
 
 def load_pipeline(path):
     """
-    FIXME: Document.
+    Load, replace and validate the pipeline definition file.
+
+    - Path can be in any of the supported file formats.
+    - Replacement values will be performed with the available namespaces.
+    - Schema validation will be performed.
+
+    :param Path path: Path to the pipeline definition file.
+
+    :return: A dictionary data structure with the pipeline definition.
+    :rtype: dict
     """
     supported_formats = {
         '.toml': load_pipeline_toml,

@@ -30,6 +30,15 @@ log = get_logger(__name__)
 
 
 def namespace_env(path):
+    """
+    Fetch data from the environment.
+
+    :param Path path: Path to the pipeline definition file.
+
+    :return: A named tuple with information from the environment.
+    :rtype: namedtuple
+    """
+
     # Get the environment object
     safe_env = {
         key: value
@@ -50,6 +59,23 @@ def namespace_env(path):
 
 
 def namespace_pipeline(path):
+    """
+    Fetch information relative to the pipeline definition file.
+
+    :param Path path: Path to the pipeline definition file.
+
+    :return: A named tuple with information about the pipeline definition file.
+
+     Values available:
+
+     - dir : Parent directory of the definition file.
+     - ext : Extension of the definition file.
+     - file : Complete filename of the definition file.
+     - name : Filename without the extension.
+
+    :rtype: namedtuple
+    """
+
     # Get pipeline object
     pipeline_type = namedtuple(
         'pipeline',
@@ -67,6 +93,22 @@ def namespace_pipeline(path):
 
 
 def namespace_git(path):
+    """
+    Fetch information relative to the git vcs versioning the pipeline
+    definition file, if any.
+
+    :param Path path: Path to the pipeline definition file.
+
+    :return: A named tuple with information about the git vcs.
+
+     Values available:
+
+     - root : git repository root.
+     - branch : current branch.
+     - rev : current revision hash.
+
+    :rtype: namedtuple
+    """
 
     from shutil import which
 
@@ -127,6 +169,23 @@ def namespace_git(path):
 
 
 def get_namespaces(path):
+    """
+    Get all replacement namespaces.
+
+    Currently supported namespaces are:
+
+    - env : fetch data from the environment.
+    - pipeline : fetch information relative to the pipeline definition file.
+    - git : fetch information relative to the git vcs versioning the pipeline
+      definition file, if any.
+
+    :param Path path: Path to the pipeline definition file.
+
+    :return: A dictionary mapping the name of the namespace with the class
+     implementing it.
+    :rtype: dict
+    """
+
     return {
         'env': namespace_env(path),
         'pipeline': namespace_pipeline(path),

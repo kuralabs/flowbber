@@ -30,12 +30,16 @@ from multiprocessing import Queue, Process
 
 from colorlog import ColoredFormatter
 
+
 log = logging.getLogger(__name__)
 
 PrintRequest = namedtuple('PrintRequest', ['string', 'fd'])
 
 
 def multiprocess_except_hook(exctype, value, traceback):
+    """
+    Unhandled exception hook that works in a multiprocess environment.
+    """
     log.critical(
         'Uncaught exception',
         exc_info=(exctype, value, traceback)
@@ -43,23 +47,47 @@ def multiprocess_except_hook(exctype, value, traceback):
 
 
 class QueueListener:
+    """
+    Object that will wait for messages in a queue and print or log them.
 
-    def __init__(self, queue, handler):
+    :param multiprocessing.Queue queue: A multiprocessing queue to listen to.
+    :param logging.Handler handler: A logging handler to delegate logging
+     requests to.
+    :param dict fds: Dictionary mapping a name with a file descriptor.
+     If ``None`` is passed, a basic dictionary with stdout and stderr will be
+     used.
+    """
+
+    def __init__(self, queue, handler, fds=None):
         self._queue = queue
         self._handler = handler
-        self._fds = {
-            'stdout': sys.stdout,
-            'stderr': sys.stderr,
-        }
+        self._fds = fds
+
+        if fds is None:
+            self._fds = {
+                'stdout': sys.stdout,
+                'stderr': sys.stderr,
+            }
 
     def start(self):
+        """
+        Start listening on the queue.
+
+        This method blocks until a ``None`` is submitted to the queue managed
+        by this instance.
+        """
+
         # Start listening for records
         self._run_loop(True)
         # There might still be records in the queue.
         self._run_loop(False)
 
     def _run_loop(self, block):
+        """
+        Perform the listening and execution look.
 
+        :param bool block: Block on the queue or not.
+        """
         while True:
             try:
                 # Handle stop
@@ -77,7 +105,6 @@ class QueueListener:
 
                     fd = self._fds[record.fd]
                     fd.write(record.string)
-                    fd.write('\n')
                     continue
 
                 # Handle logging
@@ -89,6 +116,13 @@ class QueueListener:
 
 
 class LoggingManager:
+    """
+    Logging manager class.
+
+    This class is expected to run as a singleton. It allows to setup the
+    logging subprocess and handlers for all main process and later work
+    subprocesses with one single call.
+    """
 
     FORMAT = (
         '  {log_color}{levelname:8}{reset} | '
@@ -113,7 +147,10 @@ class LoggingManager:
 
     def _logging_subprocess(self):
         """
-        FIXME: Document.
+        Logging subprocess target function.
+
+        This function will setup the basic logging configuration and start
+        the listener on the logging queue.
         """
 
         # Setup logging for logging subprocess
@@ -154,9 +191,9 @@ class LoggingManager:
         logging has been performed it will fail as the handler will already
         exists.
 
-        :param str string: String to print.
-        :param str fd: Name of the file descriptor.
-         Either stdout or stderr only.
+        :param int verbosity: Verbosity level, as defined by
+         ``LoggingManager.LEVELS``. The greater the number the more information
+         is provided, with 0 as initial level.
         """
 
         # Perform first time setup in main process and start the logging
@@ -187,7 +224,9 @@ class LoggingManager:
 
     def stop_logging(self):
         """
-        FIXME: Document.
+        Stop the logging subprocess.
+
+        This shouldn't be called unless the application is quitting.
         """
 
         self._log_queue.put_nowait(None)
@@ -202,7 +241,7 @@ class LoggingManager:
          Either stdout or stderr only.
         """
         self._log_queue.put_nowait(
-            PrintRequest(string=string, fd=fd)
+            PrintRequest(string=string + '\n', fd=fd)
         )
 
 

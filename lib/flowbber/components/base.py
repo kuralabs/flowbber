@@ -28,7 +28,8 @@ from ..config import Configurator
 
 class NamedABCMeta(ABCMeta):
     """
-    FIXME: Document.
+    Base metaclass for abstract classes that pretty print the name of the
+    class.
     """
 
     def __str__(cls):  # noqa: False N805
