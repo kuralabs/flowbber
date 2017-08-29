@@ -527,7 +527,7 @@ provides the functions:
 #. :func:`flowbber.logging.get_logger` that allows to get a multiprocess safe
    logger.
 #. :func:`flowbber.logging.print` that allows to safely print to ``stdout`` or
-`  ``stderr`` in a multiprocess context.
+   ``stderr`` in a multiprocess context.
 
 .. autofunction:: flowbber.logging.get_logger
    :noindex:
