@@ -26,7 +26,7 @@ from collections import OrderedDict, namedtuple
 from pprintpp import pformat
 from cerberus import Validator
 
-from .inputs import SLUG_REGEX
+from .schema import SLUG_REGEX
 from .logging import get_logger
 
 

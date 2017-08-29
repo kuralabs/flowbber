@@ -20,121 +20,13 @@ Input pipeline definition formats parses.
 """
 
 from pprintpp import pformat
-from cerberus import Validator
 
 from .logging import get_logger
 from .namespaces import get_namespaces
-
-
-SLUG_REGEX = r'^[a-zA-Z][a-zA-Z0-9_]*$'
-
-
-SLUG_SCHEMA = {
-    'required': True,
-    'type': 'string',
-    'regex': SLUG_REGEX,
-}
-
-
-COMPONENT_SCHEMA = {
-    'type': SLUG_SCHEMA,
-    'id': SLUG_SCHEMA,
-    'config': {
-        'required': False,
-        'type': 'dict',
-        'keyschema': {
-            'type': 'string',
-            'regex': SLUG_REGEX,
-        },
-    },
-}
-
-
-SCHEDULER_SCHEMA = {
-    'frequency': {
-        'required': True,
-        'coerce': 'timedelta',
-    },
-    'samples': {
-        'required': False,
-        'type': 'integer',
-        'min': 1,
-        'nullable': True,
-        'default': None,
-    },
-    'start': {
-        'required': False,
-        'type': 'integer',
-        'min': 0,
-        'nullable': True,
-        'default': None,
-    },
-    'stop_on_failure': {
-        'required': False,
-        'type': 'boolean',
-        'default': False,
-    }
-}
-
-
-PIPELINE_SCHEMA = {
-    'schedule': {
-        'required': False,
-        'type': 'dict',
-        'schema': SCHEDULER_SCHEMA,
-    },
-    'sources': {
-        'required': True,
-        'type': 'list',
-        'empty': False,
-        'schema': {
-            'type': 'dict',
-            'schema': COMPONENT_SCHEMA,
-        },
-    },
-    'aggregators': {
-        'required': False,
-        'type': 'list',
-        'empty': True,
-        'default': [],
-        'schema': {
-            'type': 'dict',
-            'schema': COMPONENT_SCHEMA,
-        },
-    },
-    'sinks': {
-        'required': True,
-        'type': 'list',
-        'empty': False,
-        'schema': {
-            'type': 'dict',
-            'schema': COMPONENT_SCHEMA,
-        },
-    },
-}
+from .schema import TimedeltaValidator, PIPELINE_SCHEMA
 
 
 log = get_logger(__name__)
-
-
-class PipelineValidator(Validator):
-    """
-    Cerberus validator that allows to coerce a string to a positive integer as
-    a timedelta in seconds.
-
-    For this transformation the pytimeparse library is used.
-
-    .. _pytimeparse: https://github.com/wroberts/pytimeparse
-    """
-
-    def _normalize_coerce_timedelta(self, value):
-        from pytimeparse import parse
-
-        timedelta = parse(value)
-        if timedelta is None:
-            raise ValueError('Unable to parse timedelta {}'.format(value))
-
-        return timedelta
 
 
 def replace_values(definition, path):
@@ -236,7 +128,7 @@ def load_pipeline(path):
     definition = replace_values(definition, path)
 
     # Validate data structure
-    validator = PipelineValidator(PIPELINE_SCHEMA)
+    validator = TimedeltaValidator(PIPELINE_SCHEMA)
     validated = validator.validated(definition)
 
     if validated is None:
