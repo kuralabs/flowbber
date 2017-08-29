@@ -19,12 +19,14 @@
 Module implementating the Configurator class.
 """
 
+from re import match
 from copy import deepcopy
 from collections import OrderedDict, namedtuple
 
 from pprintpp import pformat
 from cerberus import Validator
 
+from .inputs import SLUG_REGEX
 from .logging import get_logger
 
 
@@ -69,7 +71,8 @@ class Configurator:
         """
         Declare an option.
 
-        :param str key: Key of the configuration option.
+        :param str key: Key of the configuration option. Must be representable
+         as a public Python variable.
         :param default: Default value for this option if optional and no value
          was provided.
         :param bool optional: Is this option mandatory or optional. Default is
@@ -80,6 +83,11 @@ class Configurator:
         """
         if not key:
             raise ValueError('Missing configuration key')
+
+        if not match(SLUG_REGEX, key):
+            raise ValueError('Invalid key "{}". Valid keys match {}'.format(
+                key, SLUG_REGEX
+            ))
 
         if not isinstance(optional, bool):
             raise ValueError('optional must be a boolean')
@@ -107,7 +115,18 @@ class Configurator:
 
     def validate(self, userconf):
         """
-        FIXME: Document.
+        Validate the given user configuration dictionary with the declared
+        config handled by this configurator.
+
+        :raise MissingOptions: if mandatory options are missing.
+        :raise UnknownOptions: if non declared options are present.
+
+        :param dict userconf: The user configuration.
+
+        :return: A custom named tuple that maps the config keys with another
+         named tuple that holds the name of the key, the value and the flag
+         marking it as secret or not.
+        :rtype: namedtuple
         """
         if not self._declared:
             self._configtype = namedtuple('config', [])

@@ -26,7 +26,7 @@ from .logging import get_logger
 from .namespaces import get_namespaces
 
 
-SLUG_REGEX = r'^[a-zA-Z_][a-zA-Z0-9_]*$'
+SLUG_REGEX = r'^[a-zA-Z][a-zA-Z0-9_]*$'
 
 
 SLUG_SCHEMA = {
