@@ -322,7 +322,7 @@ expression:
 
 .. code-block:: python3
 
-    r'^[a-zA-Z_][a-zA-Z0-9_]*$'
+    r'^[a-zA-Z][a-zA-Z0-9_]*$'
 
 JSON
 ----
@@ -461,9 +461,12 @@ Available Namespaces
 
     .. warning::
 
-        Because :py:func:`collections.namedtuple` doesn't support
-        attributes that start with a `_` (underscore), any environment
-        variable that starts with it will be filtered out.
+        For execution safety and because :py:func:`collections.namedtuple`
+        doesn't support attributes that start with a `_` (underscore), any
+        environment variable name that doesn't match the following regular
+        expression will be filtered out:
+
+          ``^[a-zA-Z][a-zA-Z0-9_]*$``
 
     .. warning::
 

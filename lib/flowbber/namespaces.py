@@ -19,10 +19,12 @@
 Namespaces for variables replacement.
 """
 
+from re import match
 from os import environ
 from collections import namedtuple
 
 from .utils.command import run
+from .schema import SLUG_REGEX
 from .logging import get_logger
 
 
@@ -39,21 +41,23 @@ def namespace_env(path):
     :rtype: namedtuple
     """
 
-    # Get the environment object
-    safe_env = {
-        key: value
-        for key, value in environ.items()
-        if not key.startswith('_')
-    }
+    env_safe = {key for key in environ.keys() if match(SLUG_REGEX, key)}
+    env_available = set(environ.keys())
+    env_ignored = env_available - env_safe
+
+    if env_ignored:
+        log.debug('Environment variables unsafe to load: {}'.format(
+            sorted(env_ignored)
+        ))
 
     env_type = namedtuple(
         'env',
-        safe_env.keys()
+        env_safe
     )
-    env = env_type(**safe_env)
+    env = env_type(**{key: environ[key] for key in env_safe})
 
     log.debug('env namespace: {}'.format(env._replace(
-        **{key: '****' for key in safe_env.keys()}
+        **{key: '****' for key in env_safe}
     )))
     return env
 
