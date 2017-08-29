@@ -10,8 +10,6 @@ from flowbber.logging import setup_logging
 CONFIG = """
 [cpud]
 verbosity = 3
-
-[sampling]
 # Take a sample each 10 seconds
 frequency = 10
 
@@ -32,6 +30,10 @@ def build_definition(config):
     """
     definition = {
         'sources': [
+            {'type': 'timestamp', 'id': 'timekeys', 'config': {
+                'epoch': True,  # Key for MongoDB
+                'iso8601': True,  # Key for InfluxDB
+            }},
             {'type': 'cpu', 'id': 'cpu'},
         ],
         'sinks': [],
@@ -45,7 +47,7 @@ def build_definition(config):
             'config': {
                 'uri': config['influxdb']['uri'],
                 'database': config['influxdb']['database'],
-                'key': None,
+                'key': 'timekeys.iso8601',
             }
         })
 
@@ -57,7 +59,7 @@ def build_definition(config):
                 'uri': config['mongodb']['uri'],
                 'database': config['mongodb']['database'],
                 'collection': config['mongodb']['collection'],
-                'key': None,
+                'key': 'timekeys.epoch',
             }
         })
 
@@ -89,7 +91,7 @@ def main():
     # Build and run scheduler
     scheduler = Scheduler(
         pipeline,
-        config['sampling']['frequency'],
+        config['cpud']['frequency'],
         stop_on_failure=True
     )
 

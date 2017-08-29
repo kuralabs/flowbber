@@ -5,7 +5,7 @@ Implementing Custom Pipelines
 To implement your custom components you must create a class that subclasses
 one of the 3 available components as described in :ref:`implementing`.
 
-Once implemented, you can register it to make it available for Flowbber as
+Once implemented, you can register it to make it available to Flowbber as
 described in :ref:`registering`.
 
 To allow passing configuration options to your component, implement the
@@ -20,7 +20,7 @@ To allow passing configuration options to your component, implement the
 Implementing Components
 =======================
 
-Depending on the type on component you want to create, subclass one of the
+Depending on the type of component you want to create, subclass one of the
 following classes and implement its abstract method.
 
 Sources
@@ -34,10 +34,10 @@ To implement a :term:`Source` component, subclass the Flowbber's
    :members:
 
 Source's ``collect()`` method must return a dictionary with the collected data,
-using key as label and value as value of the label. Collected data structure
-can be more complicated and nested as required, as long as JSON serializable
-objects are used, for example built-in datatypes like integers, booleans,
-floats, strings, and data structures like dictionaries and lists.
+using key as label and value as value of the label. The collected data
+structure can be more complicated and nested as required, as long as JSON
+serializable objects are used, for example built-in datatypes like integers,
+booleans, floats, strings, and data structures like dictionaries and lists.
 
 For example, consider a basic implementation of the built-in
 :ref:`EnvSource <sources-env>` that collects data from the environment:
@@ -73,7 +73,7 @@ For example, consider a pipeline that uses twice the built-in
 :ref:`CoberturaSource <sources-cobertura>` because your codebase has a part
 written in C and another one in Go, and you need a global coverage metric.
 
-The pipeline sources could look like this:
+The pipeline's sources could look like this:
 
 .. code-block:: toml
 
@@ -132,8 +132,8 @@ We could implement a basic aggregator that sums the total of both suites:
             total_statements = 0
             total_misses = 0
 
-            for sourcedata in ids:
-                total = data[sourcedata]['total']
+            for datakey in ids:
+                total = data[datakey]['total']
                 total_statements += total['total_statements']
                 total_misses += total['total_misses']
 
@@ -204,7 +204,7 @@ For example, consider a basic and naive implementation of the built-in
     log = get_logger(__name__)
 
 
-    class MySink(Sink):
+    class SimpleMongoDBSink(Sink):
         def distribute(self, data):
             from pymongo import MongoClient
 
@@ -269,8 +269,8 @@ structure:
     <your_new_type> = <yourpackage>.<submodule>.<submodule>:<YourComponentClass>
 
 Please note the ``:`` (colon) after the module path. Once installed alongside
-Flowbber, your package will be available for use using
-``type = your_new_type`` in your pipeline definition file.
+Flowbber, your package will be available for use using ``type = your_new_type``
+in your pipeline definition file.
 
 
 Pipeline's flowconf
@@ -293,8 +293,8 @@ components and the definition of the pipeline is straightforward. Flowbber
 will load the components defined in this way and made it available to your
 pipeline.
 
-In the ``flowconf.py`` file, you can register your components using function
-``register`` for each loader:
+In the ``flowconf.py`` file, you can register your components using the
+``register`` function for each loader:
 
 **Sources:**
 
@@ -386,7 +386,7 @@ to :meth:`flowbber.config.Configurator.add_option` is performed.
 
 For example, let's retake our previous simple
 :ref:`MongoDB sink example <example-sink-mongodb>`. We want to parametrize,
-among other things, the ``uri``, ``database`` and the ``collection``.
+among other things, the ``uri``, ``database`` and ``collection``.
 
 .. code-block:: python3
 
@@ -448,7 +448,7 @@ as follows:
     from flowbber.components import Sink
 
 
-    class MySink(Sink):
+    class SimpleMongoDBSink(Sink):
         def declare_config(self, config):
             # Declare options ...
 
@@ -526,8 +526,8 @@ provides the functions:
 
 #. :func:`flowbber.logging.get_logger` that allows to get a multiprocess safe
    logger.
-#. :func:`flowbber.logging.print` that allows to multiprocess safe print to
-   stdout or stderr.
+#. :func:`flowbber.logging.print` that allows to safely print to ``stdout`` or
+`  ``stderr`` in a multiprocess context.
 
 .. autofunction:: flowbber.logging.get_logger
    :noindex:
@@ -535,11 +535,11 @@ provides the functions:
 .. autofunction:: flowbber.logging.print
    :noindex:
 
-Nevertheless, it is important to note that Python's traditional
+Nevertheless, it is important to note that in Flowbber, Python's traditional
 :py:func:`logging.getLogger` loggers will also work correctly, for example,
-inside a third party library used in your sources or sinks, so that no change
-needs to be done if Flowbber's ``get_logger`` function isn't used for logging,
-it is just the recommended one.
+inside a third party library used in your sources or sinks. So no change needs
+to be done if Flowbber's ``get_logger`` function isn't used for logging, it is
+just the recommended one.
 
 **Usage:**
 
@@ -553,6 +553,7 @@ it is just the recommended one.
 
     def do_foo(say):
         print(say)
+        print(say, fd='stderr')
         log.info(say)
 
 
@@ -560,22 +561,28 @@ Pipeline API Usage
 ==================
 
 It is possible to build a Python package that implements a specific pipeline
-based on Flowbber. For example, consider a monitoring daemon that grabs the CPU
-usage information from the system and submits it to a InfluxDB_ and / or
-MongoDB_ database.
+based on Flowbber.
+
+For example, consider a daemon that reads values from connected Arduino based
+sensors inside a RaspberryPI and submits it to a server in the cloud, either
+using a web service or a database management system.
+
+As another example consider a monitoring daemon that grabs the CPU usage
+information from the system and submits it to a InfluxDB_ and / or MongoDB_
+database.
 
 .. _InfluxDB: https://www.influxdata.com/time-series-platform/influxdb/
 .. _MongoDB: https://www.mongodb.com/
 
-Let's call our hypothetical daemon ``cpud``. Its configuration file is located
-at ``/etc/cpud.toml`` and look like this:
+Let's code a basic version of our hypothetical daemon ``cpud``. Let's assume
+that its configuration file is located at ``/etc/cpud.toml`` and look like
+this:
 
 .. code-block:: toml
 
     [cpud]
     verbosity = 3
 
-    [sampling]
     # Take a sample each 10 seconds
     frequency = 10
 
@@ -605,6 +612,10 @@ A basic and naive implementation of such daemon could looks like this:
         """
         definition = {
             'sources': [
+                {'type': 'timestamp', 'id': 'timekeys', 'config': {
+                    'epoch': True,  # Key for MongoDB
+                    'iso8601': True,  # Key for InfluxDB
+                }},
                 {'type': 'cpu', 'id': 'cpu'},
             ],
             'sinks': [],
@@ -618,7 +629,7 @@ A basic and naive implementation of such daemon could looks like this:
                 'config': {
                     'uri': config['influxdb']['uri'],
                     'database': config['influxdb']['database'],
-                    'key': None,
+                    'key': 'timekeys.iso8601',
                 }
             })
 
@@ -630,7 +641,7 @@ A basic and naive implementation of such daemon could looks like this:
                     'uri': config['mongodb']['uri'],
                     'database': config['mongodb']['database'],
                     'collection': config['mongodb']['collection'],
-                    'key': None,
+                    'key': 'timekeys.epoch',
                 }
             })
 
@@ -663,7 +674,7 @@ A basic and naive implementation of such daemon could looks like this:
         # Build and run scheduler
         scheduler = Scheduler(
             pipeline,
-            config['sampling']['frequency'],
+            config['cpud']['frequency'],
             stop_on_failure=True
         )
 
