@@ -17,31 +17,21 @@ The following sources plugins are included as part of Flowbber.
 
 .. automodule:: flowbber.plugins.sources.cobertura
 
--------------------------------------------------------------------------
-
 .. _sources-cpu:
 
 .. automodule:: flowbber.plugins.sources.cpu
-
--------------------------------------------------------------------------
 
 .. _sources-env:
 
 .. automodule:: flowbber.plugins.sources.env
 
--------------------------------------------------------------------------
-
 .. _sources-speed:
 
 .. automodule:: flowbber.plugins.sources.speed
 
--------------------------------------------------------------------------
-
 .. _sources-timestamp:
 
 .. automodule:: flowbber.plugins.sources.timestamp
-
--------------------------------------------------------------------------
 
 .. _sources-user:
 

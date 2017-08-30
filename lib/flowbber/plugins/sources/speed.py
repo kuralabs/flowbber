@@ -21,7 +21,7 @@ Speed
 =====
 
 This source collects the network bandwidth the system curretly has
-using `Speedtest.net <http://beta.speedtest.net/>`_ servers.
+using `Speedtest.net <http://speedtest.net/>`_ servers.
 
 Three metrics are collected:
 

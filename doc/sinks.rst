@@ -17,25 +17,17 @@ The following sinks plugins are included as part of Flowbber.
 
 .. automodule:: flowbber.plugins.sinks.archive
 
--------------------------------------------------------------------------
-
 .. _sinks-influxdb:
 
 .. automodule:: flowbber.plugins.sinks.influxdb
-
--------------------------------------------------------------------------
 
 .. _sinks-mongodb:
 
 .. automodule:: flowbber.plugins.sinks.mongodb
 
--------------------------------------------------------------------------
-
 .. _sinks-print:
 
 .. automodule:: flowbber.plugins.sinks.print
-
--------------------------------------------------------------------------
 
 .. _sinks-template:
 
