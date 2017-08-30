@@ -166,10 +166,9 @@ class Scheduler:
             self._runs_failed += 1
 
             if self._stop_on_failure:
-                return
+                raise e
 
-        finally:
-            self._sched_next()
+        self._sched_next()
 
     def run(self):
         """
