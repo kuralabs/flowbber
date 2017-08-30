@@ -10,8 +10,12 @@ from flowbber.logging import setup_logging
 CONFIG = """
 [cpud]
 verbosity = 3
+
 # Take a sample each 10 seconds
 frequency = 10
+
+# Number of samples to take
+samples = 2
 
 [influxdb]
 uri = "influxdb://localhost:8086/"
@@ -92,6 +96,7 @@ def main():
     scheduler = Scheduler(
         pipeline,
         config['cpud']['frequency'],
+        samples=config['cpud']['samples'],
         stop_on_failure=True
     )
 

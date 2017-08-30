@@ -11,8 +11,11 @@ CONFIG = """
 [speedd]
 verbosity = 3
 
-# Take a sample each hour
-frequency = 3600
+# Take a sample each 10 seconds
+frequency = 30
+
+# Number of samples to take
+samples = 2
 
 # InfluxDB settings
 uri = "influxdb://localhost:8086/"
@@ -78,6 +81,7 @@ def main():
     scheduler = Scheduler(
         pipeline,
         config['frequency'],
+        samples=config['samples'],
         stop_on_failure=True
     )
 

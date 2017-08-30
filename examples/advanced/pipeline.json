@@ -73,7 +73,7 @@
             "type": "template",
             "id": "template1",
             "config": {
-                "template": "file://{pipeline.dir}/template1.tpl",
+                "template": "file://{pipeline.dir}/template.tpl",
                 "output": "render1.html",
                 "override": true,
                 "create_parents": true
@@ -83,7 +83,7 @@
             "type": "template",
             "id": "template2",
             "config": {
-                "template": "python://flowconf:atemplate",
+                "template": "python://flowconf:get_template",
                 "output": "render2.html",
                 "override": true,
                 "create_parents": true
