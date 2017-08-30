@@ -31,6 +31,12 @@ The following sources plugins are included as part of Flowbber.
 
 -------------------------------------------------------------------------
 
+.. _sources-speed:
+
+.. automodule:: flowbber.plugins.sources.speed
+
+-------------------------------------------------------------------------
+
 .. _sources-timestamp:
 
 .. automodule:: flowbber.plugins.sources.timestamp
