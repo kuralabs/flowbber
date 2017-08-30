@@ -12,6 +12,18 @@ Documentation
     https://flowbber.readthedocs.io
 
 
+Changelog
+=========
+
+1.0.0 (2017-08-30)
+------------------
+
+New
+~~~
+
+- Initial version.
+
+
 TODO
 ====
 
