@@ -22,6 +22,8 @@ pytest-cov
 # Documentation       #
 #######################
 
+# docutils fix with https://sourceforge.net/p/docutils/bugs/281/
+svn+https://svn.code.sf.net/p/docutils/code/trunk/docutils@8169#egg=docutils
 sphinx
 autoapi
 plantweb

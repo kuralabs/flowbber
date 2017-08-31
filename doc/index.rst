@@ -1,3 +1,6 @@
+.. meta::
+   :property=og:image: https://flowbber.readthedocs.io/en/latest/_images/arch.png
+
 ========
 Flowbber
 ========
