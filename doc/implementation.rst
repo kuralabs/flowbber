@@ -52,7 +52,7 @@ For example, consider a basic implementation of the built-in
         def collect(self):
             return {
                 key, value
-                for key, value in environ.items():
+                for key, value in environ.items()
             }
 
 Aggregators

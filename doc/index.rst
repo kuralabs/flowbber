@@ -19,6 +19,11 @@ custom pipelines for data collection, analysis and publishing.
 
    implementation
 
+.. toctree::
+   :maxdepth: 2
+
+   visualization
+
 
 Plugins
 =======
