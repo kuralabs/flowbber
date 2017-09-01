@@ -23,7 +23,7 @@ from re import match
 from os import environ
 from collections import namedtuple
 
-from .utils.command import run
+
 from .schema import SLUG_REGEX
 from .logging import get_logger
 
@@ -114,58 +114,31 @@ def namespace_git(path):
     :rtype: namedtuple
     """
 
-    from shutil import which
-
-    gitcmd = which('git')
-    if gitcmd is None:
-        log.debug('git executable not found')
-        return None
+    from .utils.git import find_root, find_branch, find_revision, GitNotFound
 
     parent = str(path.parent)
 
-    # Get repository root
-    cmd_root = run([
-        gitcmd, '-C', parent,
-        'rev-parse', '--show-toplevel'
-    ])
-    if cmd_root.returncode != 0:
-        log.debug('Unable to determine git repository root: {}'.format(
-            cmd_root.stderr
-        ))
+    # Try to determine git namespace
+    try:
+        root = find_root(directory=parent)
+        branch = find_branch(directory=parent)
+        rev = find_revision(directory=parent)
+    except GitNotFound as e:
         return None
 
-    # Get current branch
-    cmd_branch = run([
-        gitcmd, '-C', parent,
-        'rev-parse', '--abbrev-ref', 'HEAD'
-    ])
-    if cmd_branch.returncode != 0:
-        log.debug('Unable to determine git branch: {}'.format(
-            cmd_branch.stderr
-        ))
+    if not all([root, branch, rev]):
         return None
 
-    # Get current revision
-    cmd_rev = run([
-        gitcmd, '-C', parent,
-        'rev-parse', '--short', '--verify', 'HEAD'
-    ])
-    if cmd_rev.returncode != 0:
-        log.debug('Unable to determine git revision: {}'.format(
-            cmd_rev.stderr
-        ))
-        return None
-
-    # Get git object
+    # Create git namespace object
     git_type = namedtuple(
         'git',
         ['root', 'branch', 'rev']
     )
 
     git = git_type(
-        root=cmd_root.stdout,
-        branch=cmd_branch.stdout,
-        rev=cmd_rev.stdout,
+        root=root,
+        branch=branch,
+        rev=rev,
     )
 
     log.debug('git namespace: {}'.format(git))
