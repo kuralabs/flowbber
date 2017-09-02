@@ -114,7 +114,10 @@ def namespace_git(path):
     :rtype: namedtuple
     """
 
-    from .utils.git import find_root, find_branch, find_revision, GitNotFound
+    from .utils.git import (
+        find_root, find_branch, find_revision,
+        GitNotFound, GitError,
+    )
 
     parent = str(path.parent)
 
@@ -123,10 +126,10 @@ def namespace_git(path):
         root = find_root(directory=parent)
         branch = find_branch(directory=parent)
         rev = find_revision(directory=parent)
-    except GitNotFound as e:
+    except GitError as e:
+        log.debug(str(e))
         return None
-
-    if not all([root, branch, rev]):
+    except GitNotFound as e:
         return None
 
     # Create git namespace object

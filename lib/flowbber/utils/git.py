@@ -28,6 +28,12 @@ from ..logging import get_logger
 log = get_logger(__name__)
 
 
+class GitError(Exception):
+    """
+    Typed exception raised when a call to a git executable failed.
+    """
+
+
 class GitNotFound(Exception):
     """
     Typed exception raised when the git executable wasn't found on the system.
@@ -71,10 +77,9 @@ def find_root(git=None, directory='.'):
         'rev-parse', '--show-toplevel'
     ])
     if call.returncode != 0:
-        log.debug('Unable to determine git repository root: {}'.format(
+        raise GitError('Unable to determine git repository root:\n{}'.format(
             call.stderr
         ))
-        return None
 
     return call.stdout
 
@@ -100,10 +105,9 @@ def find_branch(git=None, directory='.'):
         'rev-parse', '--abbrev-ref', 'HEAD'
     ])
     if call.returncode != 0:
-        log.debug('Unable to determine git branch: {}'.format(
+        raise GitError('Unable to determine git branch:\n{}'.format(
             call.stderr
         ))
-        return None
 
     return call.stdout
 
@@ -130,10 +134,9 @@ def find_revision(git=None, directory='.'):
         'rev-parse', '--short', '--verify', 'HEAD'
     ])
     if call.returncode != 0:
-        log.debug('Unable to determine git revision: {}'.format(
+        raise GitError('Unable to determine git revision:\n{}'.format(
             call.stderr
         ))
-        return None
 
     return call.stdout
 
