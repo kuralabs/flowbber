@@ -19,7 +19,9 @@
 Utilities for git repositories.
 """
 
+from re import match
 from shutil import which
+from collections import OrderedDict
 
 from .command import run
 from ..logging import get_logger
@@ -139,6 +141,131 @@ def find_revision(git=None, directory='.'):
         ))
 
     return call.stdout
+
+
+class Author:
+
+    def __init__(self, name, email):
+        self._name = name
+        self._email = email
+        self._lines = 0
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def email(self):
+        return self._email
+
+    @property
+    def lines(self):
+        return self._lines
+
+    def __add__(self, other):
+        self._lines += other
+        return self
+
+
+class LineOfCode:
+    def __init__(self, linenum, code, author, date):
+        self._linenum = linenum
+        self._code = code
+        self._author = author
+        self._date = date
+
+
+class Blame:
+
+    EMAIL_LINE_REGEX = (
+        r'^'                            # Regex start
+        r'(?P<rev>[0-9A-Fa-f]+)'        # Match revision SHA hexadecimal hash
+        r'\s+\(<'                       # Separation, a literal ( and <
+        r'(?P<email>.+@.+)'             # Match email
+        r'>\s+'                         # A literal >, separation
+        r'(?P<timestamp>\d+)'           # Match timestamp
+        r'\s+'                          # Separation
+        r'(?P<timezone>(-|\+)?\d+)'     # Match timezone
+        r'\s+(?P<linenum>\d+)'          # Match line number
+        r'\)'                           # A literal )
+        r'(?P<code>.*)'                 # Trailing is code line
+        r'$'                            # Regex end
+    )
+
+    NAME_LINE_REGEX = (
+        r'^'                            # Regex start
+        r'(?P<rev>[0-9A-Fa-f]+)'        # Match revision SHA hexadecimal hash
+        r'\s+\('                        # Separation, a literal (
+        r'(?P<name>.+?)'                # Match email
+        r'\s+'                          # Separation
+        r'(?P<timestamp>\d+)'           # Match timestamp
+        r'.+$'                          # Regex end
+    )
+
+    def __init__(self, filename, git=None, directory='.'):
+        if git is None:
+            git = find_git()
+
+        self._filename = filename
+        self._git = git
+        self._directory = directory
+
+        self._authors = OrderedDict()
+        self._raw_blame = []
+        self._parse()
+
+    def _git_blame(self, email=True):
+        args = [
+            self._git, '-C', self._directory, '--no-pager',
+            'annotate', '-t', self._filename,
+        ]
+        if email:
+            args.append('-e')
+
+        call = run(args)
+
+        if call.returncode != 0:
+            raise GitError('Unable to blame file {}:\n{}'.format(
+                self._filename,
+                call.stderr
+            ))
+
+        return call.stdout
+
+    def _parse(self):
+        with_emails = self._git_blame(email=True).split('\n')
+        with_names = self._git_blame(email=False).split('\n')
+
+        del self._raw_blame[:]
+
+        for linenum, (email_line, name_line) in enumerate(zip(
+            with_emails, with_names
+        ), 1):
+
+            email_match = match(Blame.EMAIL_LINE_REGEX, email_line)
+            if not email_match:
+                raise Exception(email_line)  # FIXME: Type
+
+            name_match = match(Blame.NAME_LINE_REGEX, name_line)
+            if not name_match:
+                raise Exception(name_line)  # FIXME: Type
+
+            email_group = email_match.groupdict()
+            name_group = name_match.groupdict()
+
+            assert int(email_group['linenum']) == linenum
+            assert email_group['rev'] == name_group['rev']
+            assert email_group['timestamp'] == name_group['timestamp']
+
+            self._raw_blame.append({
+                'name': name_group['name'],
+                'email': email_group['email'],
+                'rev': email_group['rev'],
+                'timestamp': int(email_group['timestamp']),
+                'timezone': email_group['timezone'],
+                'linenum': linenum,
+                'code': email_group['code'],
+            })
 
 
 __all__ = [
