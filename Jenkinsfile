@@ -1,5 +1,7 @@
 pipeline {
-    agent any
+    agent {
+        docker { image 'kuralabs/python3-dev:latest' }
+    }
 
     stages {
         stage('Build') {
