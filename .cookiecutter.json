@@ -3,7 +3,7 @@
     "email": "info@kuralabs.io",
     "repo_name": "flowbber",
     "repo_url": "https://github.com/kuralabs/flowbber",
-    "doc_url": "https://flowbber.readthedocs.io",
+    "doc_url": "https://docs.kuralabs.io/flowbber/",
     "project_name": "Flowbber",
     "short_description": "Flowbber is a generic tool and framework that allows to execute custom pipelines for data gathering, publishing and analysis.",
     "year": "2017",

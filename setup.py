@@ -380,7 +380,7 @@ setup(
         'custom pipelines for data gathering, publishing and analysis.'
     ),
     long_description=read('README.rst'),
-    url='https://flowbber.readthedocs.io',
+    url='https://docs.kuralabs.io/flowbber/',
     keywords='flowbber',
 
     classifiers=[

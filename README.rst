@@ -1,6 +1,6 @@
-========
-Flowbber
-========
+======================================
+Flowbber - The Data Pipeline Framework
+======================================
 
 Flowbber is a generic tool and framework that allows to execute custom
 pipelines for data gathering, publishing and analysis.
@@ -9,7 +9,7 @@ pipelines for data gathering, publishing and analysis.
 Documentation
 =============
 
-    https://flowbber.readthedocs.io
+    https://docs.kuralabs.io/flowbber/
 
 
 Changelog
