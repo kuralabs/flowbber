@@ -1,0 +1,21 @@
+{% extends "!layout.html" %}
+
+{%- block extra_head %}
+{{ super() }}
+
+<!-- Open Graph data - Facebook -->
+<meta property="og:title" content="Flowbber - The Data Pipeline Framework" />
+<meta property="og:type" content="website" />
+<meta property="og:image" content="https://docs.kuralabs.io/flowbber/arch.png" />
+<meta property="og:url" content="https://docs.kuralabs.io/flowbber/" />
+<meta property="og:description" content="Flowbber provides a tool and framework that allows to create and execute custom pipelines for data collection, analysis and publishing." />
+
+<!-- Twitter Summary Card with Large Image -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@kuralabs">
+<meta name="twitter:creator" content="@kuralabs">
+<meta name="twitter:title" content="Flowbber - The Data Pipeline Framework">
+<meta name="twitter:description" content="Take a look to #Flowbber a tool that allows to execute custom pipelines for #data gathering, publishing and analysis. #Flowbber collect #data from different sources, process it and publishes it to many stores like #influxdb & #mongodb. The data collected by #Flowbber can be later visualized using tools like #grafana, #chronograf and #bokeh">
+<meta name="twitter:image" content="https://docs.kuralabs.io/flowbber/arch.png">
+
+{%- endblock %}

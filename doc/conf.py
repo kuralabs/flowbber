@@ -119,7 +119,11 @@ extensions.append('guzzle_sphinx_theme')
 # Guzzle theme options (see theme.conf for more information)
 html_theme_options = {
     # Set the name of the project to appear in the sidebar
-    'project_nav_name': 'Home'
+    'project_nav_name': 'Home',
+    # Google Analytics
+    'google_analytics_account': 'UA-105676084-1',
+    # Specify a base_url used to generate sitemap.xml links.
+    'base_url': 'https://docs.kuralabs.io/flowbber/',
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
@@ -133,7 +137,7 @@ html_static_path = ['_static']
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
 # directly to the root of the documentation.
-# html_extra_path = []
+html_extra_path = ['_static/images/arch.png']
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
