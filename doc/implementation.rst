@@ -604,6 +604,7 @@ A basic and naive implementation of such daemon could looks like this:
     from flowbber.pipeline import Pipeline
     from flowbber.scheduler import Scheduler
     from flowbber.logging import setup_logging
+    from flowbber.inputs import validate_definition
 
 
     def build_definition(config):
@@ -663,9 +664,12 @@ A basic and naive implementation of such daemon could looks like this:
         # Build pipeline definition
         definition = build_definition(config)
 
+        # Validate pipeline definition
+        validated = validate_definition(definition)
+
         # Build pipeline
         pipeline = Pipeline(
-            definition,
+            validated,
             'cpud',
             app='cpud',
             save_journal=False,
@@ -688,6 +692,9 @@ The most relevant parts of this example is that:
 
    Note that the package itself could package the required
    :term:`components <Component>` (Sources, Aggregators or Sinks) altogether.
+
+   In particular, we use :func:`flowbber.inputs.validate_definition` that
+   normalizes and validates the pipeline definition we just built.
 
 #. We create an instance of :class:`flowbber.pipeline.Pipeline` with the
    definition.

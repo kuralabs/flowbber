@@ -34,8 +34,15 @@ class Aggregator(Component):
     Main base class to implement an Aggregator.
     """
 
-    def __init__(self, index, type_, id_, config):
-        super().__init__(index, type_, id_, config)
+    def __init__(
+        self, index, type_, id_,
+        optional=False, timeout=None, config=None
+    ):
+        super().__init__(
+            index, type_, id_,
+            optional=optional, timeout=timeout, config=config
+        )
+
         self.duration = None
 
     def execute(self, data):

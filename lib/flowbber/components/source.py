@@ -35,11 +35,17 @@ class Source(Component):
     Main base class to implement a Source.
     """
 
-    def __init__(self, index, type_, id_, config):
-        super().__init__(index, type_, id_, config)
+    def __init__(
+        self, index, type_, id_,
+        optional=False, timeout=None, config=None
+    ):
+        super().__init__(
+            index, type_, id_,
+            optional=optional, timeout=timeout, config=config
+        )
 
-        self.result = Queue(maxsize=1)
         self.duration = Queue(maxsize=1)
+        self.result = Queue(maxsize=1)
 
     def execute(self):
         setproctitle(str(self))

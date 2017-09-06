@@ -175,7 +175,9 @@ class Pipeline:
                     index,
                     component['type'],
                     component['id'],
-                    component.get('config', {}),
+                    optional=component.get('optional', False),
+                    timeout=component.get('timeout', None),
+                    config=component.get('config', None),
                 )
 
                 destination.append(instance)

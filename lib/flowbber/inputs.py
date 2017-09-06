@@ -22,8 +22,6 @@ Input pipeline definition formats parses.
 from pprintpp import pformat
 
 from .logging import get_logger
-from .namespaces import get_namespaces
-from .schema import TimedeltaValidator, PIPELINE_SCHEMA
 
 
 log = get_logger(__name__)
@@ -44,6 +42,7 @@ def replace_values(definition, path):
      values replaced with values in the namespace.
     :rtype: dict
     """
+    from .namespaces import get_namespaces
 
     namespaces = get_namespaces(path)
 
@@ -64,6 +63,34 @@ def replace_values(definition, path):
         return obj
 
     return replace(definition)
+
+
+def validate_definition(definition):
+    """
+    Validate given pipeline definition against the schema.
+
+    :raise SyntaxError: if invalid pipeline definition.
+
+    :param dict definition: The pipeline definition dictionary data structure.
+
+    :return: The normalized and validated pipeline definition.
+     This will include the default values of all optional attributes.
+    :rtype: dict
+    """
+    from .schema import TimedeltaValidator, PIPELINE_SCHEMA
+
+    validator = TimedeltaValidator(PIPELINE_SCHEMA)
+    validated = validator.validated(definition)
+
+    if validated is None:
+        log.critical(
+            'Invalid pipeline definition:\n{}'.format(
+                pformat(validator.errors)
+            )
+        )
+        raise SyntaxError('Invalid pipeline definition')
+
+    return validated
 
 
 def load_pipeline_json(path):
@@ -128,20 +155,15 @@ def load_pipeline(path):
     definition = replace_values(definition, path)
 
     # Validate data structure
-    validator = TimedeltaValidator(PIPELINE_SCHEMA)
-    validated = validator.validated(definition)
-
-    if validated is None:
-        log.critical(
-            'Invalid pipeline definition:\n{}'.format(
-                pformat(validator.errors)
-            )
-        )
-        raise SyntaxError('Invalid pipeline definition')
+    validated = validate_definition(definition)
 
     log.info('Pipeline definition loaded, realized and validated.')
     log.debug(pformat(validated))
     return validated
 
 
-__all__ = ['load_pipeline']
+__all__ = [
+    'replace_values',
+    'validate_definition',
+    'load_pipeline'
+]

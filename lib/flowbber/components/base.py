@@ -48,18 +48,27 @@ class Component(metaclass=NamedABCMeta):
     :param int index: Position of this component in the pipeline definition.
     :param str type_: Type key used to fetch this component.
     :param str id_: Unique identifier for this component.
+    :param bool optional: Successful execution of this component is optional.
+     That is, it is allowed to fail and the pipeline won't fail.
+    :param int timeout: Execution timeout for this component, in seconds.
+     None means no timeout, wait forever.
     :param dict config: User configuration for this component.
     """
 
     @abstractmethod
-    def __init__(self, index, type_, id_, config):
+    def __init__(
+        self, index, type_, id_,
+        optional=False, timeout=None, config=None
+    ):
         self._index = index
         self._type_ = type_
         self._id = id_
+        self._optional = optional
+        self._timeout = timeout
 
         configurator = Configurator()
         self.declare_config(configurator)
-        self.config = configurator.validate(config)
+        self.config = configurator.validate(config or {})
 
     @property
     def id(self):

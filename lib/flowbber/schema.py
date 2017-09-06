@@ -55,6 +55,8 @@ COMPONENT_SCHEMA = {
     'config': {
         'required': False,
         'type': 'dict',
+        'default': None,
+        'nullable': True,
         'keyschema': {
             'type': 'string',
             'regex': SLUG_REGEX,
