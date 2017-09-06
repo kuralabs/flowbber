@@ -22,13 +22,13 @@ Base class for Flowbber pipeline.
 from os import getpid
 from pathlib import Path
 from collections import OrderedDict
-from multiprocessing import Process
 from tempfile import NamedTemporaryFile, gettempdir
 
 from ujson import dumps
 from setproctitle import setproctitle
 
 from .logging import get_logger
+from .components import CrashError, TimeExceededError
 from .loaders import SourcesLoader, AggregatorsLoader, SinksLoader
 
 
@@ -248,154 +248,192 @@ class Pipeline:
 
         return journal
 
+    def _run_components(
+        self, name, components, journal,
+        mutator, provider,
+        parallel=True
+    ):
+        """
+        Main function to run a collection of components.
+
+        Components can be run sequentially or in parallel.
+
+        :param str name: Name of the component type to run.
+        :param list components: Collection of components.
+        :param list journal: Journal to add entries.
+        :param function mutator: Function that will grab the context of the
+         current execution and return the value to be accumulated between
+         joins to the components.
+        :param function provider: Function that will grab the context of the
+         current execution and return the parameters that must be provided
+         to the component being created.
+        :param bool parallel: Run in parallel or sequentially.
+
+        :return: The final value set to the accumulator, as returned by the
+         mutator function.
+        :rtype: Variable, depending on the return value of the mutator.
+        """
+
+        # Accumulator for the mutator function
+        accumulator = None
+
+        # Execution schedule
+        schedule = components
+
+        def start(component):
+            """
+            Helper to log and start a component.
+            """
+            log.info(
+                'Starting {name} #{component.index} "{component.id}"'.format(
+                    name=name,
+                    component=component,
+                )
+            )
+            args = provider(accumulator, component)
+            component.start(*args)
+
+        # Start components in parallel if requested
+        if parallel:
+
+            # Re-order components using timeout in ascending order
+            schedule = sorted(components)
+
+            for component in components:
+                start(component)
+
+        # Join components according to schedule
+        for component in schedule:
+
+            # Start components in series if requested
+            if not parallel:
+                start(component)
+
+            log.info(
+                'Joining {name} #{component.index} "{component.id}"'.format(
+                    name=name,
+                    component=component
+                )
+            )
+
+            try:
+                execution = component.join()
+                accumulator = mutator(
+                    accumulator, component, execution.data
+                )
+
+                log.info(
+                    '{name} #{component.index} "{component.id}" (PID '
+                    '{execution.pid}) finished successfully after '
+                    '{execution.duration:.4f} seconds'.format(
+                        name=name.capitalize(),
+                        component=component,
+                        execution=execution,
+                    )
+                )
+
+            except (CrashError, TimeExceededError) as e:
+                execution = e.execution
+
+                errmsg = (
+                    'Process PID {execution.pid} for {name} '
+                    '#{component.index} "{component.id}" {execution.status} '
+                    'with exit code {execution.exitcode}'.format(
+                        name=name,
+                        component=component,
+                        execution=execution,
+                    )
+                )
+
+                if not component.optional:
+                    raise RuntimeError(errmsg)
+
+                log.warning(errmsg)
+                log.warning(
+                    '{name} #{component.index} "{component.id}" is marked as '
+                    'optional. Keep going...'.format(
+                        name=name.capitalize(),
+                        component=component,
+                    )
+                )
+
+            # Add entry to the journal
+            journal_entry = {
+                'index': component.index,
+                'id': component.id,
+                name: str(component),
+                'pid': execution.pid,
+                'status': execution.status,
+                'exitcode': execution.exitcode,
+                'duration': execution.duration,
+            }
+            journal.append(journal_entry)
+
+        return accumulator
+
     def _run_sources(self, journal):
         """
         Run the sources of the pipeline.
         """
 
-        sources_processes = [
-            (
-                index,
-                source,
-                Process(
-                    target=source.execute,
-                    name=str(source),
-                ),
-            )
-            for index, source in enumerate(self._sources)
-        ]
+        def mutator(accumulator, component, data):
+            if accumulator is None:
+                accumulator = OrderedDict()
+            accumulator[component.id] = data
+            return accumulator
 
-        for index, source, process in sources_processes:
-            log.info(
-                'Starting source #{} "{}"'.format(
-                    index, source.id
-                )
-            )
-            process.start()
+        def provider(accumulator, component):
+            return ()
 
-        for index, source, process in sources_processes:
-            log.info(
-                'Collecting data from source #{} "{}"'.format(
-                    index, source.id
-                )
-            )
-            result = source.result.get()
-            self._data.update(result)
+        results = self._run_components(
+            'source', self._sources, journal,
+            mutator, provider,
+            parallel=True
+        )
 
-        for index, source, process in sources_processes:
-            process.join()
-
-            journal_entry = {
-                'index': index,
-                'id': source.id,
-                'pid': process.pid,
-                'source': str(source),
-                'exitcode': process.exitcode,
-                'duration': source.duration.get(),
-            }
-            journal.append(journal_entry)
-
-            log.debug('Process {} exited with {}'.format(
-                process.pid, process.exitcode
-            ))
-            if process.exitcode != 0:
-                raise RuntimeError(
-                    'Process PID {pid} for source #{index} "{id}" crashed '
-                    'with exit code {exitcode}'.format(
-                        **journal_entry
-                    )
-                )
-
-            log.info(
-                'Source #{index} "{id}" (PID {pid}) finished collecting data '
-                'successfully after {duration:.4f} seconds'.format(
-                    **journal_entry
-                )
-            )
+        # Re-order data from scheduling
+        for source in self._sources:
+            if source.id in results:
+                self._data[source.id] = results[source.id]
 
     def _run_aggregators(self, journal):
         """
         Run the aggregators of the pipeline.
         """
 
-        for index, aggregator in enumerate(self._aggregators):
+        if not self._aggregators:
+            return
 
-            log.info('Executing data aggregator #{} "{}"'.format(
-                index, aggregator.id
-            ))
-            aggregator.execute(self._data)
+        def mutator(accumulator, component, data):
+            return data
 
-            journal_entry = {
-                'index': index,
-                'id': aggregator.id,
-                'aggregator': str(aggregator),
-                'duration': aggregator.duration,
-            }
-            journal.append(journal_entry)
+        def provider(accumulator, component):
+            if accumulator is None:
+                accumulator = self._data
+            return (accumulator, )
 
-            log.info(
-                'Aggregator #{index} "{id}" finished accumulating data '
-                'successfully after {duration:.4f} seconds'.format(
-                    **journal_entry
-                )
-            )
+        self._data = self._run_components(
+            'aggregator', self._aggregators, journal,
+            mutator, provider,
+            parallel=False
+        )
 
     def _run_sinks(self, journal):
         """
         Run the sinks of the pipeline.
         """
 
-        sink_processes = [
-            (
-                index,
-                sink,
-                Process(
-                    target=sink.execute,
-                    args=(self._data, ),
-                    name=str(sink),
-                ),
-            )
-            for index, sink in enumerate(self._sinks)
-        ]
+        def mutator(accumulator, component, data):
+            return None
 
-        for index, sink, process in sink_processes:
-            log.info(
-                'Executing data sink #{} "{}"'.format(
-                    index, sink.id
-                )
-            )
-            process.start()
+        def provider(accumulator, component):
+            return (self._data, )
 
-        for index, sink, process in sink_processes:
-            process.join()
-
-            journal_entry = {
-                'index': index,
-                'id': sink.id,
-                'pid': process.pid,
-                'sink': str(sink),
-                'exitcode': process.exitcode,
-                'duration': sink.duration.get(),
-            }
-            journal.append(journal_entry)
-
-            log.debug('Process {} exited with {}'.format(
-                process.pid, process.exitcode
-            ))
-            if process.exitcode != 0:
-                raise RuntimeError(
-                    'Process PID {pid} for sink #{index} "{id}" crashed '
-                    'with exit code {exitcode}'.format(
-                        **journal_entry
-                    )
-                )
-
-            log.info(
-                'Sink #{index} "{id}" (PID {pid}) finished successfully after '
-                '{duration:.4f} seconds'.format(
-                    **journal_entry
-                )
-            )
+        self._run_components(
+            'sink', self._sinks, journal,
+            mutator, provider,
+            parallel=True
+        )
 
 
 __all__ = ['Pipeline']

@@ -21,9 +21,71 @@ Base class for all Flowbber components.
 All Flowbber components extend from the Component class.
 """
 
+from time import time
+from queue import Empty
 from abc import ABCMeta, abstractmethod
+from multiprocessing import Queue, Process
+
+from setproctitle import setproctitle
 
 from ..config import Configurator
+from ..logging import get_logger
+
+
+log = get_logger(__name__)
+
+
+class ComponentError(Exception):
+    """
+    Generic exception raised when a component fails.
+    """
+
+    def __init__(self, execution):
+        super().__init__(str(execution))
+        self.execution = execution
+
+
+class TimeExceededError(ComponentError):
+    """
+    Exception raised when a component execution time was exceeded.
+    """
+    pass
+
+
+class CrashError(ComponentError):
+    """
+    Exception raised when a component crashed.
+    """
+    pass
+
+
+class ExecutionInfo:
+    """
+    Component execution information object.
+
+    :var status: Word used to describe the status of the execution.
+     For example: ``succeeded``, ``crashed``, ``killed``, ``hanged`` or
+     ``timed out``.
+    :var duration: Duration time in seconds of the execution of the process.
+    :var pid: Pid of the executing process.
+    :var exitcode: Exit code of the executing process.
+     Can be None if status is ``hanged``.
+    :var data: Data returned by the executing process, if any.
+    """
+
+    def __init__(self, status, duration, pid, exitcode, data):
+        self.status = status
+        self.duration = duration
+        self.pid = pid
+        self.exitcode = exitcode
+        self.data = data
+
+    def __str__(self):
+        return (
+            'Execution of PID {execution.pid} {execution.status}. '
+            'Exit code is {execution.exitcode} and the process ran for '
+            '{execution.duration} seconds'.format(execution=self)
+        )
 
 
 class NamedABCMeta(ABCMeta):
@@ -45,13 +107,23 @@ class Component(metaclass=NamedABCMeta):
 
     All Component classes (Sink, Aggregator, Source) extend from this class.
 
-    :param int index: Position of this component in the pipeline definition.
-    :param str type_: Type key used to fetch this component.
-    :param str id_: Unique identifier for this component.
-    :param bool optional: Successful execution of this component is optional.
+    **Properties**:
+
+    :var int index: Position of this component in the pipeline definition.
+    :var str id: Unique identifier for this component.
+    :var bool optional: Successful execution of this component is optional.
      That is, it is allowed to fail and the pipeline won't fail.
-    :param int timeout: Execution timeout for this component, in seconds.
+    :var int timeout: Execution timeout for this component, in seconds.
      None means no timeout, wait forever.
+    :var namedtuple config: Frozen configuration after validation.
+
+    **Parameters**:
+
+    :param int index: Value to set the index property.
+    :param str type_: Type key used to fetch this component.
+    :param str id_: Value to set the id property.
+    :param bool optional: Value to set the optional property.
+    :param int timeout: Value to set the timeout property.
     :param dict config: User configuration for this component.
     """
 
@@ -66,9 +138,21 @@ class Component(metaclass=NamedABCMeta):
         self._optional = optional
         self._timeout = timeout
 
+        self._duration = None
+        self._result = None
+        self._start = None
+        self._process = None
+
         configurator = Configurator()
         self.declare_config(configurator)
         self.config = configurator.validate(config or {})
+
+    @property
+    def index(self):
+        """
+        Index of this component in the stage.
+        """
+        return self._index
 
     @property
     def id(self):
@@ -76,6 +160,20 @@ class Component(metaclass=NamedABCMeta):
         Component unique identifier.
         """
         return self._id
+
+    @property
+    def optional(self):
+        """
+        Component successful execution is optional or not.
+        """
+        return self._optional
+
+    @property
+    def timeout(self):
+        """
+        Timeout for this component.
+        """
+        return self._timeout
 
     def declare_config(self, config):
         """
@@ -85,6 +183,177 @@ class Component(metaclass=NamedABCMeta):
         :type config: :class:`flowbber.config.Configurator`
         """
         pass
+
+    @abstractmethod
+    def _component_execute(self, *args):
+        """
+        Abstract method that components must implement to provide its specific
+        behavior.
+
+        Implementations can receive arbitrary arguments and must return the
+        data they want to return back to the called process.
+        """
+        pass
+
+    def _process_execute(self, *args):
+        """
+        Execute this component.
+
+        This method MUST be run in a subprocess.
+        """
+        setproctitle(str(self))
+
+        assert self._duration.empty()
+        assert self._result.empty()
+
+        # We reset the start time so that the measurement is more accurate
+        # and will not account for the time the process took to start
+        self.start = time()
+        data = None
+
+        try:
+            data = self._component_execute(*args)
+
+        finally:
+            self._duration.put(time() - self.start)
+            self._result.put(data)
+
+    def _reset(self, procargs):
+        """
+        Reset this component so its ready for another execution.
+
+        :param tuple procargs: Process execution arguments.
+        """
+        self._duration = Queue(maxsize=1)
+        self._result = Queue(maxsize=1)
+        self._start = time()
+        self._process = Process(
+            target=self._process_execute,
+            name=str(self),
+            args=procargs,
+        )
+
+    def start(self, *args):
+        """
+        Start the component execution.
+        """
+        self._reset(args)
+        self._process.start()
+
+    def join(self):
+        """
+        Join the component and get its execution information.
+
+        :return: The execution information of this component.
+        :rtype: :class:`ExecutionInfo`.
+        """
+
+        # Calculate timeout from elapsed time
+        timeout = None
+        if self.timeout is not None:
+            timeout = max([0, self.timeout - (time() - self.start)])
+
+        # Get results
+        try:
+            result = self._result.get(True, timeout)
+
+            try:
+                duration = self._duration.get(True, 5)
+            except Empty as e:
+                # Hopefully this is impossible to happen if result was fetch
+                # already. Nevertheless it is preferable a crashed pipeline
+                # than a deadlocked one.
+                raise RuntimeError(
+                    'Unable to get duration time for source #{source.index} '
+                    '"{source.id}"'.format(
+                        source=self,
+                    )
+                )
+
+            # Standard Python crash
+            if result is None:
+                execution = ExecutionInfo(
+                    'crashed', duration,
+                    self._process.pid,
+                    self._process.exitcode,
+                    None
+                )
+                raise CrashError(execution)
+
+            # All good
+            execution = ExecutionInfo(
+                'succeeded', duration,
+                self._process.pid,
+                self._process.exitcode,
+                result
+            )
+            return execution
+
+        except Empty as e:
+            # In most cases the duration of the process will be unable to be
+            # determined
+            duration = None
+
+            # Check if killed without executing the finally clause
+            if not self._process.is_alive():
+                log.warning(
+                    'Source #{source.index} "{source.id}" collecting process '
+                    'PID {process.pid} was killed.\n'
+                    'Possible causes can be a segfault, SIGTERM, SIGKILL '
+                    'or OOM killer'.format(
+                        source=self,
+                        process=self._process,
+                    )
+                )
+
+                status = 'killed'
+
+            # Real timeout, process still alive, lets kill it
+            else:
+                self._process.terminate()
+
+                # Check if process hanged
+                self._process.join(0.1)
+                if self._process.is_alive():
+                    log.warning(
+                        'Data collection for source #{source.index} '
+                        '"{source.id}" timed out and its process PID '
+                        '{process.pid} seems to have hanged'.format(
+                            source=self,
+                            process=self._process,
+                        )
+                    )
+
+                    status = 'hanged'
+
+                else:
+                    # At least we can offer an estimate if we kill the process
+                    duration = time() - self.start
+                    status = 'timed out'
+
+            # Note: exitcode can be None if the process hanged
+            execution = ExecutionInfo(
+                status, duration,
+                self._process.pid,
+                self._process.exitcode,
+                None
+            )
+            raise TimeExceededError(execution)
+
+    def __lt__(self, other):
+        """
+        "Less than" magic method allows to sort a collection of this objects
+        by its timeout.
+        """
+
+        if self.timeout is None and other.timeout is None:
+            return True  # Or False?
+        if self.timeout is None:
+            return False
+        if other.timeout is None:
+            return True
+
+        return self.timeout < other.timeout
 
     def __str__(self):
         return '#{} {}.{}.{}'.format(
@@ -98,4 +367,9 @@ class Component(metaclass=NamedABCMeta):
         return str(self)
 
 
-__all__ = ['Component']
+__all__ = [
+    'TimeExceededError',
+    'CrashError',
+    'ExecutionInfo',
+    'Component',
+]

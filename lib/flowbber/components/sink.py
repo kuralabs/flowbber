@@ -21,11 +21,7 @@ Module implementating the Sink base class.
 All custom Flowbber sinks must extend from the Sink class.
 """
 
-from time import time
 from abc import abstractmethod
-from multiprocessing import Queue
-
-from setproctitle import setproctitle
 
 from .base import Component
 
@@ -44,17 +40,16 @@ class Sink(Component):
             optional=optional, timeout=timeout, config=config
         )
 
-        self.duration = Queue(maxsize=1)
+    def _component_execute(self, data):
+        """
+        Sink component execute override.
 
-    def execute(self, data):
-        setproctitle(str(self))
-
-        start = time()
-
-        try:
-            self.distribute(data)
-        finally:
-            self.duration.put(time() - start)
+        This function will just call the user provided ``distribute()``
+        function with the input data and return an empty dictionary
+        ("no data").
+        """
+        self.distribute(data)
+        return {}
 
     @abstractmethod
     def distribute(self, data):

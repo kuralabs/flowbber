@@ -21,11 +21,7 @@ Module implementating the Source base class.
 All custom Flowbber sources must extend from the Source class.
 """
 
-from time import time
 from abc import abstractmethod
-from multiprocessing import Queue
-
-from setproctitle import setproctitle
 
 from .base import Component
 
@@ -44,20 +40,32 @@ class Source(Component):
             optional=optional, timeout=timeout, config=config
         )
 
-        self.duration = Queue(maxsize=1)
-        self.result = Queue(maxsize=1)
+    def _component_execute(self):
+        """
+        Source component execute override.
 
-    def execute(self):
-        setproctitle(str(self))
+        This function will just call the user provided ``collect()`` function,
+        validate the returned value and finally return it back to the caller.
+        """
+        data = self.collect()
 
-        start = time()
-        entry = {}
+        if not isinstance(data, dict):
+            raise RuntimeError(
+                'Source #{source.index} "{source.id}" collected '
+                'non-dictionary data'.format(
+                    source=self,
+                )
+            )
 
-        try:
-            entry[self.id] = self.collect()
-        finally:
-            self.result.put(entry)
-            self.duration.put(time() - start)
+        if not data:
+            raise RuntimeError(
+                'Source #{source.index} "{source.id}" didn\'t produced '
+                'any data'.format(
+                    source=self,
+                )
+            )
+
+        return data
 
     @abstractmethod
     def collect(self):

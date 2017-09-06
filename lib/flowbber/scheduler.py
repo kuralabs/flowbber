@@ -159,7 +159,7 @@ class Scheduler:
 
         except Exception as e:
             log.error(
-                'Pipeline {} failed:\n{}'.format(
+                'Pipeline "{}" failed:\n{}'.format(
                     self._pipeline.name, format_exc()
                 )
             )
