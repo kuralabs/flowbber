@@ -205,7 +205,8 @@ class Pipeline:
             self._data = OrderedDict()
         else:
             log.info('Running pipeline ...')
-            self._executed += 1
+
+        self._executed += 1
 
         journal = OrderedDict((
             ('sources', []),
