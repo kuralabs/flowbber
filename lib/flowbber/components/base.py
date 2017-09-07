@@ -282,11 +282,13 @@ class Component(metaclass=NamedABCMeta):
             # Check if killed without executing the finally clause
             if not self._process.is_alive():
                 log.warning(
-                    'Source #{source.index} "{source.id}" collecting process '
-                    'PID {process.pid} was killed.\n'
+                    '{name} #{component.index} "{component.id}" driving '
+                    'process with PID {process.pid} was killed '
+                    '({process.exitcode}).\n'
                     'Possible causes can be a segfault, SIGTERM, SIGKILL '
                     'or OOM killer'.format(
-                        source=self,
+                        name=self.__class__.__name__,
+                        component=self,
                         process=self._process,
                     )
                 )
@@ -301,10 +303,11 @@ class Component(metaclass=NamedABCMeta):
                 self._process.join(0.1)
                 if self._process.is_alive():
                     log.warning(
-                        'Data collection for source #{source.index} '
-                        '"{source.id}" timed out and its process PID '
-                        '{process.pid} seems to have hanged'.format(
-                            source=self,
+                        'Execution of {name} #{component.index} '
+                        '"{component.id}" timed out and its driving process '
+                        'with PID {component.pid} seems to have hanged'.format(
+                            name=self.__class__.__name__.lower(),
+                            component=self,
                             process=self._process,
                         )
                     )
