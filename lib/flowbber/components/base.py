@@ -138,7 +138,6 @@ class Component(metaclass=NamedABCMeta):
         self._optional = optional
         self._timeout = timeout
 
-        self._duration = None
         self._result = None
         self._start = None
         self._process = None
@@ -203,7 +202,6 @@ class Component(metaclass=NamedABCMeta):
         """
         setproctitle(str(self))
 
-        assert self._duration.empty()
         assert self._result.empty()
 
         # We reset the start time so that the measurement is more accurate
@@ -215,8 +213,9 @@ class Component(metaclass=NamedABCMeta):
             data = self._component_execute(*args)
 
         finally:
-            self._duration.put(time() - self.start)
-            self._result.put(data)
+            self._result.put(
+                (time() - self.start, data)
+            )
 
     def _reset(self, procargs):
         """
@@ -224,7 +223,6 @@ class Component(metaclass=NamedABCMeta):
 
         :param tuple procargs: Process execution arguments.
         """
-        self._duration = Queue(maxsize=1)
         self._result = Queue(maxsize=1)
         self._start = time()
         self._process = Process(
@@ -255,23 +253,10 @@ class Component(metaclass=NamedABCMeta):
 
         # Get results
         try:
-            result = self._result.get(True, timeout)
-
-            try:
-                duration = self._duration.get(True, 5)
-            except Empty as e:
-                # Hopefully this is impossible to happen if result was fetch
-                # already. Nevertheless it is preferable a crashed pipeline
-                # than a deadlocked one.
-                raise RuntimeError(
-                    'Unable to get duration time for source #{source.index} '
-                    '"{source.id}"'.format(
-                        source=self,
-                    )
-                )
+            duration, data = self._result.get(True, timeout)
 
             # Standard Python crash
-            if result is None:
+            if data is None:
                 execution = ExecutionInfo(
                     'crashed', duration,
                     self._process.pid,
@@ -285,7 +270,7 @@ class Component(metaclass=NamedABCMeta):
                 'succeeded', duration,
                 self._process.pid,
                 self._process.exitcode,
-                result
+                data
             )
             return execution
 
