@@ -138,23 +138,6 @@ class ArchiveSink(Sink):
             },
         )
 
-        def custom_validator(validated):
-            outfile = Path(validated['output'])
-
-            # Check if file exists
-            if outfile.is_file() and not validated['override']:
-                raise FileExistsError(
-                    'File {} already exists'.format(outfile)
-                )
-
-            # Check archiving directory exists
-            if not validated['create_parents'] and not outfile.parent.is_dir():
-                raise FileNotFoundError(
-                    'No such directory {}'.format(outfile.parent)
-                )
-
-        config.add_validator(custom_validator)
-
     def distribute(self, data):
         from ujson import dumps
         outfile = Path(self.config.output.value)

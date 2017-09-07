@@ -128,21 +128,17 @@ class CoberturaSource(Source):
             },
         )
 
-        # Check if file exists
-        def custom_validator(validated):
-            infile = Path(validated['xmlpath'])
-
-            if not infile.is_file():
-                raise FileNotFoundError(
-                    'No such file {}'.format(infile)
-                )
-
-        config.add_validator(custom_validator)
-
     def collect(self):
         from pycobertura import Cobertura
 
-        cobertura = Cobertura(self.config.xmlpath.value)
+        # Check if file exists
+        infile = Path(self.config.xmlpath.value)
+        if not infile.is_file():
+            raise FileNotFoundError(
+                'No such file {}'.format(infile)
+            )
+
+        cobertura = Cobertura(str(infile))
 
         files = {
             filename: {
