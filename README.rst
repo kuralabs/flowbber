@@ -23,6 +23,25 @@ Install
 Changelog
 =========
 
+1.1.0 (2017-09-07)
+------------------
+
+New
+~~~
+
+- Added "optional" and "timeout" features to pipeline components.
+
+Changes
+~~~~~~~
+
+- Git helpers now live into its own utilities module ``flowbber.utils.git``.
+
+Fixes
+~~~~~
+
+- Fixed bug where pipeline execution counter didn't increment.
+
+
 1.0.0 (2017-08-30)
 ------------------
 
@@ -30,12 +49,6 @@ New
 ~~~
 
 - Initial version.
-
-
-TODO
-====
-
-- Implement execution timeout for all components.
 
 
 License

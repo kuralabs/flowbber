@@ -21,4 +21,4 @@ flowbber module entry point.
 
 __author__ = 'KuraLabs S.R.L'
 __email__ = 'info@kuralabs.io'
-__version__ = '1.0.0'
+__version__ = '1.1.0'
