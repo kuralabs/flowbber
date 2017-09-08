@@ -325,9 +325,9 @@ one form.
 
 In the same way, in some situations the gathering of data from a particular
 data store, the processing of such data or the publication of the final bundle
-can take a lot of time. In some sources, it doesn't even makes sense to wait
-for the data to be collected as it has lost its value if it is not collected in
-a particular time frame.
+can take a lot of time. In some sources, it doesn't even make sense to wait for
+the data to be collected as it has lost its relevance because it wasn't
+collected in a particular time frame.
 
 For this use cases, and to avoid pipeline deadlocks, any component can be setup
 to execute in a specific timeframe. This **timeout** is either a time

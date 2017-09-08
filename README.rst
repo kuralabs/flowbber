@@ -12,6 +12,14 @@ Documentation
     https://docs.kuralabs.io/flowbber/
 
 
+Install
+=======
+
+.. code-block:: sh
+
+    pip3 install flowbber
+
+
 Changelog
 =========
 

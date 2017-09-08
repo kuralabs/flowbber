@@ -87,6 +87,9 @@ class ExecutionInfo:
             '{execution.duration} seconds'.format(execution=self)
         )
 
+    def __repr__(self):
+        return str(self)
+
 
 class NamedABCMeta(ABCMeta):
     """
