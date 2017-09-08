@@ -1,0 +1,196 @@
+
+<!doctype html>
+<html>
+<head>
+    <title>Pipeline Execution</title>
+
+    <style type="text/css">
+        body {
+            color: #d3d3d3;
+            font: 12pt sans;
+            background-color: #222222;
+        }
+
+        #pipeline {
+            width: 600px;
+            height: 600px;
+            margin: auto auto;
+        }
+    </style>
+    <script
+        type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.20.1/vis.min.js">
+    </script>
+    <link
+        type="text/css"
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.20.1/vis.min.css" />
+    <link
+        type="text/css"
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+
+    <script type="text/javascript">
+        var network = null;
+
+        function describe() {
+            var sources = [
+                {id: 'timestamp'},
+                {id: 'user'},
+                {id: 'env'},
+            ];
+
+            var aggregators = [
+                {id: 'aggr1'},
+                {id: 'aggr2'},
+                {id: 'aggr3'},
+            ];
+
+            var sinks = [
+                {id: 'template'},
+                {id: 'influxdb'},
+                {id: 'mongodb'},
+            ];
+
+            return [sources, aggregators, sinks];
+        }
+
+        function graph(sources, aggregators, sinks) {
+
+            var nodes = [];
+            var edges = [];
+            var uid = 0;
+
+            // Add sources
+            for (var i = 0; i < sources.length; i++, uid++) {
+                nodes.push({
+                    id: uid,
+                    label: sources[i].id,
+                    group: 'sources',
+                });
+                edges.push({
+                    from: uid,
+                    to: sources.length,
+                });
+            }
+
+            // Add aggregators
+            for (var i = 0; i < aggregators.length; i++, uid++) {
+                nodes.push({
+                    id: uid,
+                    label: aggregators[i].id,
+                    group: 'aggregators',
+                    level: i + 1,
+                });
+                edges.push({
+                    from: uid,
+                    to: uid + 1,
+                });
+            }
+
+            // Add sinks
+            for (var i = 0; i < sinks.length; i++, uid++) {
+                nodes.push({
+                    id: uid,
+                    label: sinks[i].id,
+                    group: 'sinks',
+                });
+                edges.push({
+                    from: sources.length + aggregators.length - 1,
+                    to: uid,
+                });
+            }
+
+            return [nodes, edges];
+
+        }
+
+        function destroy() {
+            if (network !== null) {
+                network.destroy();
+                network = null;
+            }
+        }
+
+        function draw() {
+            destroy();
+
+            // Fetch graph
+            var [sources, aggregators, sinks] = describe();
+
+            // Create nodes and edges
+            var [nodes, edges] = graph(sources, aggregators, sinks);
+
+            // Create a network
+            var container = document.getElementById('pipeline');
+            var data = {
+                nodes: nodes,
+                edges: edges
+            };
+
+            var options = {
+                nodes: {
+                    font: {
+                        size: 16,
+                        color: '#ffffff'
+                    },
+                    borderWidth: 2
+                },
+                edges: {
+                    smooth: {
+                        type: 'cubicBezier',
+                        roundness: 0.4
+                    }
+                },
+                layout: {
+                    hierarchical: {
+                    }
+                },
+                groups: {
+                    sources: {
+                        level: 0,
+                        shape: 'icon',
+                        icon: {
+                            face: 'Material Icons',
+                            code: '\ue169',
+                            size: 50,
+                            color: '#2196F3'
+                        }
+                    },
+                    aggregators: {
+                        color: 'green',
+                        shape: 'icon',
+                        icon: {
+                            face: 'Material Icons',
+                            code: '\ue8b8',
+                            size: 50,
+                            color: '#009688'
+                        }
+                    },
+                    sinks: {
+                        color: 'blue',
+                        level: aggregators.length + 1,
+                        shape: 'icon',
+                        icon: {
+                            face: 'Material Icons',
+                            code: '\ue149',
+                            size: 50,
+                            color: '#FF4081'
+                        }
+                    },
+                },
+                physics: true
+            };
+            network = new vis.Network(container, data, options);
+        }
+
+    </script>
+
+</head>
+
+<body onload="draw();">
+
+<div id="pipeline"></div>
+
+</body>
+</html>
