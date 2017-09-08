@@ -21,10 +21,7 @@ Module implementating the Aggregator base class.
 All custom Flowbber aggregators must extend from the Aggregator class.
 """
 
-from time import time
 from abc import abstractmethod
-
-from setproctitle import setproctitle
 
 from .base import Component
 
@@ -34,19 +31,24 @@ class Aggregator(Component):
     Main base class to implement an Aggregator.
     """
 
-    def __init__(self, index, type_, id_, config):
-        super().__init__(index, type_, id_, config)
-        self.duration = None
+    def __init__(
+        self, index, type_, id_,
+        optional=False, timeout=None, config=None
+    ):
+        super().__init__(
+            index, type_, id_,
+            optional=optional, timeout=timeout, config=config
+        )
 
-    def execute(self, data):
-        setproctitle(str(self))
+    def _component_execute(self, data):
+        """
+        Aggregator component execute override.
 
-        start = time()
-
-        try:
-            self.accumulate(data)
-        finally:
-            self.duration = time() - start
+        This function will just call the user provided ``accumulate()``
+        function with the input data and return it again.
+        """
+        self.accumulate(data)
+        return data
 
     @abstractmethod
     def accumulate(self, data):

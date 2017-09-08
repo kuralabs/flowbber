@@ -43,7 +43,7 @@ Check that you can launch the ``flowbber`` command line application:
 .. code-block:: console
 
     $ flowbber --version
-    Flowbber v1.0.0
+    Flowbber v1.1.0
 
 Help is available using the ``--help`` flag:
 
@@ -241,15 +241,15 @@ verbosity:
 .. code-block:: console
 
     $ flowbber -vv pipeline1.toml
-      INFO     | flowbber PID 8574 starting ...
-      INFO     | Loading pipeline definition from /home/kuralabs/flowbber/pipeline1.toml ...
+      INFO     | flowbber PID 10300 starting ...
+      INFO     | Loading pipeline definition from /home/kuralabs/flowbber/examples/basic/pipeline.toml ...
       INFO     | Pipeline definition loaded, realized and validated.
-      INFO     | Loading local configuration from /home/kuralabs/flowbber ...
+      INFO     | Loading local configuration from /home/kuralabs/flowbber/examples/basic ...
       INFO     | Creating pipeline ...
       INFO     | Loading plugins ...
-      INFO     | Sources available: ['cobertura', 'env', 'user', 'timestamp']
+      INFO     | Sources available: ['env', 'cpu', 'user', 'cobertura', 'speed', 'timestamp']
       INFO     | Aggregators available: []
-      INFO     | Sinks available: ['template', 'influxdb', 'archive', 'print', 'mongodb']
+      INFO     | Sinks available: ['mongodb', 'influxdb', 'archive', 'print', 'template']
       INFO     | Building pipeline ...
       INFO     | Using configuration:
         epoch = False
@@ -270,23 +270,24 @@ verbosity:
       INFO     | Starting source #0 "timestamp1"
       INFO     | Starting source #1 "timestamp2"
       INFO     | Starting source #2 "user1"
-      INFO     | Collecting data from source #0 "timestamp1"
-      INFO     | Collecting data from source #1 "timestamp2"
-      INFO     | Collecting data from source #2 "user1"
-      INFO     | Source #0 "timestamp1" (PID 8579) finished collecting data successfully after 0.0003 seconds
-      INFO     | Source #1 "timestamp2" (PID 8580) finished collecting data successfully after 0.0005 seconds
-      INFO     | Source #2 "user1" (PID 8583) finished collecting data successfully after 0.0005 seconds
+      INFO     | Joining source #0 "timestamp1"
+      INFO     | Source #0 "timestamp1" (PID 10308) finished successfully after 0.0001 seconds
+      INFO     | Joining source #1 "timestamp2"
+      INFO     | Source #1 "timestamp2" (PID 10310) finished successfully after 0.0004 seconds
+      INFO     | Joining source #2 "user1"
+      INFO     | Source #2 "user1" (PID 10312) finished successfully after 0.0001 seconds
       INFO     | Running aggregators ...
       INFO     | Running sinks ...
-      INFO     | Executing data sink #0 "print1"
+      INFO     | Starting sink #0 "print1"
+      INFO     | Joining sink #0 "print1"
     OrderedDict([
-        ('timestamp1', {'epochf': 1503699801.471691}),
-        ('timestamp2', {'epochf': 1503699801.472847}),
+        ('timestamp1', {'epochf': 1504829040.032091}),
+        ('timestamp2', {'epochf': 1504829040.036981}),
         ('user1', {'login': 'kuralabs', 'uid': 1000}),
     ])
-      INFO     | Sink #0 "print1" (PID 8588) finished successfully after 0.0010 seconds
+      INFO     | Sink #0 "print1" (PID 10314) finished successfully after 0.0016 seconds
       INFO     | Saving journal ...
-      INFO     | Journal saved to /tmp/flowbber-journals/journal-8574-2bwi6onn
+      INFO     | Journal saved to /tmp/flowbber-journals/journal-10300-6dgy3f5w
 
 As we can see, a lot of information is provided, including configuration and
 duration of each source, plugins available, PIDs, etc.
@@ -294,6 +295,48 @@ duration of each source, plugins available, PIDs, etc.
 At this point we have covered the basics. In this example we used TOML_ to
 define the pipeline, but JSON_ can also be used, as explained in the following
 section.
+
+
+Optional Execution and Timeout
+==============================
+
+.. versionadded:: 1.1.0
+
+In some situations some components of a pipeline may fail. By default, if any
+component fails to perform its programming the pipeline will fail right away.
+
+Nevertheless, any component can be marked as **optional** (allowed or expected
+to fail), which means that if it fails or crashes, a warning will be logged and
+the pipeline can continue executing.
+
+For sources, this means that the following stages (aggregators and sinks) must
+be able to handle the possible absence of the data provided by the failed
+source. For example, in a template sink, the template should ask first if the
+id of the optional source is present in the final bundle before plotting its
+data.
+
+For aggregators, this means that the input data for the next aggregator will be
+unmodified from the one received by the failed aggregator.
+
+For sinks, it just means that if a sink fails, the pipeline won't crash right
+away. In many cases, it is recommended to mark all your sinks as optional,
+at least to retain most of the data even if the pipeline failed to submit it in
+one form.
+
+In the same way, in some situations the gathering of data from a particular
+data store, the processing of such data or the publication of the final bundle
+can take a lot of time. In some sources, it doesn't even make sense to wait for
+the data to be collected as it has lost its relevance because it wasn't
+collected in a particular time frame.
+
+For this use cases, and to avoid pipeline deadlocks, any component can be setup
+to execute in a specific timeframe. This **timeout** is either a time
+expression (str) or seconds (float) (see :ref:`frequency <frequency>` for
+format) that marks the maximum time the component is allowed to run.
+
+If the component exceeds its allowed time frame the pipeline executor will kill
+the driving process and mark the component as failed. Depending on the
+**optional** value the pipeline will then crash or continue executing.
 
 
 Pipeline Definition Format
@@ -313,8 +356,16 @@ of:
 And each element of those lists, to have:
 
 - A **type**, that identifies the component implementation.
-- An unique **id** to identify the instance.
+- A unique **id** to identify the instance.
 - A **config**, if any, as required by the component implementation.
+
+And optionally:
+
+.. versionadded:: 1.1.0
+
+- An **optional** flag that marks if the component is allowed to fail or not.
+- An execution **timeout** for this component, either a time expression (str)
+  or seconds (float) (see :ref:`frequency <frequency>` for format).
 
 All keys, and in particular those of the configuration options must be able to
 be used as Python variables, so they are checked against the following regular
@@ -343,13 +394,16 @@ JSON
           {
               "type": "type2",
               "id": "id2",
-              "config": {}
+              "config": {},
+              "optional": true,
+              "timeout": 60
           }
       ],
       "aggregators": [
           {
               "type": "type1",
-              "id": "id1"
+              "id": "id1",
+              "timeout": "1.5 min"
           }
       ],
       "sinks": [
@@ -390,10 +444,13 @@ bracket ``[[ElementInList]]``.
     [[sources]]
     type = "type2"
     id = "id2"
+    optional = true
+    timeout = 60
 
     [[aggregators]]
     type = "type1"
     id = "id1"
+    timeout = "1.2 min"
 
     [[sinks]]
     type = "type1"
@@ -551,6 +608,7 @@ Available Namespaces
 
             git -C pipeline.parent rev-parse --short --verify HEAD
 
+
 Scheduling
 ==========
 
@@ -561,7 +619,7 @@ For example, consider you want to monitor your Internet speed. You want to
 collect a sample once per hour and send it to a time series database for later
 retrieval and visualization.
 
-The obvious solution is to configure your system's cron to call the
+The obvious solution is to configure your system's ``cron`` to call the
 ``flowbber`` command line application once per hour. While this approach is
 useful, effective and supported, Flowbber has a built-in scheduler that allows
 to configure scheduling directly from the pipeline definition file and provides
@@ -594,9 +652,14 @@ In JSON:
 
 Options are:
 
+.. _frequency:
+
 ``frequency``
-    String expression denoting a time frequency. This string is parsed using
-    the pytimeparse_ library and thus the following expressions can be used:
+    String expression denoting a time frequency or a float expressing the
+    period in seconds.
+
+    The time frequency string is parsed using the pytimeparse_ library and
+    thus the following expressions can be used:
 
     .. code-block:: text
 
@@ -626,7 +689,7 @@ Options are:
     If missing or ``None``, the scheduler will start immediately.
 
 ``stop_on_failure``
-    Stop the execution of the scheduler if the pipeline execution fails.
+    Stop the execution of the scheduler if a pipeline execution fails.
 
 
 Glossary

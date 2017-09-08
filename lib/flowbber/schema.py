@@ -40,9 +40,23 @@ SLUG_SCHEMA = {
 COMPONENT_SCHEMA = {
     'type': SLUG_SCHEMA,
     'id': SLUG_SCHEMA,
+    'optional': {
+        'type': 'boolean',
+        'required': False,
+        'default': False,
+    },
+    'timeout': {
+        'coerce': 'timedelta_nullable',
+        'required': False,
+        'default': None,
+        'nullable': True,
+        'min': 0,
+    },
     'config': {
         'required': False,
         'type': 'dict',
+        'default': None,
+        'nullable': True,
         'keyschema': {
             'type': 'string',
             'regex': SLUG_REGEX,
@@ -125,8 +139,16 @@ class TimedeltaValidator(Validator):
     .. _pytimeparse: https://github.com/wroberts/pytimeparse
     """
 
+    def _normalize_coerce_timedelta_nullable(self, value):
+        if value is None:
+            return None
+        return self._normalize_coerce_timedelta(value)
+
     def _normalize_coerce_timedelta(self, value):
         from pytimeparse import parse
+
+        if isinstance(value, int):
+            return value
 
         timedelta = parse(value)
         if timedelta is None:

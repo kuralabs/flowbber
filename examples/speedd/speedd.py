@@ -5,6 +5,7 @@ from toml import loads
 from flowbber.pipeline import Pipeline
 from flowbber.scheduler import Scheduler
 from flowbber.logging import setup_logging
+from flowbber.inputs import validate_definition
 
 
 CONFIG = """
@@ -69,9 +70,12 @@ def main():
     # Build pipeline definition
     definition = build_definition(config)
 
+    # Validate pipeline definition
+    validated = validate_definition(definition)
+
     # Build pipeline
     pipeline = Pipeline(
-        definition,
+        validated,
         'speedd',
         app='speedd',
         save_journal=False,
