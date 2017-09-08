@@ -335,7 +335,7 @@ class Component(metaclass=NamedABCMeta):
         """
 
         if self.timeout is None and other.timeout is None:
-            return True  # Or False?
+            return False
         if self.timeout is None:
             return False
         if other.timeout is None:
