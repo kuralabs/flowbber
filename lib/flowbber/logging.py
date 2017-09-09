@@ -241,7 +241,7 @@ class LoggingManager:
          Either stdout or stderr only.
         """
         self._log_queue.put_nowait(
-            PrintRequest(string=string + '\n', fd=fd)
+            PrintRequest(string=str(string) + '\n', fd=fd)
         )
 
 
