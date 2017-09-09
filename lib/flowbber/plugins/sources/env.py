@@ -252,7 +252,7 @@ class EnvSource(Source):
         data = {}
 
         def is_included(value, patterns):
-            return any(fnmatch(env, pattern) for pattern in patterns)
+            return any(fnmatch(value, pattern) for pattern in patterns)
 
         for env, value in environ.items():
             if is_included(env, include) and not is_included(env, exclude):
