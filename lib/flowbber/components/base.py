@@ -258,6 +258,20 @@ class Component(metaclass=NamedABCMeta):
         try:
             duration, data = self._result.get(True, timeout)
 
+            # Got data back, wait for the process to die
+            self._process.join(0.1)
+            if self._process.is_alive():
+                log.warning(
+                    '{name} #{component.index} "{component.id}" driving '
+                    'process with PID {process.pid} took too long to die '
+                    'after submitting its result. Exit code might '
+                    'be None'.format(
+                        name=self.__class__.__name__,
+                        component=self,
+                        process=self._process,
+                    )
+                )
+
             # Standard Python crash
             if data is None:
                 execution = ExecutionInfo(
