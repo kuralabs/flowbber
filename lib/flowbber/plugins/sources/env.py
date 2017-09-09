@@ -215,7 +215,6 @@ class EnvSource(Source):
                 'type': 'list',
                 'schema': {
                     'type': 'string',
-                    'empty': False,
                 },
             },
         )
@@ -228,7 +227,6 @@ class EnvSource(Source):
                 'type': 'list',
                 'schema': {
                     'type': 'string',
-                    'empty': False,
                 },
             },
         )

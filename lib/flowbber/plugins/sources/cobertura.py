@@ -110,11 +110,69 @@ Path to the Cobertura ``coverage.xml`` file to be parsed.
 
 - **Secret**: ``False``
 
+include
+-------
+
+List of patterns of files to include.
+
+Matching is performed using Python's fnmatch_.
+
+.. _fnmatch: https://docs.python.org/3/library/fnmatch.html#fnmatch.fnmatch
+
+- **Default**: ``['*']``
+- **Optional**: ``True``
+- **Schema**:
+
+  .. code-block:: python3
+
+     {
+         'type': 'list',
+         'schema': {
+             'type': 'string',
+         },
+     }
+
+- **Secret**: ``False``
+
+exclude
+-------
+
+List of patterns of files to exclude.
+
+Matching is performed using Python's fnmatch_.
+
+.. _fnmatch: https://docs.python.org/3/library/fnmatch.html#fnmatch.fnmatch
+
+- **Default**: ``[]``
+- **Optional**: ``True``
+- **Schema**:
+
+  .. code-block:: python3
+
+     {
+         'type': 'list',
+         'schema': {
+             'type': 'string',
+         },
+     }
+
+- **Secret**: ``False``
+
 """  # noqa
 
 from pathlib import Path
+from functools import reduce
 
 from flowbber.components import Source
+from flowbber.logging import get_logger
+
+
+log = get_logger(__name__)
+
+
+def is_included(value, patterns):
+    from fnmatch import fnmatch
+    return any(fnmatch(value, pattern) for pattern in patterns)
 
 
 class CoberturaSource(Source):
@@ -128,6 +186,30 @@ class CoberturaSource(Source):
             },
         )
 
+        config.add_option(
+            'include',
+            default=['*'],
+            optional=True,
+            schema={
+                'type': 'list',
+                'schema': {
+                    'type': 'string',
+                },
+            },
+        )
+
+        config.add_option(
+            'exclude',
+            default=[],
+            optional=True,
+            schema={
+                'type': 'list',
+                'schema': {
+                    'type': 'string',
+                },
+            },
+        )
+
     def collect(self):
         from pycobertura import Cobertura
 
@@ -138,22 +220,51 @@ class CoberturaSource(Source):
                 'No such file {}'.format(infile)
             )
 
+        # Parse file
         cobertura = Cobertura(str(infile))
+
+        # Filter files
+        include = self.config.include.value
+        exclude = self.config.exclude.value
+
+        original = cobertura.files()
+        relevant = [
+            filename for filename in original if
+            is_included(filename, include) and not
+            is_included(filename, exclude)
+        ]
+
+        ignored = len(original) - len(relevant)
+        if ignored > 0:
+            log.info('{} files ignored from total coverage'.format(ignored))
+
+        # Get files coverage data
+        total = {
+            'total_statements': 0,
+            'total_misses': 0,
+            'line_rate': 0.0,
+        }
 
         files = {
             filename: {
-                'total_statements': cobertura.total_statements(filename),
-                'total_misses': cobertura.total_misses(filename),
-                'line_rate': cobertura.line_rate(filename),
+                key: getattr(cobertura, key)(filename)
+                for key in total
             }
-            for filename in cobertura.files()
+            for filename in relevant
         }
 
-        total = {
-            'total_statements': cobertura.total_statements(),
-            'total_misses': cobertura.total_misses(),
-            'line_rate': cobertura.line_rate(),
-        }
+        # Calculate total
+        def reducer(accumulator, element):
+            for key in ['total_statements', 'total_misses']:
+                accumulator[key] = accumulator.get(key, 0) + element[key]
+            return accumulator
+
+        total = reduce(reducer, files.values(), total)
+
+        if total['total_statements']:
+            total['line_rate'] = 1.0 - (
+                total['total_misses'] / total['total_statements']
+            )
 
         return {
             'files': files,
