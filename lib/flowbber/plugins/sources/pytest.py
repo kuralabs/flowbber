@@ -82,7 +82,7 @@ what the issue is and where it happened.
 
 .. code-block:: sh
 
-    pip3 install flowbber[cobertura]
+    pip3 install flowbber[pytest]
 
 **Usage:**
 
