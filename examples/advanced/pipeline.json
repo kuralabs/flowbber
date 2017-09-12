@@ -51,6 +51,13 @@
             "config": {
                 "xmlpath": "{pipeline.dir}/coverage.xml"
             }
+        },
+        {
+            "type": "pytest",
+            "id": "pytest",
+            "config": {
+                "xmlpath": "{pipeline.dir}/tests.xml"
+            }
         }
     ],
     "aggregators": [],

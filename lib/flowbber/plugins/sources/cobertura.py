@@ -86,7 +86,9 @@ files can be generated for several programming languages, including:
                 "type": "cobertura",
                 "id": "...",
                 "config": {
-                    "xmlpath": "coverage.xml"
+                    "xmlpath": "coverage.xml",
+                    "include": ["*"],
+                    "exclude": []
                 }
             }
         ]

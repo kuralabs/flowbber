@@ -341,6 +341,8 @@ setup(
         'cpu': ['psutil'],
         # EnvSource
         'env': [],
+        # PyTestSource
+        'pytest': [],
         # SpeedSource
         'speed': ['pyspeedtest'],
         # TimestampSource
@@ -403,6 +405,7 @@ setup(
             'cobertura = flowbber.plugins.sources.cobertura:CoberturaSource',
             'cpu = flowbber.plugins.sources.cpu:CPUSource',
             'env = flowbber.plugins.sources.env:EnvSource',
+            'pytest = flowbber.plugins.sources.pytest:PytestSource',
             'speed = flowbber.plugins.sources.speed:SpeedSource',
             'timestamp = flowbber.plugins.sources.timestamp:TimestampSource',
             'user = flowbber.plugins.sources.user:UserSource',
