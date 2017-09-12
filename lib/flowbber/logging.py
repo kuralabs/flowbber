@@ -92,7 +92,7 @@ class QueueListener:
         while True:
             try:
                 # Handle stop
-                record = self._queue.get(False)
+                record = self._queue.get(block)
                 if record is None:
                     break
 
