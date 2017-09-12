@@ -29,6 +29,7 @@ from logging.handlers import QueueHandler
 from multiprocessing import Queue, Process
 
 from colorlog import ColoredFormatter
+from setproctitle import setproctitle
 
 
 log = logging.getLogger(__name__)
@@ -154,6 +155,7 @@ class LoggingManager:
         """
 
         # Setup logging for logging subprocess
+        setproctitle('flowbber - logging manager')
 
         # # Level
         level = self.LEVELS.get(self._verbosity, logging.DEBUG)
