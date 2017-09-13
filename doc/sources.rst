@@ -25,6 +25,10 @@ The following sources plugins are included as part of Flowbber.
 
 .. automodule:: flowbber.plugins.sources.env
 
+.. _sources-gtest:
+
+.. automodule:: flowbber.plugins.sources.gtest
+
 .. _sources-pytest:
 
 .. automodule:: flowbber.plugins.sources.pytest

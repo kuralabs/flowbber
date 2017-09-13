@@ -1,0 +1,27 @@
+[[sources]]
+type = "pytest"
+id = "pytest"
+
+    [sources.config]
+    xmlpath = "{pipeline.dir}/pytest.xml"
+
+[[sources]]
+type = "gtest"
+id = "gtest"
+
+    [sources.config]
+    xmlpath = "{pipeline.dir}/gtest.xml"
+
+[[sinks]]
+type = "print"
+id = "print"
+
+[[sinks]]
+type = "archive"
+id = "archive"
+
+    [sinks.config]
+    output = "data.json"
+    override = true
+    create_parents = true
+    pretty = true

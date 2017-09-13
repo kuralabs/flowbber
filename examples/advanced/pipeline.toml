@@ -44,13 +44,6 @@ id = "coverage"
     [sources.config]
     xmlpath = "{pipeline.dir}/coverage.xml"
 
-[[sources]]
-type = "pytest"
-id = "pytest"
-
-    [sources.config]
-    xmlpath = "{pipeline.dir}/tests.xml"
-
 [[sinks]]
 type = "print"
 id = "print"

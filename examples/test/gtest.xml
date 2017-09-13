@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="5" failures="2" disabled="1" errors="0" timestamp="2017-09-20T02:03:43" time="0.001" name="AllTests">
+  <testsuite name="test1" tests="2" failures="1" disabled="0" errors="0" time="0">
+    <testcase name="test_a" status="run" time="0" classname="test1" test_id="1:test_a" seed="123456" />
+    <testcase name="test_b" status="run" time="0" classname="test1" test_id="1:test_b" seed="123456">
+      <failure message="/home/kuralabs/googletest-example/tests/test1.cpp:12&#x0A;      Expected: 0&#x0A;To be equal to: 1" type=""><![CDATA[/home/kuralabs/googletest-example/tests/test1.cpp:12
+      Expected: 0
+To be equal to: 1]]></failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="test2" tests="3" failures="1" disabled="1" errors="0" time="0">
+    <testcase name="test_a" status="run" time="0" classname="test2" test_id="2:test_a" seed="123456" />
+    <testcase name="test_b" status="run" time="0" classname="test2" test_id="2:test_b" seed="123456">
+      <failure message="/home/kuralabs/googletest-example/tests/test2.cpp:12&#x0A;      Expected: 0&#x0A;To be equal to: 1" type=""><![CDATA[/home/kuralabs/googletest-example/tests/test2.cpp:12
+      Expected: 0
+To be equal to: 1]]></failure>
+    </testcase>
+    <testcase name="DISABLED_test_c" status="notrun" time="0" classname="test2" />
+  </testsuite>
+</testsuites>
