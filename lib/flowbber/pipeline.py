@@ -243,7 +243,7 @@ class Pipeline:
             dir=str(journal_dir),
             delete=False
         ) as jfd:
-            jfd.write(dumps(journal, indent=4))
+            jfd.write(dumps(journal, indent=4, ensure_ascii=False))
         log.info('Journal saved to {}'.format(jfd.name))
 
         return journal
