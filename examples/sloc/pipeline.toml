@@ -1,0 +1,43 @@
+[[sources]]
+type = "timestamp"
+id = "timestamp"
+
+    [sources.config]
+    iso8601 = true
+
+[[sources]]
+type = "sloc"
+id = "sloc"
+
+    [sources.config]
+    directory = "{git.root}"
+    include = ["*"]
+    exclude = [
+        "build", "dist",
+        ".tox", ".git", ".cache",
+        "__pycache__", "**/__pycache__",
+        "*.pyc", "*.egg-info",
+        "doc/flowbber/*.rst",
+    ]
+
+[[sinks]]
+type = "print"
+id = "print"
+
+[[sinks]]
+type = "archive"
+id = "archive"
+
+    [sinks.config]
+    output = "data.json"
+    override = true
+    create_parents = true
+    pretty = true
+
+[[sinks]]
+type = "influxdb"
+id = "influxdb"
+
+    [sinks.config]
+    uri = "influxdb://localhost:8086/"
+    database = "flowbber"

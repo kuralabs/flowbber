@@ -41,6 +41,10 @@ The following sources plugins are included as part of Flowbber.
 
 .. automodule:: flowbber.plugins.sources.pytest
 
+.. _sources-sloc:
+
+.. automodule:: flowbber.plugins.sources.sloc
+
 .. _sources-speed:
 
 .. automodule:: flowbber.plugins.sources.speed

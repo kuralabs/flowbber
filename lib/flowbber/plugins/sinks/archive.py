@@ -187,6 +187,7 @@ class ArchiveSink(Sink):
         # Pretty output
         kwargs = {
             'ensure_ascii': False,
+            'escape_forward_slashes': False,
         }
         if self.config.pretty.value:
             kwargs['indent'] = 4

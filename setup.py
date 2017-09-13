@@ -349,6 +349,8 @@ setup(
         'gtest': [],
         # PyTestSource
         'pytest': [],
+        # SLOCSource
+        'sloc': ['pygount'],
         # SpeedSource
         'speed': ['pyspeedtest'],
         # TimestampSource
@@ -415,6 +417,7 @@ setup(
             'github = flowbber.plugins.sources.github:GitHubSource',
             'gtest = flowbber.plugins.sources.gtest:GTestSource',
             'pytest = flowbber.plugins.sources.pytest:PytestSource',
+            'sloc = flowbber.plugins.sources.sloc:SLOCSource',
             'speed = flowbber.plugins.sources.speed:SpeedSource',
             'timestamp = flowbber.plugins.sources.timestamp:TimestampSource',
             'user = flowbber.plugins.sources.user:UserSource',
