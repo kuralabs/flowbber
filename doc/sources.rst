@@ -25,6 +25,10 @@ The following sources plugins are included as part of Flowbber.
 
 .. automodule:: flowbber.plugins.sources.env
 
+.. _sources-git:
+
+.. automodule:: flowbber.plugins.sources.git
+
 .. _sources-github:
 
 .. automodule:: flowbber.plugins.sources.github

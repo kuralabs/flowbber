@@ -57,6 +57,35 @@ def find_git():
     return git
 
 
+def find_tag(git=None, directory='.'):
+    """
+    Find the tag for the current revision.
+
+    :param str git: Path to git executable.
+     If None, the default, will try to find it using :func:`find_git`.
+    :param str directory: Run as if git was started in ``directory`` instead of
+     the current working directory.
+
+    :return: The name of the tag pointing to the current revision.
+     Raises GitError if no tag is found.
+    :rtype: str
+    """
+    if git is None:
+        git = find_git()
+
+    # Get current revision
+    call = run([
+        git, '-C', directory,
+        'describe', '--tags', '--exact-match', 'HEAD'
+    ])
+    if call.returncode != 0:
+        raise GitError('Unable to determine git tag:\n{}'.format(
+            call.stderr
+        ))
+
+    return call.stdout
+
+
 def find_root(git=None, directory='.'):
     """
     Find the root of the git repository.
@@ -141,9 +170,155 @@ def find_revision(git=None, directory='.'):
     return call.stdout
 
 
+def find_name(git=None, directory='.'):
+    """
+    Find the name of the author of the current revision.
+
+    :param str git: Path to git executable.
+     If None, the default, will try to find it using :func:`find_git`.
+    :param str directory: Run as if git was started in ``directory`` instead of
+     the current working directory.
+
+    :return: The name of the author of the current revision.
+    :rtype: str
+    """
+    if git is None:
+        git = find_git()
+
+    # Get current revision
+    call = run([
+        git, '-C', directory,
+        'log', '-1', '--pretty=format:%an'
+    ])
+    if call.returncode != 0:
+        raise GitError('Unable to determine git author name:\n{}'.format(
+            call.stderr
+        ))
+
+    return call.stdout
+
+
+def find_email(git=None, directory='.'):
+    """
+    Email of the author of the current revision.
+
+    :param str git: Path to git executable.
+     If None, the default, will try to find it using :func:`find_git`.
+    :param str directory: Run as if git was started in ``directory`` instead of
+     the current working directory.
+
+    :return: The email of the author of the current revision.
+    :rtype: str
+    """
+    if git is None:
+        git = find_git()
+
+    # Get current revision
+    call = run([
+        git, '-C', directory,
+        'log', '-1', '--pretty=format:%ae'
+    ])
+    if call.returncode != 0:
+        raise GitError('Unable to determine git author email:\n{}'.format(
+            call.stderr
+        ))
+
+    return call.stdout
+
+
+def find_subject(git=None, directory='.'):
+    """
+    Commit message subject of current revision.
+
+    :param str git: Path to git executable.
+     If None, the default, will try to find it using :func:`find_git`.
+    :param str directory: Run as if git was started in ``directory`` instead of
+     the current working directory.
+
+    :return: The commit message subject of current revision.
+    :rtype: str
+    """
+    if git is None:
+        git = find_git()
+
+    # Get current revision
+    call = run([
+        git, '-C', directory,
+        'log', '-1', '--pretty=format:%s'
+    ])
+    if call.returncode != 0:
+        raise GitError('Unable to determine git commit subject:\n{}'.format(
+            call.stderr
+        ))
+
+    return call.stdout
+
+
+def find_body(git=None, directory='.'):
+    """
+    Commit message body of current revision.
+
+    :param str git: Path to git executable.
+     If None, the default, will try to find it using :func:`find_git`.
+    :param str directory: Run as if git was started in ``directory`` instead of
+     the current working directory.
+
+    :return: The commit message body of current revision.
+    :rtype: str
+    """
+    if git is None:
+        git = find_git()
+
+    # Get current revision
+    call = run([
+        git, '-C', directory,
+        'log', '-1', '--pretty=format:%b'
+    ])
+    if call.returncode != 0:
+        raise GitError('Unable to determine git commit body:\n{}'.format(
+            call.stderr
+        ))
+
+    return call.stdout
+
+
+def find_date(git=None, directory='.'):
+    """
+    Commit date in strict ISO 8601 format.
+
+    :param str git: Path to git executable.
+     If None, the default, will try to find it using :func:`find_git`.
+    :param str directory: Run as if git was started in ``directory`` instead of
+     the current working directory.
+
+    :return: The commit date in strict ISO 8601 format.
+    :rtype: str
+    """
+    if git is None:
+        git = find_git()
+
+    # Get current revision
+    call = run([
+        git, '-C', directory,
+        'log', '-1', '--pretty=format:%aI'
+    ])
+    if call.returncode != 0:
+        raise GitError('Unable to determine git commit date:\n{}'.format(
+            call.stderr
+        ))
+
+    return call.stdout
+
+
 __all__ = [
     'find_git',
+    'find_tag',
     'find_root',
     'find_branch',
     'find_revision',
+    'find_name',
+    'find_email',
+    'find_subject',
+    'find_body',
+    'find_date',
 ]

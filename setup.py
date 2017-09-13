@@ -341,6 +341,8 @@ setup(
         'cpu': ['psutil'],
         # EnvSource
         'env': [],
+        # GitSource
+        'git': [],
         # GitHubSource
         'github': ['pygithub'],
         # GTestSource
@@ -409,6 +411,7 @@ setup(
             'cobertura = flowbber.plugins.sources.cobertura:CoberturaSource',
             'cpu = flowbber.plugins.sources.cpu:CPUSource',
             'env = flowbber.plugins.sources.env:EnvSource',
+            'git = flowbber.plugins.sources.git:GitSource',
             'github = flowbber.plugins.sources.github:GitHubSource',
             'gtest = flowbber.plugins.sources.gtest:GTestSource',
             'pytest = flowbber.plugins.sources.pytest:PytestSource',

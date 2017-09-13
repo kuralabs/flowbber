@@ -24,7 +24,7 @@ This source collects pull requests and issues statistics from a GitHub
 repository using the GitHub API v3. This source requires a
 `personal access token`_, you can create one in your
 `settings <https://github.com/settings/tokens>`_.
-No particular scope are required.
+No particular scope is required.
 
 .. _personal access token: https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/
 
