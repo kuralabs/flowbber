@@ -1,0 +1,22 @@
+[[sources]]
+type = "github"
+id = "github"
+
+    [sources.config]
+    token = "..."
+    repository = "organization/repository"
+    base_url = "https://api.github.com"
+
+[[sinks]]
+type = "print"
+id = "print"
+
+[[sinks]]
+type = "archive"
+id = "archive"
+
+    [sinks.config]
+    output = "data.json"
+    override = true
+    create_parents = true
+    pretty = true
