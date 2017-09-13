@@ -164,8 +164,7 @@ Matching is performed using Python's fnmatch_.
 
 from os import walk
 from pathlib import Path
-from functools import reduce
-from collections import defaultdict, OrderedDict
+from collections import OrderedDict
 
 from flowbber.components import Source
 from flowbber.logging import get_logger
@@ -222,6 +221,52 @@ def collect_files(directory, include, exclude):
     return files_collected
 
 
+def analyze_directory(directory, include, exclude):
+    """
+    Analyze source code files from directory applying given include and
+    exclude patterns.
+
+    :param str directory: Directory to search for files to analyze.
+    :param list include: List of include patterns.
+    :param list exclude: List of exclude patterns.
+
+    :return: A dictionary mapping the file analyzed and the language detected
+     and a dictionary mapping the languages detected in the directory and
+     the total amount of lines of code, documentation, empty and string.
+    :rtype: tuple of dict
+    """
+    from pygount import source_analysis
+
+    # Collect files
+    collected = collect_files(directory, include, exclude)
+
+    # Analyze files
+    files = OrderedDict()
+    sloc = OrderedDict()
+
+    for relfname, absfname in joiner(directory, collected):
+        # Perform analysis
+        analysis = source_analysis(
+            absfname, '', fallback_encoding='utf-8'
+        )
+
+        # Get language and register the file as analyzed
+        lang = analysis.language.lower()
+        files[relfname] = lang
+
+        # Ignore unknown and binary files
+        if lang in ['__unknown__', '__binary__']:
+            continue
+
+        # Grab counter and perform accumulation
+        counter = sloc.setdefault(lang, OrderedDict())
+
+        for count in ['code', 'documentation', 'empty', 'string']:
+            counter[count] = counter.get(count, 0) + getattr(analysis, count)
+
+    return files, sloc
+
+
 class SLOCSource(Source):
 
     def declare_config(self, config):
@@ -265,55 +310,15 @@ class SLOCSource(Source):
         )
 
     def collect(self):
-        from pygount import source_analysis
-
         directory = self.config.directory.value
         include = self.config.include.value
         exclude = self.config.exclude.value
 
-        # Collect files
-        collected = collect_files(directory, include, exclude)
-        files = OrderedDict()
-
-        # Analyze files
-        def reducer(accumulator, element):
-
-            # Perform analysis
-            relfname, absfname = element
-
-            analysis = source_analysis(
-                absfname, 'flowbber', fallback_encoding='utf-8'
-            )
-
-            # Get language and register the file as analyzed
-            lang = analysis.language.lower()
-            files[relfname] = lang
-
-            # Ignore unknown and binary files
-            if lang in ['__unknown__', '__binary__']:
-                return accumulator
-
-            # Grab counter and perform accumulation
-            counter = accumulator[lang]
-
-            for count in ['code', 'documentation', 'empty', 'string']:
-                counter[count] += getattr(analysis, count)
-
-            return accumulator
-
-        accumulator = defaultdict(lambda: defaultdict(lambda: 0))
-        reduce(reducer, joiner(directory, collected), accumulator)
-
-        data = {
+        files, sloc = analyze_directory(directory, include, exclude)
+        return {
             'files': files,
-            'sloc': {
-                # We transform the defaultdict to a dict
-                # Defaultdicts break multiprocessing queues
-                lang: dict(counter)
-                for lang, counter in accumulator.items()
-            },
+            'sloc': sloc,
         }
-        return data
 
 
 __all__ = ['SLOCSource']
