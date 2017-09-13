@@ -40,7 +40,8 @@ This sink writes all collected data to a JSON file.
                 "config": {
                     "output": "data.json",
                     "override": true,
-                    "create_parents": true
+                    "create_parents": true,
+                    "pretty": false
                 }
             }
         ]
@@ -98,6 +99,23 @@ Create output file parent directories if don't exist.
 
 - **Secret**: ``False``
 
+pretty
+------
+
+Pretty output.
+
+- **Default**: ``False``
+- **Optional**: ``True``
+- **Schema**:
+
+  .. code-block:: python3
+
+     {
+         'type': 'boolean',
+     }
+
+- **Secret**: ``False``
+
 """  # noqa
 
 from pathlib import Path
@@ -138,6 +156,15 @@ class ArchiveSink(Sink):
             },
         )
 
+        config.add_option(
+            'pretty',
+            default=False,
+            optional=True,
+            schema={
+                'type': 'boolean',
+            },
+        )
+
     def distribute(self, data):
         from ujson import dumps
         outfile = Path(self.config.output.value)
@@ -157,8 +184,15 @@ class ArchiveSink(Sink):
                 'No such directory {}'.format(outfile.parent)
             )
 
+        # Pretty output
+        kwargs = {
+            'ensure_ascii': False,
+        }
+        if self.config.pretty.value:
+            kwargs['indent'] = 4
+
         log.info('Archiving data to {}'.format(outfile))
-        outfile.write_text(dumps(data), encoding='utf-8')
+        outfile.write_text(dumps(data, **kwargs), encoding='utf-8')
 
 
 __all__ = ['ArchiveSink']
