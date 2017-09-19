@@ -32,8 +32,8 @@ keys of the sources with the measurements they performed.
 To accomplish this, the flattening process will:
 
 - Join all dictionaries keys (using the ``keysjoiner`` character) until a leaf
-  value that has a datatype supported by InfluxDB (string, float, integer, or
-  boolean) is found.
+  value that has a datatype supported by InfluxDB (string, float, integer,
+  boolean or None) is found.
 
 - Lists are converted to a dictionary that maps the index of the element
   with the element previous to the flattening.
@@ -91,7 +91,7 @@ The above structure will be transformed into:
     ``keysjoinerreplace`` and ``keysjoiner`` options.
 
     Also note that the leaf keys must map to a value that can be used as field
-    value in InfluxDB (string, float, integer, or boolean), if not, the
+    value in InfluxDB (string, float, integer, boolean or None), if not, the
     flattening will fail.
 
 Or in case of lists:
@@ -414,7 +414,7 @@ def transform_to_flat(data, keysjoiner, keysjoinerreplace):
     - Lists are converted to a dictionary that maps the index of the element
       with the element previous to the flattening.
     """
-    influxdb_supported = (str, int, float, bool)
+    influxdb_supported = (str, int, float, bool, type(None))
 
     def joinkey(path, key):
         parts = [*path, key]
