@@ -92,6 +92,7 @@ id = "mongodb"
     uri = "mongodb://localhost:27017/"
     database = "flowbber"
     collection = "pipeline1data"
+    key = "timestamp.epoch"
 
 [[sinks]]
 type = "influxdb"
