@@ -224,10 +224,72 @@ Database to connect to.
 collection
 ----------
 
-Collection to write to.
+Collection to write to. This option defines two modes of operation depending if
+it is set to ``None`` or any other string value:
 
-- **Default**: ``N/A``
-- **Optional**: ``False``
+1. This option is nullable, if null is provided (the default), the collection
+   will be determined for each entry in the collected data bundle using its
+   key. For example, given the following pipeline:
+
+   .. code-block:: toml
+
+      [[sources]]
+      type = "somesource"
+      id = "first_id"
+
+      [[sources]]
+      type = "somesource"
+      id = "second_id"
+
+      [[sinks]]
+      type = "mongodb"
+      id = "mongodb"
+
+          [sinks.config]
+          uri = "..."
+          database = "mydatabase"
+
+   Collects the following data:
+
+   .. code-block:: python3
+
+      {
+          'first_id': {
+              'abc': 'def',
+              'xyz': '123',
+          },
+          'second_id': {
+              '123': 'abc',
+              'qwe': 'rty',
+          },
+      }
+
+   Will be stored in MongoDB as follows:
+
+   **In collection ``first_id``**:
+
+   .. code-block:: python3
+
+      {
+          'abc': 'def',
+          'xyz': '123',
+      }
+
+   **In collection ``second_id``**:
+
+   .. code-block:: python3
+
+      {
+          '123': 'abc',
+          'qwe': 'rty',
+      }
+
+2. Otherwise, the whole data bundle will be stored to the collection specified.
+
+In both cases the ``key`` option will be honored.
+
+- **Default**: ``None``
+- **Optional**: ``True``
 - **Schema**:
 
   .. code-block:: python3
@@ -235,6 +297,7 @@ Collection to write to.
      {
          'type': 'string',
          'empty': False,
+         'nullable': True,
      }
 
 - **Secret**: ``False``
@@ -447,9 +510,12 @@ class MongoDBSink(Sink):
 
         config.add_option(
             'collection',
+            default=None,
+            optional=True,
             schema={
                 'type': 'string',
                 'empty': False,
+                'nullable': True,
             },
         )
 
@@ -521,14 +587,13 @@ class MongoDBSink(Sink):
             options['username'] = self.config.username.value
             options['password'] = self.config.password.value
 
-        # Connect to database
+        # Connect to MongoDB server
         client = MongoClient(**options)
         version = client.server_info()['version']
-        log.info('Connected to MongoDB database version {}'.format(version))
+        log.info('Connected to MongoDB version {}'.format(version))
 
-        # Get database, collection and insert document
+        # Get database
         database = client[self.config.database.value]
-        collection = database[self.config.collection.value]
 
         # Transform data
         log.info('Converting data to be safe for MongoDB')
@@ -539,16 +604,32 @@ class MongoDBSink(Sink):
         )
 
         # Set key if available
+        document_id = {}
         if key is not None:
             log.info('Using key {} = {}'.format(self.config.key.value, key))
-            data['_id'] = key
+            document_id['_id'] = key
 
-        data_id = collection.insert_one(data).inserted_id
-        log.info(
-            'Inserted document with id {} in {}.{}'.format(
-                data_id, database.name, collection.name
+        # Fetch collections and data units
+        collection = self.config.collection.value
+        if collection is None:
+            bundles = [
+                (database[key], value) for key, value in data.items()
+            ]
+        else:
+            bundles = [
+                (database[collection], data)
+            ]
+
+        # Insert data
+        for dbcollection, bundle in bundles:
+            bundle.update(document_id)
+
+            inserted_id = dbcollection.insert_one(bundle).inserted_id
+            log.info(
+                'Inserted document with id {} in {}.{}'.format(
+                    inserted_id, database.name, dbcollection.name
+                )
             )
-        )
 
 
 __all__ = ['MongoDBSink']
