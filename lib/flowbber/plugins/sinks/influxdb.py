@@ -311,9 +311,6 @@ key
 Path to a value in the collected data that will be used as key timestamp when
 submitting the flattened data to the database.
 
-The default is ``timestamp.iso8601`` which assumes that your pipeline had
-collected the timestamp in that format using the included ``timestamp`` source.
-
 Specify the path to the value by joining keys path with a ``.`` (dot).
 
 For example given the following structure:
@@ -331,11 +328,33 @@ For example given the following structure:
 The corresponding path to use the value ``2017-08-19T01:26:35.683529`` as
 timestamp is ``my_key.a_sub_key.yet_another``.
 
-This option is nullable, and if null is provided, the timestamp will be
-determined when submitting the data by calling Python's
+This option is nullable, and if null is provided (the default), the timestamp
+will be determined when submitting the data by calling Python's
 ``datetime.now().isoformat()``.
 
-- **Default**: ``timestamp.iso8601``
+In order to have a single timestamp for your pipeline you can include the
+:ref:`Timestamp <sources-timestamp>` source and use a configuration similar to
+the following:
+
+.. code-block:: toml
+
+    [[sources]]
+    type = "timestamp"
+    id = "timestamp"
+
+        [sources.config]
+        iso8601 = true
+
+    [[sinks]]
+    type = "influxdb"
+    id = "..."
+
+        [sinks.config]
+        uri = "..."
+        database = "..."
+        key = "timestamp.iso8601"
+
+- **Default**: ``None``
 - **Optional**: ``True``
 - **Schema**:
 
@@ -582,7 +601,7 @@ class InfluxDBSink(Sink):
 
         config.add_option(
             'key',
-            default='timestamp.iso8601',
+            default=None,
             optional=True,
             schema={
                 'type': 'string',

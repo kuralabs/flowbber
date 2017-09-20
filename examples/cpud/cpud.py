@@ -21,6 +21,7 @@ samples = 2
 [influxdb]
 uri = "influxdb://localhost:8086/"
 database = "cpud"
+key = "timestamp.iso8601"
 
 [mongodb]
 uri = "mongodb://localhost:27017/"

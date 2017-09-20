@@ -110,7 +110,8 @@
             "id": "influxdb",
             "config": {
                 "uri": "influxdb://localhost:8086/",
-                "database": "flowbber"
+                "database": "flowbber",
+                "key": "timestamp.iso8601"
             }
         }
     ]
