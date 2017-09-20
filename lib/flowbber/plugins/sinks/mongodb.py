@@ -266,23 +266,23 @@ it is set to ``None`` or any other string value:
 
    Will be stored in MongoDB as follows:
 
-   **In collection ``first_id``**:
+   1. In collection ``first_id``:
 
-   .. code-block:: python3
+      .. code-block:: python3
 
-      {
-          'abc': 'def',
-          'xyz': '123',
-      }
+         {
+             'abc': 'def',
+             'xyz': '123',
+         }
 
-   **In collection ``second_id``**:
+   2. In collection ``second_id``:
 
-   .. code-block:: python3
+      .. code-block:: python3
 
-      {
-          '123': 'abc',
-          'qwe': 'rty',
-      }
+         {
+             '123': 'abc',
+             'qwe': 'rty',
+         }
 
 2. Otherwise, the whole data bundle will be stored to the collection specified.
 
