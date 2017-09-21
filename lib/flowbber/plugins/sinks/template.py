@@ -213,6 +213,46 @@ Create output file parent directories if don't exist.
 
 - **Secret**: ``False``
 
+payload
+-------
+
+Extra data to pass to the template. Data provided using this configuration
+option will be available to the template under the ``payload`` variable.
+
+Usage:
+
+.. code-block:: toml
+
+   [[sinks]]
+   type = "template"
+   id = "mytemplate"
+
+       [sinks.config.payload]
+       project_name = "Flowbber"
+       project_url = "https://docs.kuralabs.io/flowbber/"
+
+And then in your template:
+
+.. code-block:: html+jinja
+
+   <p>Visit our project page at
+       <a href="{{ payload.project_url }}">{{ payload.project_name }}</a>
+   </p>
+
+- **Default**: ``None``
+- **Optional**: ``True``
+- **Schema**:
+
+  .. code-block:: python3
+
+     {
+         'type': 'dict',
+         'nullable': True,
+     }
+
+- **Secret**: ``False``
+
+
 """  # noqa
 
 from pathlib import Path
@@ -261,6 +301,16 @@ class TemplateSink(Sink):
             optional=True,
             schema={
                 'type': 'boolean',
+            },
+        )
+
+        config.add_option(
+            'payload',
+            default=None,
+            optional=True,
+            schema={
+                'type': 'dict',
+                'nullable': True,
             },
         )
 
@@ -322,7 +372,9 @@ class TemplateSink(Sink):
 
         # Render template and write it
         log.info('Rendering template to {}'.format(outfile))
-        rendered = Template(template).render(data=data)
+        rendered = Template(template).render(
+            data=data, payload=self.config.payload.value
+        )
         outfile.write_text(rendered, encoding='utf-8')
 
 
