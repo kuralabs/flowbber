@@ -363,6 +363,7 @@ class Pipeline:
                                     component
                                 )
                             )
+                            continue
                     raise
 
                 log.warning(errmsg)
