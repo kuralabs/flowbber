@@ -346,7 +346,24 @@ class Pipeline:
                 )
 
                 if not component.optional:
-                    raise RuntimeError(errmsg)
+
+                    log.fatal(errmsg)
+                    log.fatal('Pipeline is shutting down ...')
+
+                    # Pipeline is shuting down. Kill all child processes.
+                    # This avoids a deadlock condition were still alive child
+                    # processes try to put data to a queue but the master
+                    # process is shuting down and blocked at waitpid() call.
+                    for component in schedule:
+                        try:
+                            component.stop()
+                        except Exception as e:
+                            log.exception(
+                                'Component {} crashed when stopping.'.format(
+                                    component
+                                )
+                            )
+                    raise
 
                 log.warning(errmsg)
                 log.warning(

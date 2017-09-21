@@ -241,6 +241,15 @@ class Component(metaclass=NamedABCMeta):
         self._reset(args)
         self._process.start()
 
+    def stop(self):
+        """
+        Force stop this component.
+
+        Use only when the result of the source is not longer relevant.
+        """
+        assert self._process is not None
+        self._process.terminate()
+
     def join(self):
         """
         Join the component and get its execution information.
