@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<testsuite errors="1" failures="2" name="pytest" skips="1" tests="5" time="0.039">
+    <testcase classname="test.test_function" file="test/test_function.py" line="19" name="test_function_fail" time="0.0011262893676757812">
+        <properties>
+            <property name="test_id" value="1501"/>
+        </properties>
+        <failure message="assert False">topology = &apos;a_topology&apos;
+
+    @pytest.mark.test_id(1501)
+    @pytest.mark.initialize(
+        initialize,
+        args=(&apos;init1&apos;, ),
+        kwargs={&apos;kwarg1&apos;: &apos;kwargs1init&apos;}
+    )
+    @pytest.mark.terminate(
+        terminate,
+        args=(&apos;term1&apos;, ),
+        kwargs={&apos;kwarg1&apos;: &apos;kwargs1term&apos;}
+    )
+    def test_function_fail(topology):
+        print()
+        print(&apos;Test:&apos;)
+        print(&apos;topology = {}&apos;.format(topology))
+&gt;       assert False
+E       assert False
+
+../../../test/test_function.py:35: AssertionError</failure>
+    </testcase>
+    <testcase classname="test.test_function" file="test/test_function.py" line="37" name="test_function_pass" time="0.00035500526428222656">
+        <properties>
+            <property name="test_id" value="1502"/>
+        </properties>
+    </testcase>
+    <testcase classname="test.test_function2" file="test/test_function2.py" line="19" name="test_function_fail" time="0.00039267539978027344">
+        <properties>
+            <property name="test_id" value="1601"/>
+        </properties>
+        <failure message="assert False">topology = &apos;a_topology&apos;
+
+    @pytest.mark.test_id(1601)
+    @pytest.mark.initialize(
+        initialize,
+        args=(&apos;init1&apos;, ),
+        kwargs={&apos;kwarg1&apos;: &apos;kwargs1init&apos;}
+    )
+    @pytest.mark.terminate(
+        terminate,
+        args=(&apos;term1&apos;, ),
+        kwargs={&apos;kwarg1&apos;: &apos;kwargs1term&apos;}
+    )
+    def test_function_fail(topology):
+        print()
+        print(&apos;Test:&apos;)
+        print(&apos;topology = {}&apos;.format(topology))
+&gt;       assert False
+E       assert False
+
+../../../test/test_function2.py:35: AssertionError</failure>
+    </testcase>
+    <testcase classname="test.test_function2" file="test/test_function2.py" line="37" name="test_function_error" time="0.0007448196411132812">
+        <properties>
+            <property name="test_id" value="1602"/>
+        </properties>
+        <error message="test setup failure">@pytest.fixture
+    def dofail():
+&gt;       raise RuntimeError()
+E       RuntimeError
+
+../../../test/conftest.py:14: RuntimeError</error>
+    </testcase>
+    <testcase classname="test.test_function2" file="test/test_function2.py" line="54" name="test_skip" time="0.00015878677368164062">
+        <skipped message="Just because" type="pytest.skip">test/test_function2.py:54: &lt;py._xmlgen.raw object at 0x7f4be014f048&gt;</skipped>
+    </testcase></testsuite>

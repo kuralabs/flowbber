@@ -1,0 +1,70 @@
+[[sources]]
+type = "timestamp"
+id = "timestamp"
+
+    [sources.config]
+    iso8601 = true
+
+[[sources]]
+type = "env"
+id = "jenkins"
+
+    [sources.config]
+    include = ["BUILD_NUMBER", "BUILD_URL"]
+
+[[sources]]
+type = "gtest"
+id = "unit"
+optional = true
+
+    [sources.config]
+    xmlpath = "{pipeline.dir}/unit.xml"
+
+[[sources]]
+type = "pytest"
+id = "functional1"
+
+    [sources.config]
+    xmlpath = "{pipeline.dir}/functional1.xml"
+
+[[sources]]
+type = "pytest"
+id = "functional2"
+
+    [sources.config]
+    xmlpath = "{pipeline.dir}/functional2.xml"
+
+[[sources]]
+type = "git"
+id = "git"
+
+    [sources.config]
+    directory = "{git.root}"
+
+[[sinks]]
+type = "print"
+id = "print"
+
+[[sinks]]
+type = "archive"
+id = "archive"
+
+    [sinks.config]
+    output = "data.json"
+    override = true
+    create_parents = true
+    pretty = true
+
+[[sinks]]
+type = "template"
+id = "email"
+
+    [sinks.config]
+    template = "{pipeline.dir}/email.tpl"
+    output = "email.html"
+    override = true
+    create_parents = true
+
+        [sinks.config.payload]
+        project_name = "Flowbber"
+        project_url = "https://docs.kuralabs.io/flowbber/"
