@@ -302,6 +302,16 @@ Optional Execution and Timeout
 
 .. versionadded:: 1.1.0
 
+**Synopsis:**
+
+.. code-block:: toml
+
+   [[sources]]
+   type = "mytype"
+   id = "myid"
+   optional = true
+   timeout = "2 min"
+
 In some situations some components of a pipeline may fail. By default, if any
 component fails to perform its programming the pipeline will fail right away.
 
@@ -665,6 +675,7 @@ Options are:
 
         0.1 second
         1s
+        1.2 min
         10 minutes
         10:20:10
         2 days, 4:13:02
