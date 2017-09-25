@@ -21,5 +21,5 @@ flowbber.components.component module entry point.
 
 from .source import Source  # noqa
 from .aggregator import Aggregator  # noqa
-from .sink import Sink  # noqa
+from .sink import Sink, FilterSink  # noqa
 from .base import TimeExceededError, CrashError  # noqa

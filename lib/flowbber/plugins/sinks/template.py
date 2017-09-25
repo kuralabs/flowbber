@@ -258,15 +258,17 @@ And then in your template:
 from pathlib import Path
 from importlib import import_module
 
-from flowbber.components import Sink
 from flowbber.logging import get_logger
+from flowbber.components import FilterSink
 
 
 log = get_logger(__name__)
 
 
-class TemplateSink(Sink):
+class TemplateSink(FilterSink):
     def declare_config(self, config):
+        super().declare_config(config)
+
         config.add_option(
             'template',
             schema={
@@ -316,6 +318,9 @@ class TemplateSink(Sink):
 
     def distribute(self, data):
         from jinja2 import Template
+
+        # Allow to filter data
+        super().distribute(data)
 
         # Determine schema
         template_uri = self.config.template.value

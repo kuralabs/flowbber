@@ -120,15 +120,16 @@ Pretty output.
 
 from pathlib import Path
 
-from flowbber.components import Sink
+from flowbber.components import FilterSink
 from flowbber.logging import get_logger
 
 
 log = get_logger(__name__)
 
 
-class ArchiveSink(Sink):
+class ArchiveSink(FilterSink):
     def declare_config(self, config):
+        super().declare_config(config)
 
         config.add_option(
             'output',
@@ -167,6 +168,10 @@ class ArchiveSink(Sink):
 
     def distribute(self, data):
         from ujson import dumps
+
+        # Allow to filter data
+        super().distribute(data)
+
         outfile = Path(self.config.output.value)
 
         # Re-check no file exists, in case it was created during execution
