@@ -51,6 +51,14 @@ id = "coverage"
     [sources.config]
     xmlpath = "{pipeline.dir}/coverage.xml"
 
+[[aggregators]]
+type = "filter"
+id = "filter"
+
+    [aggregators.config]
+    include = ["*"]
+    exclude = ["coverage.files.plugins/sinks/*.py", "git.body"]
+
 [[sinks]]
 type = "print"
 id = "print"
@@ -63,6 +71,7 @@ id = "archive"
     output = "data.json"
     override = true
     create_parents = true
+    pretty = true
 
 [[sinks]]
 type = "template"

@@ -23,6 +23,68 @@ Filter
 Filter the collected data structure using the provided include and exclude
 patterns.
 
+For example, consider a collected data that looks as following:
+
+.. code-block:: python3
+
+    OrderedDict([
+        ('my_source', {
+            'my_value1': 1000,
+            'my_value2': 2000,
+            'my_value3': 3000,
+            'other_value': 'hello'
+        }),
+        ('coverage', {
+            'files': {
+                '__init__.py': {
+                    'line_rate': 1.0,
+                    'total_misses': 0,
+                    'total_statements': 4,
+                },
+                '__main__.py': {
+                    'line_rate': 0.5,
+                    'total_misses': 5,
+                    'total_statements': 10,
+                },
+            },
+            'total': {
+                'line_rate': 0.37275985663082434,
+                'total_misses': 350,
+                'total_statements': 558,
+            },
+        }),
+    ])
+
+And you want to remove all the ``my_value*`` keys from ``my_source`` and all
+``files`` entries in ``coverage``. If using the configuration:
+
+.. code-block:: toml
+
+    [[aggregators]]
+    type = "filter"
+    id = "filter"
+
+        [aggregators.config]
+        include = ["*"]
+        exclude = ["my_source.my_value*", "coverage.files"]
+
+The data will be filtered to:
+
+.. code-block:: python3
+
+    OrderedDict([
+        ('my_source', {
+            'other_value': 'hello'
+        }),
+        ('coverage', {
+            'total': {
+                'line_rate': 0.37275985663082434,
+                'total_misses': 350,
+                'total_statements': 558,
+            },
+        }),
+    ])
+
 **Dependencies:**
 
 .. code-block:: sh

@@ -60,7 +60,16 @@
             }
         }
     ],
-    "aggregators": [],
+    "aggregators": [
+        {
+            "type": "filter",
+            "id": "filter",
+            "config": {
+                "include": ["*"],
+                "exclude": ["coverage.files.plugins/sinks/*.py", "git.body"]
+            }
+        }
+    ],
     "sinks": [
         {
             "type": "print",
@@ -73,7 +82,8 @@
             "config": {
                 "output": "data.json",
                 "override": true,
-                "create_parents": true
+                "create_parents": true,
+                "pretty": true
             }
         },
         {
