@@ -34,6 +34,7 @@ Flowbber has batteries included with a set of commonly used plugins:
    :maxdepth: 2
 
    sources
+   aggregators
    sinks
 
 

@@ -422,7 +422,9 @@ setup(
             'timestamp = flowbber.plugins.sources.timestamp:TimestampSource',
             'user = flowbber.plugins.sources.user:UserSource',
         ],
-        'flowbber_plugin_aggregators_1_0': [],
+        'flowbber_plugin_aggregators_1_0': [
+            'filter = flowbber.plugins.aggregators.filter:FilterAggregator',
+        ],
         'flowbber_plugin_sinks_1_0': [
             'archive = flowbber.plugins.sinks.archive:ArchiveSink',
             'influxdb = flowbber.plugins.sinks.influxdb:InfluxDBSink',
