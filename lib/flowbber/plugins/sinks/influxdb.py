@@ -414,8 +414,8 @@ from datetime import datetime
 
 from pprintpp import pformat
 
-from flowbber.components import Sink
 from flowbber.logging import get_logger
+from flowbber.components import FilterSink
 
 
 log = get_logger(__name__)
@@ -515,8 +515,9 @@ def transform_to_points(timestamp, flat):
     return points
 
 
-class InfluxDBSink(Sink):
+class InfluxDBSink(FilterSink):
     def declare_config(self, config):
+        super().declare_config(config)
 
         # Connection options
         config.add_option(
@@ -644,6 +645,9 @@ class InfluxDBSink(Sink):
 
     def distribute(self, data):
         from influxdb import InfluxDBClient
+
+        # Allow to filter data
+        super().distribute(data)
 
         # Get key
         if self.config.key.value is None:

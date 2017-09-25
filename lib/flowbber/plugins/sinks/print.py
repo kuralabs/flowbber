@@ -49,13 +49,20 @@ large data structures.
 
 """
 
-from flowbber.components import Sink
 from flowbber.logging import print
+from flowbber.components import FilterSink
 
 
-class PrintSink(Sink):
+class PrintSink(FilterSink):
+    def declare_config(self, config):
+        super().declare_config(config)
+
     def distribute(self, data):
         from pprintpp import pformat
+
+        # Allow to filter data
+        super().distribute(data)
+
         print(pformat(data))
 
 

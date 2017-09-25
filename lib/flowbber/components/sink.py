@@ -24,6 +24,7 @@ All custom Flowbber sinks must extend from the Sink class.
 from abc import abstractmethod
 
 from .base import Component
+from ..utils.filter import filter_dict
 
 
 class Sink(Component):
@@ -64,4 +65,52 @@ class Sink(Component):
         pass
 
 
-__all__ = ['Sink']
+class FilterSink(Sink):
+    """
+    Common sink base class that adds a include and exclude configuration
+    options and filters the data before using it.
+    """
+
+    def declare_config(self, config):
+        config.add_option(
+            'include',
+            default=['*'],
+            optional=True,
+            schema={
+                'type': 'list',
+                'schema': {
+                    'type': 'string',
+                },
+            },
+        )
+
+        config.add_option(
+            'exclude',
+            default=[],
+            optional=True,
+            schema={
+                'type': 'list',
+                'schema': {
+                    'type': 'string',
+                },
+            },
+        )
+
+    @abstractmethod
+    def distribute(self, data):
+        include = self.config.include.value
+        exclude = self.config.exclude.value
+
+        # Optimization when no filter is requested to the input data
+        if include == ['*'] and not exclude:
+            return
+
+        filtered = filter_dict(data, include, exclude)
+        data.clear()
+        data.update(filtered)
+
+
+__all__ = [
+    'Sink',
+    'FilterSink',
+]

@@ -403,8 +403,8 @@ beginning of any key in the collected data (see MongoDB data safety above).
 
 """  # noqa
 
-from flowbber.components import Sink
 from flowbber.logging import get_logger
+from flowbber.components import FilterSink
 
 
 log = get_logger(__name__)
@@ -433,8 +433,9 @@ def mongodb_safe(data, dotreplace, dollarreplace):
     return safe_value(data)
 
 
-class MongoDBSink(Sink):
+class MongoDBSink(FilterSink):
     def declare_config(self, config):
+        super().declare_config(config)
 
         # Connection options
         config.add_option(
@@ -562,6 +563,9 @@ class MongoDBSink(Sink):
 
     def distribute(self, data):
         from pymongo import MongoClient
+
+        # Allow to filter data
+        super().distribute(data)
 
         # Get key
         if self.config.key.value is None:
