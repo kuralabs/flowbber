@@ -23,11 +23,31 @@ from fnmatch import fnmatch
 
 
 def included_in(value, patterns):
+    """
+    Check if the given value is included in the given list of patterns.
+
+    :param str value: The value to check for.
+    :param list patterns: List of patterns to check for.
+
+    :return: True in the value is included, False otherwise.
+    :rtype: bool
+    """
     return any(fnmatch(value, pattern) for pattern in patterns)
 
 
-def is_wanted(path, include, exclude):
-    return included_in(path, include) and not included_in(path, exclude)
+def is_wanted(value, include, exclude):
+    """
+    Check that the given value is included in the include list and not included
+    in the exclude list.
+
+    :param str value: The value to check for.
+    :param list include: List of patterns of values to include.
+    :param list exclude: List of patterns of values to exclude.
+
+    :return: True in the value is wanted, False otherwise.
+    :rtype: bool
+    """
+    return included_in(value, include) and not included_in(value, exclude)
 
 
 def filter_dict(data, include, exclude, joinchar='.'):

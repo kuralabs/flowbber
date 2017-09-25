@@ -202,6 +202,7 @@ Store variables names in lowercase.
 """  # noqa
 
 from flowbber.components import Source
+from flowbber.utils.filter import is_wanted
 
 
 class EnvSource(Source):
@@ -242,18 +243,14 @@ class EnvSource(Source):
 
     def collect(self):
         from os import environ
-        from fnmatch import fnmatch
 
         include = self.config.include.value
         exclude = self.config.exclude.value
 
         data = {}
 
-        def is_included(value, patterns):
-            return any(fnmatch(value, pattern) for pattern in patterns)
-
         for env, value in environ.items():
-            if is_included(env, include) and not is_included(env, exclude):
+            if is_wanted(env, include, exclude):
 
                 key = env if not self.config.lowercase.value else env.lower()
                 data[key] = value

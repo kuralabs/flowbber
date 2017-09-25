@@ -168,14 +168,10 @@ from collections import OrderedDict
 
 from flowbber.components import Source
 from flowbber.logging import get_logger
+from flowbber.utils.filter import is_wanted
 
 
 log = get_logger(__name__)
-
-
-def is_included(value, patterns):
-    from fnmatch import fnmatch
-    return any(fnmatch(value, pattern) for pattern in patterns)
 
 
 def joiner(parent, collection):
@@ -202,19 +198,13 @@ def collect_files(directory, include, exclude):
         directories[:] = [
             subdir
             for subdir, relsubdir in joiner(relative, directories)
-            if (
-                is_included(relsubdir, include) and not
-                is_included(relsubdir, exclude)
-            )
+            if is_wanted(relsubdir, include, exclude)
         ]
 
         files_collected.extend(
             relfname
             for _, relfname in joiner(relative, files)
-            if (
-                is_included(relfname, include) and not
-                is_included(relfname, exclude)
-            )
+            if is_wanted(relfname, include, exclude)
         )
 
     files_collected.sort()

@@ -167,14 +167,10 @@ from functools import reduce
 
 from flowbber.components import Source
 from flowbber.logging import get_logger
+from flowbber.utils.filter import is_wanted
 
 
 log = get_logger(__name__)
-
-
-def is_included(value, patterns):
-    from fnmatch import fnmatch
-    return any(fnmatch(value, pattern) for pattern in patterns)
 
 
 class CoberturaSource(Source):
@@ -231,9 +227,8 @@ class CoberturaSource(Source):
 
         original = cobertura.files()
         relevant = [
-            filename for filename in original if
-            is_included(filename, include) and not
-            is_included(filename, exclude)
+            filename for filename in original
+            if is_wanted(filename, include, exclude)
         ]
 
         ignored = len(original) - len(relevant)
