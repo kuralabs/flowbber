@@ -1,19 +1,21 @@
+{% import "colors.tpl" as colors %}
+
 <!DOCTYPE html>
 <head>
     <style>
     .low {
-        color: #D8000C;
-        background-color: #FFBABA;
+        color: {{ colors.low }};
+        background-color: {{ colors.low_background }};
     }
 
     .mid {
-        color: #9F6000;
-        background-color: #FEEFB3;
+        color: {{ colors.mid }};
+        background-color: {{ colors.mid_background }};
     }
 
     .high {
-        color: #4F8A10;
-        background-color: #DFF2BF;
+        color: {{ colors.high }};
+        background-color: {{ colors.high_background }};
     }
     </style>
 </head>

@@ -11,7 +11,7 @@ class MySource(Source):
 
 
 def get_template(template_name):
-    template = Path(__file__).resolve().parent / (template_name + '.tpl')
+    template = Path(__file__).resolve().parent / template_name
     return template.read_text(encoding='utf-8')
 
 

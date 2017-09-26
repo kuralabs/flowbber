@@ -94,7 +94,7 @@ type = "template"
 id = "template2"
 
     [sinks.config]
-    template = "python://flowconf.get_template:template"
+    template = "python://flowconf.get_template:template.tpl"
     output = "render2.html"
     override = true
     create_parents = true
