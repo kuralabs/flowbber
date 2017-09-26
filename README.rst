@@ -5,6 +5,10 @@ Flowbber - The Data Pipeline Framework
 Flowbber is a generic tool and framework that allows to execute custom
 pipelines for data gathering, publishing and analysis.
 
+.. image:: https://build.kuralabs.io/buildStatus/icon?job=GitHub/flowbber/master
+   :target: https://build.kuralabs.io/job/GitHub/job/flowbber/job/master/
+   :alt: Latest version released on PyPi
+
 
 Documentation
 =============
