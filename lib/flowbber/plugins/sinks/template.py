@@ -118,21 +118,73 @@ Supported schemas:
 
       file://path/to/template.tpl
 
-- ``python://``: A Python package and function name to load the content of the
-  template.
-
-  This is particularly useful if your templates are included as
-  ``package_data`` in a package with your custom plugins, or you want to load
-  the template using a custom logic from your ``flowconf.py`` (in which case
-  use ``python://flowconf:yourfunction``).
-
-  Specify the package using a dotted notation and the function name separated
-  by a ``:`` (colon). The function mustn't receive any arguments and must
-  return the content of the template.
+  Or if using :ref:`substitutions`:
 
   ::
 
-      python://package.subpackage:function
+      file://{pipeline.dir}/template.tpl
+
+  When using this option, the selected template is able to load sibling
+  templates (in the same directory) using Jinja2_ ``import`` or ``extend``
+  directives:
+
+  .. code-block:: jinja
+
+     {% import "common.html" as common %}
+
+  .. code-block:: jinja
+
+     {% extends "base.html" %}
+
+- ``python://``: A Python package and function name to load the content of the
+  template.
+
+  ::
+
+      python://package.subpackage.function:template
+
+  This is particularly useful if your templates are included as
+  ``package_data`` in a package with your custom plugins, or you want to load
+  the template using a custom logic from your ``flowconf.py``.
+
+  Specify the package and function using a dotted notation and the template
+  name separated by a ``:`` (colon). The function receives the template name as
+  argument and must return the content of the template.
+
+  For example, in your ``flowconf.py``:
+
+  .. code-block:: python3
+
+     from jinja2 import TemplateNotFound
+
+     def my_loading_function(template_name):
+        if template_name == 'greeting_template':
+            return '<h1>Hello { data.user.name }!</h1>'
+        raise TemplateNotFound(template_name)
+
+  This can be used in your pipeline as:
+
+  .. code-block: toml
+
+     [[sinks]]
+     type = "template"
+     id = "template1"
+
+         [sinks.config]
+         template = "python://flowconf.my_loading_function:greeting_template"
+         output = "greeting.html"
+
+  When using this option, the selected template is able to load other templates
+  that the function is able to resolve using Jinja2_ ``import`` or ``extend``
+  directives:
+
+  .. code-block:: jinja
+
+     {% import "common" as common %}
+
+  .. code-block:: jinja
+
+     {% extends "base" %}
 
 - **Default**: ``N/A``
 - **Optional**: ``False``
@@ -153,17 +205,17 @@ output
 Output file.
 
 This option is nullable, if ``None`` is provided (the default), the output file
-name will be auto-determined using the name of the template or the function
-that loaded the template and appending an ``out`` file extension.
+name will be auto-determined using the name of the template and
+appending an ``out`` file extension.
 
 For example:
 
-=========================================  =====================
-``template``                               ``output``
-=========================================  =====================
-``file://templates/the_template.tpl``      ``the_template.out``
-``python://mypackage.data:load_template``  ``load_template.out``
-=========================================  =====================
+================================================  =====================
+``template``                                      ``output``
+================================================  =====================
+``file://templates/the_template.tpl``             ``the_template.out``
+``python://mypackage.load_template:my_template``  ``my_template.out``
+================================================  =====================
 
 - **Default**: ``None``
 - **Optional**: ``True``
@@ -317,7 +369,7 @@ class TemplateSink(FilterSink):
         )
 
     def distribute(self, data):
-        from jinja2 import Template
+        from jinja2 import Environment, FileSystemLoader, FunctionLoader
 
         # Allow to filter data
         super().distribute(data)
@@ -338,18 +390,23 @@ class TemplateSink(FilterSink):
                     'No such template {}'.format(template_uri)
                 )
 
-            template = template_file.read_text(encoding='utf-8')
-            template_name = template_file.stem
+            loader = FileSystemLoader(str(template_file.parent))
+            template_name = template_file.name
+            template_base = template_file.stem
 
         # Get template from Python package
         elif schema == 'python':
 
-            module_path, function_name = template_uri.rsplit(':', 1)
+            function_path, template_name = template_uri.rsplit(':', 1)
+            module_path, function_name = function_path.rsplit('.', 1)
             module = import_module(module_path)
-            function = getattr(module, function_name)
+            function = getattr(module, function_name, None)
 
-            template = function()
-            template_name = function_name
+            if function is None:
+                ValueError('No such function {}'.format(function_name))
+
+            loader = FunctionLoader(function)
+            template_base = function_name
 
         else:
             raise ValueError('Unsupported schema {}'.format(schema))
@@ -357,7 +414,7 @@ class TemplateSink(FilterSink):
         # Check output file
         outfile_path = self.config.output.value
         if outfile_path is None:
-            outfile_path = '{}.out'.format(template_name)
+            outfile_path = '{}.out'.format(template_base)
 
         outfile = Path(outfile_path)
 
@@ -375,9 +432,13 @@ class TemplateSink(FilterSink):
                 'No such directory {}'.format(outfile.parent)
             )
 
+        # Create environment
+        env = Environment(loader=loader)
+        template = env.get_template(template_name)
+
         # Render template and write it
         log.info('Rendering template to {}'.format(outfile))
-        rendered = Template(template).render(
+        rendered = template.render(
             data=data, payload=self.config.payload.value
         )
         outfile.write_text(rendered, encoding='utf-8')

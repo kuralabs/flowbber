@@ -476,6 +476,8 @@ bracket ``[[ElementInList]]``.
         opt3 = 1000
 
 
+.. _substitutions:
+
 Substitutions
 =============
 
@@ -618,6 +620,8 @@ Available Namespaces
 
             git -C pipeline.parent rev-parse --short --verify HEAD
 
+
+.. _scheduling:
 
 Scheduling
 ==========

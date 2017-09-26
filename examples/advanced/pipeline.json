@@ -100,7 +100,7 @@
             "type": "template",
             "id": "template2",
             "config": {
-                "template": "python://flowconf:get_template",
+                "template": "python://flowconf.get_template:template",
                 "output": "render2.html",
                 "override": true,
                 "create_parents": true

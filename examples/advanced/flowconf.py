@@ -10,6 +10,6 @@ class MySource(Source):
         return {'my_value': 1000}
 
 
-def get_template():
-    template = Path(__file__).resolve().parent / 'template.tpl'
+def get_template(template_name):
+    template = Path(__file__).resolve().parent / (template_name + '.tpl')
     return template.read_text(encoding='utf-8')
