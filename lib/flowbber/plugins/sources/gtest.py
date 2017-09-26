@@ -203,6 +203,7 @@ class GTestSource(Source):
             ('timestamp', str),
             ('time', float),
         ])
+        data['passed'] = 0
 
         testsuites = OrderedDict()
         data['suites'] = testsuites
@@ -261,6 +262,8 @@ class GTestSource(Source):
                     testsuite['passed'] += 1
 
                 testcases[casename] = testcase
+
+            data['passed'] += testsuite['passed']
 
         return data
 
