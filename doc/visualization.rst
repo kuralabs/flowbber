@@ -16,8 +16,8 @@ Examples of time series data are:
 - Evolution of the code coverage of your project over time.
 - Internet speed of a system over time.
 - CPU load of a system over time.
-- Number of tests implemented and passing, failing or skipping in your project
-  over time.
+- Number of tests implemented, passed, failed or skipped in your project over
+  time.
 - Temperature, humidity, and barometric pressure submitted by sensor over time.
 
 We could implemented a custom application using visualization libraries like
