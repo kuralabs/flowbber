@@ -83,6 +83,12 @@ id = "template1"
     override = true
     create_parents = true
 
+    [sinks.config.payload]
+    project = "Project Template 1"
+
+    [sinks.config.filters]
+    coverage_class = "flowconf.filter_coverage_class"
+
 [[sinks]]
 type = "template"
 id = "template2"
@@ -92,6 +98,12 @@ id = "template2"
     output = "render2.html"
     override = true
     create_parents = true
+
+    [sinks.config.payload]
+    project = "Project Template 2"
+
+    [sinks.config.filters]
+    coverage_class = "flowconf.filter_coverage_class"
 
 [[sinks]]
 type = "mongodb"

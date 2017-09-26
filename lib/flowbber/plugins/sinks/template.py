@@ -304,6 +304,70 @@ And then in your template:
 
 - **Secret**: ``False``
 
+filters
+-------
+
+Custom filters to pass to the template.
+
+This options must map the name of the filter with the path to the function that
+implements it. Any path to a Python function is valid, including using the
+local ``flowconf.py`` file.
+
+Usage:
+
+.. code-block:: toml
+
+   [[sinks]]
+   type = "template"
+   id = "mytemplate"
+
+       [sinks.config.filters]
+       coverage_class = "flowconf.filter_coverage_class"
+
+And then in your ``flowconf.py`` (or package with custom components):
+
+.. code-block:: python3
+
+   def filter_coverage_class(value, threshold=(0.5, 0.8)):
+       lower, higher = threshold
+       if value < lower:
+           return 'low'
+       if value < higher:
+           return 'mid'
+       return 'high'
+
+The above filter can then be used as:
+
+.. code-block:: html+jinja
+
+   {% for filename, filedata in data.coverage.files.items() %}
+   <ul>
+       <li class="{{ filedata.line_rate|coverage_class }}">
+           {{ filename }}
+       </li>
+   </ul>
+   {% endfor %}
+
+- **Default**: ``None``
+- **Optional**: ``True``
+- **Schema**:
+
+  .. code-block:: python3
+
+     {
+         'type': 'dict',
+         'keyschema': {
+             'type': 'string',
+             'empty': False,
+         },
+         'valueschema': {
+             'type': 'string',
+             'empty': False,
+         },
+         'nullable': True,
+     }
+
+- **Secret**: ``False``
 
 """  # noqa
 
@@ -315,6 +379,27 @@ from flowbber.components import FilterSink
 
 
 log = get_logger(__name__)
+
+
+def import_function(function_path):
+    """
+    Import and return a function specified by the given path.
+
+    :param str function_path: Path (module, submodule) to a function, as when
+     importing it in Python. For example ``module.submodule.function`` for the
+     equivalent of ``from module.submodule import function``.
+
+    :return: The function at the given path.
+    :rtype: function
+    """
+    module_path, function_name = function_path.rsplit('.', 1)
+    module = import_module(module_path)
+    function = getattr(module, function_name, None)
+
+    if function is None:
+        raise ValueError('No such function {}'.format(function_path))
+
+    return function
 
 
 class TemplateSink(FilterSink):
@@ -368,6 +453,37 @@ class TemplateSink(FilterSink):
             },
         )
 
+        config.add_option(
+            'filters',
+            default=None,
+            optional=True,
+            schema={
+                'type': 'dict',
+                'keyschema': {
+                    'type': 'string',
+                    'empty': False,
+                },
+                'valueschema': {
+                    'type': 'string',
+                    'empty': False,
+                },
+                'nullable': True,
+            },
+        )
+
+    def _load_filters(self):
+        """
+        Load filter functions from the configuration option.
+        """
+        filters = self.config.filters.value
+        if filters is None:
+            return {}
+
+        return {
+            key: import_function(function_path)
+            for key, function_path in filters.items()
+        }
+
     def distribute(self, data):
         from jinja2 import Environment, FileSystemLoader, FunctionLoader
 
@@ -398,15 +514,13 @@ class TemplateSink(FilterSink):
         elif schema == 'python':
 
             function_path, template_name = template_uri.rsplit(':', 1)
-            module_path, function_name = function_path.rsplit('.', 1)
-            module = import_module(module_path)
-            function = getattr(module, function_name, None)
+            function = import_function(function_path)
 
             if function is None:
-                ValueError('No such function {}'.format(function_name))
+                raise ValueError('No such function {}'.format(function_path))
 
             loader = FunctionLoader(function)
-            template_base = function_name
+            template_base = function.__name__
 
         else:
             raise ValueError('Unsupported schema {}'.format(schema))
@@ -432,8 +546,13 @@ class TemplateSink(FilterSink):
                 'No such directory {}'.format(outfile.parent)
             )
 
+        # Fetch filters
+        filters = self._load_filters()
+
         # Create environment
         env = Environment(loader=loader)
+        env.filters.update(filters)
+
         template = env.get_template(template_name)
 
         # Render template and write it

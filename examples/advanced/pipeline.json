@@ -93,7 +93,13 @@
                 "template": "file://{pipeline.dir}/template.tpl",
                 "output": "render1.html",
                 "override": true,
-                "create_parents": true
+                "create_parents": true,
+                "payload": {
+                    "project": "Project Template 1"
+                },
+                "filters": {
+                    "coverage_class": "flowconf.filter_coverage_class"
+                }
             }
         },
         {
@@ -103,7 +109,13 @@
                 "template": "python://flowconf.get_template:template",
                 "output": "render2.html",
                 "override": true,
-                "create_parents": true
+                "create_parents": true,
+                "payload": {
+                    "project": "Project Template 1"
+                },
+                "filters": {
+                    "coverage_class": "flowconf.filter_coverage_class"
+                }
             }
         },
         {
