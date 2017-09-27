@@ -1,8 +1,17 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+extern int yet_another(bool enter);
+
+
 int function(bool enter) {
-    printf("The answer is 42\n");
+    if(enter) {
+        printf("I'm in!\n");
+    } else {
+        printf("The answer is 42\n");
+    }
+
+    yet_another(enter);
 }
 
 

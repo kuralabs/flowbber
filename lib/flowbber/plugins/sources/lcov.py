@@ -43,11 +43,15 @@ is then parsed using the flowbber Cobertura source.
             "my_source_code.c": {
                 "total_statements": 40,
                 "total_misses": 20,
+                "branch_rate": 0.5,
+                "total_hits": 8,
                 "line_rate": 0.5
             },
             "another_source.c": {
                 "total_statements": 40,
                 "total_misses": 40,
+                "branch_rate": 0.5,
+                "total_hits": 8,
                 "line_rate": 0.0
             }
         },

@@ -241,12 +241,14 @@ class CoberturaSource(Source):
         total = {
             'total_statements': 0,
             'total_misses': 0,
+            'total_hits': 0,
+            'branch_rate': 0.0,
             'line_rate': 0.0,
         }
 
         files = {
             filename: {
-                key: getattr(cobertura, key)(filename)
+                key: getattr(cobertura, key)(filename=filename)
                 for key in total
             }
             for filename in relevant
@@ -254,15 +256,25 @@ class CoberturaSource(Source):
 
         # Calculate total
         def reducer(accumulator, element):
-            for key in ['total_statements', 'total_misses']:
+            for key in ['total_statements', 'total_misses', 'total_hits']:
                 accumulator[key] = accumulator.get(key, 0) + element[key]
             return accumulator
 
         total = reduce(reducer, files.values(), total)
 
+        # Re-calculate total statements
         if total['total_statements']:
             total['line_rate'] = 1.0 - (
                 total['total_misses'] / total['total_statements']
+            )
+
+        # Assign branch-rate
+        total['branch_rate'] = cobertura.branch_rate()
+        if include != ['*'] or exclude:
+            log.warning(
+                'Branch rate cannot be re-calculated when filtering files as '
+                'the cobertura XML doesn\'t include the raw number of '
+                'branches hit and total branches.'
             )
 
         return {

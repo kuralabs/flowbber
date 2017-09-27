@@ -13,3 +13,13 @@ id = "html"
 
     [sinks.config]
     key = "lcov"
+
+[[sinks]]
+type = "archive"
+id = "archive"
+
+    [sinks.config]
+    output = "data.json"
+    override = true
+    create_parents = true
+    pretty = true
