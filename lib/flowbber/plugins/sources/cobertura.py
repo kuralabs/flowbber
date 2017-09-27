@@ -231,9 +231,11 @@ class CoberturaSource(Source):
             if is_wanted(filename, include, exclude)
         ]
 
-        ignored = len(original) - len(relevant)
-        if ignored > 0:
-            log.info('{} files ignored from total coverage'.format(ignored))
+        ignored = sorted(set(original) - set(relevant))
+        if ignored:
+            log.info(
+                '{} files ignored from total coverage'.format(len(ignored))
+            )
 
         # Get files coverage data
         total = {
@@ -266,6 +268,7 @@ class CoberturaSource(Source):
         return {
             'files': files,
             'total': total,
+            'ignored': ignored,
         }
 
 
