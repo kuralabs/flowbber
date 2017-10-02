@@ -37,6 +37,10 @@ The following sources plugins are included as part of Flowbber.
 
 .. automodule:: flowbber.plugins.sources.gtest
 
+.. _sources-json:
+
+.. automodule:: flowbber.plugins.sources.json
+
 .. _sources-pytest:
 
 .. automodule:: flowbber.plugins.sources.pytest

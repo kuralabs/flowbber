@@ -345,6 +345,8 @@ setup(
         'git': [],
         # GitHubSource
         'github': ['pygithub'],
+        # JSONSource
+        'json': [],
         # GTestSource
         'gtest': [],
         # PyTestSource
@@ -357,6 +359,11 @@ setup(
         'timestamp': [],
         # UserSource
         'user': [],
+
+        ###############
+        # Aggregators #
+        ###############
+        'filter': [],
 
         ###########
         # Sinks   #
@@ -415,6 +422,7 @@ setup(
             'env = flowbber.plugins.sources.env:EnvSource',
             'git = flowbber.plugins.sources.git:GitSource',
             'github = flowbber.plugins.sources.github:GitHubSource',
+            'json = flowbber.plugins.sources.json:JSONSource',
             'gtest = flowbber.plugins.sources.gtest:GTestSource',
             'pytest = flowbber.plugins.sources.pytest:PytestSource',
             'sloc = flowbber.plugins.sources.sloc:SLOCSource',
