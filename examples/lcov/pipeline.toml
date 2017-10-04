@@ -1,0 +1,15 @@
+[[sources]]
+type = "lcov"
+id = "lcov"
+
+    [sources.config]
+    directory = "{pipeline.dir}"
+    rc_overrides = ["lcov_branch_coverage=1"]
+    remove = ["*hello2*"]
+
+[[sinks]]
+type = "lcov_html"
+id = "html"
+
+    [sinks.config]
+    key = "lcov"

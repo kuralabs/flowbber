@@ -1,0 +1,4 @@
+*.gcda
+*.o
+*.gcno
+hello
