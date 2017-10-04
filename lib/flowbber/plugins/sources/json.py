@@ -45,7 +45,10 @@ This source fetch and parses a local or remote (http, https) json file.
                 "type": "json",
                 "id": "...",
                 "config": {
-                    "xmlpath": "tests.xml"
+                    "file_uri": "file://{pipeline.dir}/file.json",
+                    "encoding": "utf-8",
+                    "ordered": true,
+                    "verify_ssl": true
                 }
             }
         ]
