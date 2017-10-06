@@ -27,8 +27,8 @@ This source allows to collect information about the current user.
 .. code-block:: json
 
     {
-        "login": "kuralabs",
-        "uid": 1000
+        "uid": 1000,
+        "user": "kuralabs"
     }
 
 **Dependencies:**
@@ -58,11 +58,12 @@ from flowbber.components import Source
 
 class UserSource(Source):
     def collect(self):
-        from os import getuid, getlogin
+        from os import getuid
+        from getpass import getuser
 
         return {
             'uid': getuid(),
-            'login': getlogin(),
+            'user': getuser(),
         }
 
 

@@ -34,7 +34,7 @@ For the following collected data:
             'iso8601': '2017-08-20T19:55:11',
             'strftime': '2017-08-20 19:55:11',
         }),
-        ('user', {'login': 'kuralabs', 'uid': 1000}),
+        ('user', {'uid': 1000, 'user': 'kuralabs'}),
     ])
 
 The following template could be used:
@@ -54,7 +54,7 @@ The following template could be used:
 
     <ul>
         <li>UID: {{ data.user.uid }}</li>
-        <li>Login: {{ data.user.login }}</li>
+        <li>User: {{ data.user.user }}</li>
     </ul>
 
 And rendering it with that data will result in:
@@ -74,7 +74,7 @@ And rendering it with that data will result in:
 
     <ul>
         <li>UID: 1000</li>
-        <li>Login: kuralabs</li>
+        <li>User: kuralabs</li>
     </ul>
 
 .. _Jinja2: http://jinja.pocoo.org/

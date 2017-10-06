@@ -34,7 +34,7 @@
 
     <ul>
         <li>UID: {{ data.user.uid }}</li>
-        <li>Login: {{ data.user.login }}</li>
+        <li>User: {{ data.user.user }}</li>
     </ul>
 
     <h2>Coverage:</h2>

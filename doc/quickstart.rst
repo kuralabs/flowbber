@@ -185,7 +185,7 @@ And let's execute this new pipeline:
     OrderedDict([
         ('timestamp1', {'epoch': 1503698275}),
         ('timestamp2', {'epoch': 1503698275}),
-        ('user1', {'login': 'kuralabs', 'uid': 1000}),
+        ('user1', {'uid': 1000, 'user': 'kuralabs'}),
     ])
 
 Note that the ``timestamp`` sources picked the same integer timestamp in
@@ -229,7 +229,7 @@ When executed, the pipeline shows:
     OrderedDict([
         ('timestamp1', {'epochf': 1503698656.83944}),
         ('timestamp2', {'epochf': 1503698656.840055}),
-        ('user1', {'login': 'kuralabs', 'uid': 1000}),
+        ('user1', {'uid': 1000, 'user': 'kuralabs'}),
     ])
 
 Now, we can see that, as expected, both ``timestamp`` sources picked the
@@ -283,7 +283,7 @@ verbosity:
     OrderedDict([
         ('timestamp1', {'epochf': 1504829040.032091}),
         ('timestamp2', {'epochf': 1504829040.036981}),
-        ('user1', {'login': 'kuralabs', 'uid': 1000}),
+        ('user1', {'uid': 1000, 'user': 'kuralabs'}),
     ])
       INFO     | Sink #0 "print1" (PID 10314) finished successfully after 0.0016 seconds
       INFO     | Saving journal ...
