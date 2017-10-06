@@ -234,16 +234,16 @@ class LoggingManager:
         self._log_queue.put_nowait(None)
         self._log_subprocess.join()
 
-    def enqueue_print(self, string, fd='stdout'):
+    def enqueue_print(self, obj, fd='stdout'):
         """
         Enqueue a print to the given fd.
 
-        :param str string: String to print.
+        :param obj: Object to print.
         :param str fd: Name of the file descriptor.
          Either stdout or stderr only.
         """
         self._log_queue.put_nowait(
-            PrintRequest(string=str(string) + '\n', fd=fd)
+            PrintRequest(string=str(obj) + '\n', fd=fd)
         )
 
 

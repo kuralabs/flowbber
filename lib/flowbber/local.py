@@ -19,12 +19,16 @@
 Module implementing the load of local flowconf.py files.
 """
 
-from sys import path
+import sys
+from importlib import import_module
 
 from .logging import get_logger
 
 
 log = get_logger(__name__)
+
+
+PREVIOUS = None
 
 
 def load_configuration(pipeline_path):
@@ -33,6 +37,9 @@ def load_configuration(pipeline_path):
 
     :param Path pipeline_path: Path to the parent directory of the pipeline to
      load local configuration from.
+
+    :return: The flowconf module loaded.
+    :rtype: module
     """
     flowconf = pipeline_path / 'flowconf.py'
 
@@ -40,10 +47,20 @@ def load_configuration(pipeline_path):
         log.debug('No local flowconf.py found.')
         return
 
-    path.append(str(pipeline_path.resolve()))
-    import flowconf
+    import_path = str(pipeline_path.resolve())
+
+    global PREVIOUS
+    if PREVIOUS is not None:
+        del sys.modules['flowconf']
+        sys.path.remove(PREVIOUS)
+
+    sys.path.append(import_path)
+    module = import_module('flowconf')
+    PREVIOUS = import_path
 
     log.info('Pipeline\'s flowconf.py loaded successfully.')
+
+    return module
 
 
 __all__ = ['load_configuration']
