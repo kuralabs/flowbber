@@ -3,7 +3,7 @@ type = "github"
 id = "github"
 
     [sources.config]
-    token = "..."
+    token = "{env.GITHUBTOKEN}"
     repository = "organization/repository"
     base_url = "https://api.github.com"
 
