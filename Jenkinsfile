@@ -3,9 +3,15 @@ pipeline {
 
     stages {
         stage('Build') {
-            agent { docker { image 'kuralabs/python3-dev:latest' } }
+            agent {
+                docker {
+                    image 'kuralabs/flowbber:latest'
+                    args '--init'
+                }
+            }
             steps {
                 sh '''
+                    entrypoint.sh
                     tox -e build
                     tox -e test
                     tox -e doc
