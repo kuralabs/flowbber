@@ -21,6 +21,10 @@ The following sinks plugins are included as part of Flowbber.
 
 .. automodule:: flowbber.plugins.sinks.influxdb
 
+.. _sinks-lcov-html:
+
+.. automodule:: flowbber.plugins.sinks.lcov_html
+
 .. _sinks-mongodb:
 
 .. automodule:: flowbber.plugins.sinks.mongodb

@@ -41,6 +41,10 @@ The following sources plugins are included as part of Flowbber.
 
 .. automodule:: flowbber.plugins.sources.json
 
+.. _sources-lcov:
+
+.. automodule:: flowbber.plugins.sources.lcov
+
 .. _sources-pytest:
 
 .. automodule:: flowbber.plugins.sources.pytest

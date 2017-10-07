@@ -28,12 +28,17 @@ def setup_module(module):
     ['advanced', 'pipeline.json'],
     ['advanced', 'pipeline.toml'],
     ['test', 'pipeline.toml'],
+    ['lcov', 'pipeline.toml'],
 ])
 def test_pipelines(name, pipelinedef):
     # Exceptions ...
     if name == 'github':
         if 'GITHUBTOKEN' not in environ:
             skip('Missing GITHUBTOKEN environment variable')
+
+    elif name == 'lcov':
+        # Create coverage files
+        run(['make', '-C', str(examples / name)], check=True)
 
     # Run pipeline
     args = Arguments(examples / name / pipelinedef)
