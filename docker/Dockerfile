@@ -23,6 +23,11 @@ RUN curl --location https://repos.influxdata.com/influxdb.key | apt-key add - &&
         influxdb
 
 
+# Install component dependencies
+RUN apt-get update && apt-get install --yes \
+        lcov
+
+
 # Configure and start supervisord
 COPY supervisord/*.conf /etc/supervisor/conf.d/
 COPY entrypoint.sh /usr/local/bin/
