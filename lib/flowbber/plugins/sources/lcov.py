@@ -20,9 +20,17 @@
 Lcov
 ====
 
-This source uses lcov to generate standard Cobertura_ XML files and then
-parses its contents with the cobertura source
+This source calls lcov_ on a specified directory and process its result file
+with lcov_cobertura_ to create a standard Cobertura_ XML file, which in turn
+is then parsed using the flowbber Cobertura source.
 
+.. note::
+
+   This source requires the ``lcov`` executable to be available in your system
+   to run.
+
+.. _lcov: http://ltp.sourceforge.net/coverage/lcov.php
+.. _lcov_cobertura: https://github.com/eriwen/lcov-to-cobertura-xml
 .. _Cobertura: http://cobertura.github.io/cobertura/
 
 
@@ -79,28 +87,29 @@ parses its contents with the cobertura source
 directory
 ---------
 
-Path to the .gcda files directory
+Path to the directory containing gcov's ``.gcda`` files .
 
+- **Default**: ``N/A``
 - **Optional**: ``False``
 - **Schema**:
 
   .. code-block:: python3
 
      {
-         'type': 'list',
+         'type': 'string',
          'empty': False
      }
-
 
 - **Secret**: ``False``
 
 rc_overrides
 ------------
 
-Override lcov configuration file setting.
+Override lcov configuration file settings.
 
-Elements should have the form SETTING=VALUE
+Elements should have the form ``SETTING=VALUE``.
 
+- **Default**: ``[]``
 - **Optional**: ``False``
 - **Schema**:
 
@@ -117,12 +126,11 @@ Elements should have the form SETTING=VALUE
 - **Secret**: ``False``
 
 remove
--------
+------
 
 List of patterns of files to remove from coverage computation.
 
-Patterns will be interpreted as shell wild‐card patterns
-
+Patterns will be interpreted as shell wild‐card patterns.
 
 - **Default**: ``[]``
 - **Optional**: ``True``
@@ -146,8 +154,6 @@ from shutil import which
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 
-from lcov_cobertura import LcovCobertura
-
 from flowbber.components import Source
 from flowbber.utils.command import run
 from flowbber.logging import get_logger
@@ -169,19 +175,6 @@ class LcovSource(Source):
         )
 
         config.add_option(
-            'remove',
-            default=[],
-            optional=True,
-            schema={
-                'type': 'list',
-                'schema': {
-                    'type': 'string',
-                    'empty': False,
-                },
-            },
-        )
-
-        config.add_option(
             'rc_overrides',
             default=[],
             optional=True,
@@ -194,7 +187,22 @@ class LcovSource(Source):
             },
         )
 
+        config.add_option(
+            'remove',
+            default=[],
+            optional=True,
+            schema={
+                'type': 'list',
+                'schema': {
+                    'type': 'string',
+                    'empty': False,
+                },
+            },
+        )
+
     def collect(self):
+        from lcov_cobertura import LcovCobertura
+
         # Check if file exists
         directory = Path(self.config.directory.value)
         if not directory.is_dir():
@@ -203,20 +211,23 @@ class LcovSource(Source):
             )
         directory = directory.resolve()
 
-        # Create a temporary file
-        tmp_file = NamedTemporaryFile()
-        # Close it, we just needed the name
-        tmp_file.close()
-        tracefile = Path(tmp_file.name)
-        result = {'tracefile': str(tracefile)}
-
+        # Check if lcov is available
         lcov = which('lcov')
         if lcov is None:
-            raise Exception('lcov binary not found')
+            raise FileNotFoundError('lcov executable not found.')
 
-        rc_overrides = ''
+        # Create a temporary file. Close it, we just need the name.
+        tmp_file = NamedTemporaryFile()
+        tmp_file.close()
+
+        tracefile = Path(tmp_file.name)
+        result = {
+            'tracefile': str(tracefile)
+        }
+
         # Transform from list to something like
-        # --rc setting1=value1 --rc setting2=value2
+        #   --rc setting1=value1 --rc setting2=value2
+        rc_overrides = ''
         if self.config.rc_overrides.value:
             rc_overrides = '--rc {}'.format(
                 ' --rc '.join(self.config.rc_overrides.value)
@@ -232,12 +243,12 @@ class LcovSource(Source):
                 output=tracefile
             )
         )
-        log.info('Gathering coverage info "{}"'.format(cmd))
+        log.info('Gathering coverage info: "{}"'.format(cmd))
         status = run(cmd)
 
         if status.returncode != 0:
             raise RuntimeError(
-                'Lcov failed capturing data {}'.format(status.stderr)
+                'Lcov failed capturing data:\n{}'.format(status.stderr)
             )
 
         # Remove files from patterns
@@ -254,28 +265,32 @@ class LcovSource(Source):
                     )
                 )
             )
-            log.info('Removing files "{}"'.format(cmd))
+            log.info('Removing files: "{}"'.format(cmd))
             status = run(cmd)
 
             if status.returncode != 0:
                 raise RuntimeError(
-                    'Lcov failed removing files from coverage {}'.format(
+                    'Lcov failed removing files from coverage:\n{}'.format(
                         status.stderr
                     )
                 )
 
-        # Create cobertura xml file
+        # Create cobertura xml file and parse it
         converter = LcovCobertura(tracefile.open().read())
-        cobertura = converter.convert()
+        cobertura_xml = converter.convert()
 
-        xml = Path('coverage.xml')
-        xml.open('w').write(cobertura)
+        with NamedTemporaryFile(delete=False) as xml:
+            xml.write(cobertura_xml.encode('utf-8'))
 
-        cobertura = CoberturaSource(
-            self._index, 'cobertura', self._id, config={'xmlpath': str(xml)}
+        source = CoberturaSource(
+            self._index, 'cobertura', self._id,
+            config={
+                'xmlpath': str(xml.name)
+            }
         )
 
-        result.update(cobertura.collect())
+        result.update(source.collect())
+
         return result
 
 
