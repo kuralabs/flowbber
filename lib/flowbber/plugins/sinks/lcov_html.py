@@ -47,7 +47,9 @@ coverage.
                 "id": "...",
                 "config": {
                     "key": "<id of lcov source>",
-                    "output": "<output directory>"
+                    "output": "<output directory>",
+                    "override": true,
+                    "create_parents": true
                 }
             }
         ]
