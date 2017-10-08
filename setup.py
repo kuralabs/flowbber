@@ -433,7 +433,7 @@ setup(
             'sloc = flowbber.plugins.sources.sloc:SLOCSource',
             'speed = flowbber.plugins.sources.speed:SpeedSource',
             'timestamp = flowbber.plugins.sources.timestamp:TimestampSource',
-            'user = flowbber.plugins.sources.user:UserSource'
+            'user = flowbber.plugins.sources.user:UserSource',
         ],
         'flowbber_plugin_aggregators_1_0': [
             'filter = flowbber.plugins.aggregators.filter:FilterAggregator',
@@ -444,7 +444,7 @@ setup(
             'lcov_html = flowbber.plugins.sinks.lcov_html:LcovHTMLSink',
             'mongodb = flowbber.plugins.sinks.mongodb:MongoDBSink',
             'print = flowbber.plugins.sinks.print:PrintSink',
-            'template = flowbber.plugins.sinks.template:TemplateSink'
+            'template = flowbber.plugins.sinks.template:TemplateSink',
         ]
     },
 

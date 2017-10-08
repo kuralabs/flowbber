@@ -83,7 +83,6 @@ is then parsed using the flowbber Cobertura source.
         ]
     }
 
-
 directory
 ---------
 

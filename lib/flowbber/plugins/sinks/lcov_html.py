@@ -17,14 +17,18 @@
 
 """
 
-lcov html
+Lcov HTML
 =========
 
+This sink plugin run lcov_ ``genhtml`` executable to generate a html report of
+coverage.
 
-This sink plugin run lcov genhtml.
+.. note::
 
-This module uses genhtml from lcov to generate a html report of coverage
+   This sink requires the ``genhtml`` executable to be available in your system
+   to run.
 
+.. _lcov: http://ltp.sourceforge.net/coverage/lcov.php
 
 **Dependencies:**
 
@@ -49,13 +53,12 @@ This module uses genhtml from lcov to generate a html report of coverage
         ]
     }
 
-
 key
 ---
 
-Id of a lcov source in the pipeline
+Id of a lcov source in the pipeline.
 
-- **Default**: ``False``
+- **Default**: ``N/A``
 - **Optional**: ``False``
 - **Schema**:
 
@@ -71,7 +74,7 @@ Id of a lcov source in the pipeline
 output
 ------
 
-Path to html tree to write the generated html.
+Path to a directory to write the generated html.
 
 - **Default**: ``N/A``
 - **Optional**: ``False``
@@ -89,7 +92,7 @@ Path to html tree to write the generated html.
 override
 --------
 
-Override output file if already exists.
+Override output directory if already exists.
 
 - **Default**: ``False``
 - **Optional**: ``True``
@@ -106,7 +109,7 @@ Override output file if already exists.
 create_parents
 --------------
 
-Create output file parent directories if don't exist.
+Create output parent directories if don't exist.
 
 - **Default**: ``True``
 - **Optional**: ``True``
@@ -119,6 +122,7 @@ Create output file parent directories if don't exist.
      }
 
 - **Secret**: ``False``
+
 """
 
 from pathlib import Path
@@ -129,6 +133,14 @@ from flowbber.utils.command import run
 
 class LcovHTMLSink(Sink):
     def declare_config(self, config):
+        config.add_option(
+            'key',
+            schema={
+                'type': 'string',
+                'empty': False,
+            },
+        )
+
         config.add_option(
             'output',
             default='html',
@@ -156,13 +168,6 @@ class LcovHTMLSink(Sink):
                 'type': 'boolean',
             },
         )
-        config.add_option(
-            'key',
-            schema={
-                'type': 'string',
-                'empty': False,
-            },
-        )
 
     def distribute(self, data):
         outdir = Path(self.config.output.value)
@@ -188,7 +193,11 @@ class LcovHTMLSink(Sink):
         )
 
         if status.returncode != 0:
-            raise RuntimeError('Failed generating html coverage report')
+            raise RuntimeError(
+                'Failed generating html coverage report:\n{}'.format(
+                    status.stderr
+                )
+            )
 
 
 __all__ = ['LcovHTMLSink']
