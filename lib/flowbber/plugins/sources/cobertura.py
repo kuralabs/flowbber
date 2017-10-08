@@ -40,7 +40,7 @@ files can be generated for several programming languages, including:
 
 .. _gcov: https://gcc.gnu.org/onlinedocs/gcc/Gcov.html
 .. _lcov: http://ltp.sourceforge.net/coverage/lcov.php
-.. _lcov_cobertura: https://pypi.python.org/pypi/lcov_cobertura/
+.. _lcov_cobertura: https://github.com/eriwen/lcov-to-cobertura-xml
 
 .. _gocov: https://github.com/axw/gocov
 .. _gocov-xml: https://github.com/AlekSi/gocov-xml
