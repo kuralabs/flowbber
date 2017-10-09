@@ -3,8 +3,8 @@ type = "github"
 id = "github"
 
     [sources.config]
-    token = "{env.GITHUBTOKEN}"
-    repository = "organization/repository"
+    token = "{env.GITHUB_TOKEN}"
+    repository = "kuralabs/flowbber"
     base_url = "https://api.github.com"
 
 [[sinks]]
