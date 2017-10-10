@@ -9,6 +9,11 @@ pipeline {
                     args '--init'
                 }
             }
+
+            environment {
+                GITHUB_TOKEN = credentials('GITHUB_TOKEN')
+            }
+
             steps {
                 sh '''
                     entrypoint.sh

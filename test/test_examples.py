@@ -33,8 +33,8 @@ def setup_module(module):
 def test_pipelines(name, pipelinedef):
     # Exceptions ...
     if name == 'github':
-        if 'GITHUBTOKEN' not in environ:
-            skip('Missing GITHUBTOKEN environment variable')
+        if 'GITHUB_TOKEN' not in environ:
+            skip('Missing GITHUB_TOKEN environment variable')
 
     elif name == 'lcov':
         # Create coverage files
