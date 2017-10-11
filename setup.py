@@ -361,6 +361,8 @@ setup(
         'timestamp': [],
         # UserSource
         'user': [],
+        # ValgrindMemcheckSource
+        'valgrind_memcheck': ['xmltodict'],
 
         ###############
         # Aggregators #
@@ -405,7 +407,7 @@ setup(
     keywords='flowbber',
 
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache Software License',
         'Natural Language :: English',
@@ -434,6 +436,7 @@ setup(
             'speed = flowbber.plugins.sources.speed:SpeedSource',
             'timestamp = flowbber.plugins.sources.timestamp:TimestampSource',
             'user = flowbber.plugins.sources.user:UserSource',
+            'valgrind_memcheck = flowbber.plugins.sources.valgrind.memcheck:ValgrindMemcheckSource',  # noqa
         ],
         'flowbber_plugin_aggregators_1_0': [
             'filter = flowbber.plugins.aggregators.filter:FilterAggregator',
