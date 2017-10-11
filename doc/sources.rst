@@ -64,3 +64,7 @@ The following sources plugins are included as part of Flowbber.
 .. _sources-user:
 
 .. automodule:: flowbber.plugins.sources.user
+
+.. _sources-valgrind-memcheck:
+
+.. automodule:: flowbber.plugins.sources.valgrind.memcheck
