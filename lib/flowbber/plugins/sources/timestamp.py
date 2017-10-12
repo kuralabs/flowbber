@@ -22,19 +22,29 @@ Timestamp
 
 This source allows to collect timestamps in several formats.
 
-It is recommended to include this block on every pipeline, in particular
-because by default some database sinks may use the data provided by this source
-as the primary key (although this can be changed on those sinks).
+It is recommended to include at least one timestamp source on every pipeline in
+order to have a unique and consistent timestamp for the whole pipeline to use.
 
 **Data collected:**
 
 .. code-block:: json
 
     {
+        "timezone": null,
         "epoch": 1502852229,
         "epochf": 1502852229.427491,
         "iso8601": "2017-08-15T20:57:09",
         "strftime": "2017-08-15 20:57:09"
+    }
+
+.. code-block:: json
+
+    {
+        "timezone": 0,
+        "epoch": 1507841667,
+        "epochf": 1507841667.9304831028,
+        "iso8601": "2017-10-12T20:54:27+00:00",
+        "strftime": "2017-10-12 20:54:27"
     }
 
 **Dependencies:**
@@ -53,6 +63,7 @@ as the primary key (although this can be changed on those sinks).
                 "type": "timestamp",
                 "id": "...",
                 "config": {
+                    "timezone": null,
                     "epoch": true,
                     "epochf": true,
                     "iso8601": true,
@@ -61,6 +72,33 @@ as the primary key (although this can be changed on those sinks).
             }
         ]
     }
+
+timezone
+--------
+
+Specify the timezone for which the timestamp should be calculated. If ``None``
+is provided (the default), the timestamp will be calculated using the local
+timezone (current time). Use ``0`` for a UTC timestamp, and a +/-12 integer for
+any other timezone.
+
+Note that this doesn't affect the ``epoch`` or ``epochf`` timestamps, as those
+values are always in POSIX time which is the number of seconds since the Epoch
+(1970-01-01 UTC) not counting leap seconds.
+
+- **Default**: ``None``
+- **Optional**: ``True``
+- **Schema**:
+
+  .. code-block:: python3
+
+     {
+        'type': 'integer',
+        'nullable': True,
+        'max': 12,
+        'min': -12,
+     }
+
+- **Secret**: ``False``
 
 epoch
 -----
@@ -146,6 +184,18 @@ class TimestampSource(Source):
 
     def declare_config(self, config):
         config.add_option(
+            'timezone',
+            default=None,
+            optional=True,
+            schema={
+                'type': 'integer',
+                'nullable': True,
+                'max': 12,
+                'min': -12,
+            },
+        )
+
+        config.add_option(
             'epoch',
             default=True,
             optional=True,
@@ -184,7 +234,8 @@ class TimestampSource(Source):
 
         # Check that at least one format is enabled
         def custom_validator(validated):
-            if not any(validated.values()):
+            timeformatkeys = ['epoch', 'epochf', 'iso8601', 'strftime']
+            if not any(validated[key] for key in timeformatkeys):
                 raise ValueError(
                     'The timestamp source requires at least one timestamp '
                     'format enabled'
@@ -193,11 +244,20 @@ class TimestampSource(Source):
         config.add_validator(custom_validator)
 
     def collect(self):
-        from datetime import datetime
+        from datetime import datetime, timezone, timedelta
 
-        now = datetime.now()
+        # Get timezone
+        tz = None
+        tzdelta = self.config.timezone.value
 
-        entry = {}
+        if tzdelta is not None:
+            tz = timezone(timedelta(hours=tzdelta))
+
+        now = datetime.now(tz=tz)
+
+        entry = {
+            'timezone': tzdelta
+        }
 
         if self.config.epoch.value:
             entry[self.config.epoch.key] = int(now.timestamp())
