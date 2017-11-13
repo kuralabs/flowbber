@@ -27,6 +27,64 @@ Install
 Changelog
 =========
 
+1.2.0 (2017-11-13)
+------------------
+
+New
+~~~
+
+- New timezone option for the timestamp source.
+- New source for Valgrind's Memcheck.
+- Add lcov source and lcov html sink.
+- New JSON source for fetch and parse local (file system) or remote
+  (http, https) JSON files.
+- The CoberturaSource now returns the list of ignored files.
+- TemplateSink now support passing filters.
+- All sinks can now filter the input data.
+- New FilterAggregator allows to filter the data structure before sending it to
+  the sinks.
+- When using the TemplateSink, extra data can now be passed from the pipeline
+  definition to the template by using the new 'payload' configuration option.
+  Fixes #5.
+- Each entry from the collected data can now be put into its own collection
+  when using the MongoDBSink. Fixes #2.
+- Added a source that counts lines of code in a directory.
+- Added a new Git source that provides revision, tag and author information of
+  a git repository.
+- New GitHub source that allows to collect statistics of closed / open pull
+  requests and issues.
+- New Google Test source.
+- Added a "pretty" option to the ArchiveSink to make JSON output pretty. Also,
+  JSON file is now saved in UTF-8.
+- Added new source plugin for pytest's JUnit-like XML test results.
+- CoberturaSource now supports filenames include and exclude patterns.
+
+Changes
+~~~~~~~
+
+- UserSource no longer returns the login key and instead returns a user key.
+- Templates used in the TemplateSink can now load sibling templates.
+  Previous way to specify python:// templates changed.
+- MongoDBSink now uses None as default for the ``key`` configuration option.
+  Related to #4.
+- InfluxDBSink now uses None as default for the ``key`` configuration option.
+  Related to #4.
+
+Fixes
+~~~~~
+
+- Local flowconf can now be reloaded in the same process.
+- Fix a deadlock condition when a non-optional component failed with still
+  running siblings components.
+- Fixes #6 : InfluxDBSink doesn't support None values.
+- Journal is now saved in UTF-8.
+- Fixed high CPU usage by the logging manager subprocess.
+- ``flowbber.logging.print`` will now convert to string any input provided.
+- Fix minor typo in EnvSource include / exclude logic.
+- The pipeline executor will now join the process of a component (max 100ms)
+  after fetching its response in order to try to get its exit code.
+
+
 1.1.0 (2017-09-07)
 ------------------
 
