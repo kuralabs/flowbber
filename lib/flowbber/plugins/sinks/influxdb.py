@@ -163,9 +163,9 @@ URI is in the form:
 
 Supported schemes are ``influxdb``, ``https+influxdb`` and ``udp+influxdb``.
 
-Check function from_DSN_ for more information.
+Check function from_dsn_ for more information.
 
-.. _from_DSN: http://influxdb-python.readthedocs.io/en/latest/api-documentation.html#influxdb.InfluxDBClient.from_DSN
+.. _from_dsn: http://influxdb-python.readthedocs.io/en/latest/api-documentation.html#influxdb.InfluxDBClient.from_dsn
 
 - **Default**: ``None``
 - **Optional**: ``True``
@@ -672,7 +672,7 @@ class InfluxDBSink(FilterSink):
                 verify_ssl=self.config.verify_ssl.value,
             )
         else:
-            client = InfluxDBClient.from_DSN(
+            client = InfluxDBClient.from_dsn(
                 self.config.uri.value,
                 database=self.config.database.value,
                 verify_ssl=self.config.verify_ssl.value,
