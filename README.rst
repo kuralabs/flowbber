@@ -27,6 +27,15 @@ Install
 Changelog
 =========
 
+1.2.1 (2017-11-26)
+------------------
+
+Fixes
+~~~~~
+
+- The InfluxDB sink is now compatible with influxdb client version 5.0.0.
+
+
 1.2.0 (2017-11-13)
 ------------------
 
