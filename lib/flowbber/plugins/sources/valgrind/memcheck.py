@@ -192,7 +192,7 @@ class ValgrindMemcheckSource(Source):
                 'No such file {}'.format(infile)
             )
 
-        doc = parse(infile.read_text())
+        doc = parse(infile.read_text(), force_list=('error',))
         return doc['valgrindoutput']
 
 
