@@ -41,8 +41,88 @@ Such XML file can be generated with:
 .. code-block:: json
 
     {
-        "FIXME": "FIXME"
+        "status":[
+            {
+                "state":"RUNNING",
+                "time":"00:00:00:00.268"
+            },
+            {
+                "state":"FINISHED",
+                "time":"00:00:00:59.394"
+            }
+        ],
+        "ppid":"4242",
+        "preamble":{
+            "line":[
+                "Memcheck, a memory error detector",
+                "Copyright (C) 2002-2015, and GNU GPL'd, by Julian Seward et al.",
+                "Using Valgrind-3.11.0 and LibVEX; rerun with -h for copyright info",
+                "Command: ./binary"
+            ]
+        },
+        "suppcounts":{
+            "pair":[
+                {
+                    "name":"reachable memory from libstdc++ pool",
+                    "count":"1"
+                }
+            ]
+        },
+        "pid":"424242",
+        "errorcounts":null,
+        "protocoltool":"memcheck",
+        "protocolversion":"4",
+        "tool":"memcheck",
+        "error":[
+            {
+                "kind":"Leak_DefinitelyLost",
+                "stack":{
+                    "frame":[
+                        {
+                            "obj":"/usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so",
+                            "ip":"0x4C2FB55",
+                            "fn":"calloc"
+                        },
+                        {
+                            "dir":"/home/library",
+                            "obj":"/home/library/binary",
+                            "line":"76",
+                            "ip":"0xED467F",
+                            "fn":"hello_world()",
+                            "file":"hello.cpp"
+                        },
+                    ]
+                },
+                "xwhat":{
+                    "leakedblocks":"1",
+                    "text":"8 bytes in 1 blocks are definitely lost in loss record 1 of 5",
+                    "leakedbytes":"8"
+                },
+                "tid":"1",
+                "unique":"0x0"
+            }
+        ],
+        "args":{
+            "vargv":{
+                "exe":"/usr/bin/valgrind.bin",
+                "arg":[
+                    "--track-origins=yes",
+                    "--leak-check=full",
+                    "--show-leak-kinds=all",
+                    "--errors-for-leak-kinds=definite",
+                    "--error-exitcode=1",
+                    "--xml=yes",
+                    "--xml-file=memcheck.xml",
+                    "--suppressions=/home/library/suppressions.supp"
+                ]
+            },
+            "argv":{
+                "exe":"./binary",
+                "arg":[]
+            }
+        }
     }
+
 
 **Dependencies:**
 
@@ -112,7 +192,7 @@ class ValgrindMemcheckSource(Source):
                 'No such file {}'.format(infile)
             )
 
-        doc = parse(infile.read_text())
+        doc = parse(infile.read_text(), force_list=('error',))
         return doc['valgrindoutput']
 
 
