@@ -16,7 +16,6 @@ pipeline {
 
             steps {
                 sh '''
-                    entrypoint.sh
                     tox -e build
                     tox -e test
                     tox -e doc
