@@ -30,6 +30,7 @@ def setup_module(module):
     ['test', 'pipeline.toml'],
     ['lcov', 'pipeline.toml'],
     ['valgrind', 'pipeline.toml'],
+    ['config', 'pipeline.toml'],
 ])
 def test_pipelines(name, pipelinedef):
     # Exceptions ...

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2017 KuraLabs S.R.L
+# Copyright (C) 2017-2018 KuraLabs S.R.L
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -118,7 +118,7 @@ class Component(metaclass=NamedABCMeta):
      That is, it is allowed to fail and the pipeline won't fail.
     :var int timeout: Execution timeout for this component, in seconds.
      None means no timeout, wait forever.
-    :var namedtuple config: Frozen configuration after validation.
+    :var namedtuple Component.config: Frozen configuration after validation.
 
     **Parameters**:
 
@@ -147,6 +147,7 @@ class Component(metaclass=NamedABCMeta):
 
         configurator = Configurator()
         self.declare_config(configurator)
+
         self.config = configurator.validate(config or {})
 
     @property
