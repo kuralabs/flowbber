@@ -337,6 +337,8 @@ setup(
 
         # CoberturaSource
         'cobertura': ['pycobertura'],
+        # ConfigSource
+        'config': [],
         # CPUSource
         'cpu': ['psutil'],
         # EnvSource
@@ -424,6 +426,7 @@ setup(
     entry_points={
         'flowbber_plugin_sources_1_0': [
             'cobertura = flowbber.plugins.sources.cobertura:CoberturaSource',
+            'config = flowbber.plugins.sources.config:ConfigSource',
             'cpu = flowbber.plugins.sources.cpu:CPUSource',
             'env = flowbber.plugins.sources.env:EnvSource',
             'git = flowbber.plugins.sources.git:GitSource',
