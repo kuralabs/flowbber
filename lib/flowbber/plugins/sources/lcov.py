@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2017 KuraLabs S.R.L
+# Copyright (C) 2017-2018 KuraLabs S.R.L
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -71,6 +71,17 @@ is then parsed using the flowbber Cobertura source.
 
 **Usage:**
 
+.. code-block:: toml
+
+    [[sources]]
+    type = "lcov"
+    id = "..."
+
+        [sources.config]
+        directory = "{pipeline.dir}"
+        rc_overrides = ["lcov_branch_coverage=1"]
+        remove = ["*hello2*"]
+
 .. code-block:: json
 
     {
@@ -79,8 +90,8 @@ is then parsed using the flowbber Cobertura source.
                 "type": "lcov",
                 "id": "...",
                 "config": {
-                    "directory": "{pipeline.dir}"
-                    "rc_overrides": ["lcov_branch_coverage=1"]
+                    "directory": "{pipeline.dir}",
+                    "rc_overrides": ["lcov_branch_coverage=1"],
                     "remove": ["*hello2*"]
                 }
             }

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2017 KuraLabs S.R.L
+# Copyright (C) 2017-2018 KuraLabs S.R.L
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -37,6 +37,18 @@ coverage.
     pip3 install flowbber[lcov]
 
 **Usage:**
+
+.. code-block:: toml
+
+    [[sinks]]
+    type = "lcov_html"
+    id = "..."
+
+        [sinks.config]
+        key = "<id of lcov source>"
+        output = "<output directory>"
+        override = true
+        create_parents = true
 
 .. code-block:: json
 

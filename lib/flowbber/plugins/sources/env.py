@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2017 KuraLabs S.R.L
+# Copyright (C) 2017-2018 KuraLabs S.R.L
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -51,6 +51,17 @@ Variables will be collected if the name of the variable match any item in  the
 
 Variables names will be stored in lowercase if the ``lowercase`` option is set
 to ``true`` (the default).
+
+.. code-block:: toml
+
+    [[sources]]
+    type = "env"
+    id = "..."
+
+        [sources.config]
+        include = ["PYTHONHASHSEED"]
+        exclude = []
+        lowercase = true
 
 .. code-block:: json
 
@@ -104,6 +115,23 @@ Configuration examples:
 This source is very helpful to collect information from Jenkins_ CI:
 
 .. _Jenkins: https://wiki.jenkins.io/display/JENKINS/Building+a+software+project#Buildingasoftwareproject-belowJenkinsSetEnvironmentVariables
+
+.. code-block:: toml
+
+    [[sources]]
+    type = "env"
+    id = "jenkins"
+
+        [sources.config]
+        include = [
+            "BUILD_NUMBER",
+            "JOB_NAME",
+            "GIT_COMMIT",
+            "GIT_URL",
+            "GIT_BRANCH",
+            "BUILD_TIMESTAMP"
+        ]
+        lowercase = false
 
 .. code-block:: json
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2017 KuraLabs S.R.L
+# Copyright (C) 2017-2018 KuraLabs S.R.L
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -130,6 +130,17 @@ transformations performed.
     pip3 install flowbber[influxdb]
 
 **Usage:**
+
+.. code-block:: toml
+
+    [[sinks]]
+    type = "influxdb"
+    id = "..."
+
+        [sinks.config]
+        uri = "influxdb://localhost:8086/"
+        database = "flowbber"
+        key = "timestamp.iso8601"
 
 .. code-block:: json
 

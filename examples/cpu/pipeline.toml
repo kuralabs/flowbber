@@ -1,0 +1,11 @@
+[[sources]]
+type = "timestamp"
+id = "timestamp1"
+
+[[sources]]
+type = "cpu"
+id = "cpu1"
+
+[[sinks]]
+type = "print"
+id = "print1"
