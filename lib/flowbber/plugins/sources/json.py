@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2017 KuraLabs S.R.L
+# Copyright (C) 2017-2018 KuraLabs S.R.L
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -36,6 +36,18 @@ This source fetch and parses a local or remote (http, https) json file.
     pip3 install flowbber[json]
 
 **Usage:**
+
+.. code-block:: toml
+
+    [[sources]]
+    type = "json"
+    id = "..."
+
+        [sources.config]
+        file_uri = "file://{pipeline.dir}/file.json"
+        encoding = "utf-8"
+        ordered = true
+        verify_ssl = true
 
 .. code-block:: json
 

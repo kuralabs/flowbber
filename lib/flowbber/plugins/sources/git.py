@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2017 KuraLabs S.R.L
+# Copyright (C) 2017-2018 KuraLabs S.R.L
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -37,16 +37,28 @@ repository to get information from. In particular, if your CI system created
 an out-of-repository build directory you can always get the context of the
 repository the pipeline definition file is commited to using:
 
+.. code-block:: toml
+
+    [[sources]]
+    type = "git"
+    id = "..."
+
+        [sources.config]
+        directory = "{git.root}"
+
 .. code-block:: json
 
     {
-        "type": "git",
-        "id": "...",
-        "config": {
-            "directory": "{git.root}"
-        }
+        "sources": [
+            {
+                "type": "git",
+                "id": "...",
+                "config": {
+                    "directory": "{git.root}"
+                }
+            }
+        ]
     }
-
 
 **Data collected:**
 
@@ -71,6 +83,15 @@ repository the pipeline definition file is commited to using:
     pip3 install flowbber[git]
 
 **Usage:**
+
+.. code-block:: toml
+
+    [[sources]]
+    type = "git"
+    id = "..."
+
+        [sources.config]
+        directory = "."
 
 .. code-block:: json
 

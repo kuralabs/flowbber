@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2017 KuraLabs S.R.L
+# Copyright (C) 2017-2018 KuraLabs S.R.L
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -51,6 +51,17 @@ No particular scope is required.
     pip3 install flowbber[github]
 
 **Usage:**
+
+.. code-block:: toml
+
+    [[sources]]
+    type = "github"
+    id = "..."
+
+        [sources.config]
+        token = "abcdefabcdefabcdefabcdef"
+        repository = "organization/repository"
+        base_url = "https://api.github.com"
 
 .. code-block:: json
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2017 KuraLabs S.R.L
+# Copyright (C) 2017-2018 KuraLabs S.R.L
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -39,6 +39,18 @@ used to perform this transformation.
     pip3 install flowbber[mongodb]
 
 **Usage:**
+
+.. code-block:: toml
+
+    [[sinks]]
+    type = "mongodb"
+    id = "..."
+
+        [sinks.config]
+        uri = "mongodb://localhost:27017/"
+        database = "flowbber"
+        collection = "pipeline1data"
+        key = "timestamp.epoch"
 
 .. code-block:: json
 

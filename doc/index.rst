@@ -9,6 +9,27 @@ Flowbber
 Flowbber provides a tool and framework that allows to create and execute
 custom pipelines for data collection, analysis and publishing.
 
+.. code-block:: console
+
+   $ cat pipeline.toml
+   [[sources]]
+   type = "timestamp"
+   id = "timestamp1"
+
+   [[sources]]
+   type = "cpu"
+   id = "cpu1"
+
+   [[sinks]]
+   type = "print"
+   id = "print1"
+
+   $ flowbber pipeline.toml
+   OrderedDict([
+       ('timestamp1', {'epoch': 1519166006, 'timezone': None}),
+       ('cpu1', {'num_cpus': 4, 'per_cpu': [1.0, 3.0, 5.0, 2.0], 'system_load': 2.75}),
+   ])
+
 .. toctree::
    :maxdepth: 2
 
@@ -54,7 +75,7 @@ License
 
 .. code-block:: text
 
-   Copyright (C) 2017 KuraLabs S.R.L
+   Copyright (C) 2017-2018 KuraLabs S.R.L
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.

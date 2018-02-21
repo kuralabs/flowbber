@@ -1,0 +1,41 @@
+#!/usr/bin/env python3
+import json
+import toml
+
+
+TEMPLATE = """\
+.. code-block:: toml
+
+    {}
+"""
+
+while True:
+
+    try:
+        print('Paste JSON')
+
+        lines = []
+        while True:
+            line = input().strip()
+            if not line:
+                break
+            lines.append(line)
+
+        jsondata = '\n'.join(lines)
+
+        if not jsondata.strip():
+            continue
+
+        try:
+            tomldata = toml.dumps(json.loads(jsondata))
+        except Exception:
+            print('Transformation failed!')
+            continue
+
+        print(TEMPLATE.format(
+            '\n    '.join(tomldata.split('\n'))
+        ))
+
+    except KeyboardInterrupt:
+        print('Bye!')
+        break
