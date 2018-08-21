@@ -212,25 +212,30 @@ class PytestSource(Source):
         # Add test cases
         for child in root:
             assert child.tag == 'testcase', 'Malformed XML child element'
-            testcase = {
-                key: cast(child.attrib[key])
-                for key, cast in [
-                    ('file', str),
-                    ('line', int),
-                    ('classname', str),
-                    ('name', str),
-                    ('time', float),
-                ]
-            }
 
-            properties = []
-            testcase['properties'] = properties
-
+            # Form an unique name base on classname and testcase name
             tckey = '{}.{}'.format(
                 child.attrib['classname'],
                 child.attrib['name']
             )
-            testcases[tckey] = testcase
+            # Pytest creates duplicates of a test case if there is an error and
+            # a failure. It does so in order to be compliant with JUnit schema
+            # See https://github.com/pytest-dev/pytest/issues/2228
+            testcase = testcases.get(tckey)
+            if testcase is None:
+                testcase = {
+                    key: cast(child.attrib[key])
+                    for key, cast in [
+                        ('file', str),
+                        ('line', int),
+                        ('classname', str),
+                        ('name', str),
+                        ('time', float),
+                    ]
+                }
+                properties = []
+                testcase['properties'] = properties
+                testcases[tckey] = testcase
 
             # Add properties
             subchild = child.find('properties')
