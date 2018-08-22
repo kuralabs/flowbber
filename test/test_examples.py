@@ -49,7 +49,10 @@ def test_pipelines(name, pipelinedef):
 
 @mark.parametrize(['script'], [
     ['cpud/cpud.py'],
-    ['speedd/speedd.py'],
+    # Aug 22 2018:
+    #   The package pytestspeed is broken.
+    #   https://github.com/fopina/pyspeedtest/issues/15
+    # ['speedd/speedd.py'],
 ])
 def test_daemons(script):
     run(str(examples / script), check=True)

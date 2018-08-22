@@ -22,7 +22,7 @@ pytest-cov
 # Documentation       #
 #######################
 
-sphinx
+sphinx==1.6.7
 autoapi
 plantweb
 pygments-github-lexers
