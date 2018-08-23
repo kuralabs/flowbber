@@ -43,7 +43,7 @@ Check that you can launch the ``flowbber`` command line application:
 .. code-block:: console
 
     $ flowbber --version
-    Flowbber v1.2.1
+    Flowbber v1.3.0
 
 Help is available using the ``--help`` flag:
 

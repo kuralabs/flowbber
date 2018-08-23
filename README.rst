@@ -27,6 +27,34 @@ Install
 Changelog
 =========
 
+1.3.0 (2018-08-23)
+------------------
+
+New
+~~~
+
+- New Config source that allows to add arbitrary data directly from the
+  pipeline definition.
+- All plugins now show the example usage in both JSON and TOML.
+- Improved documentation for the memcheck source.
+
+Changes
+~~~~~~~
+
+- The Internet speed source plugin is unavailable as the upstream package
+  providing the measurement is currently broken:
+  https://github.com/fopina/pyspeedtest/issues/15
+
+Fixes
+~~~~~
+
+- Fix in pytest source that caused a test case with both failure and error
+  to be overridden by the other:
+  https://github.com/pytest-dev/pytest/issues/2228
+- Minor fix in memcheck source plugin that caused output that violates the
+  expected schema.
+
+
 1.2.1 (2017-11-26)
 ------------------
 
