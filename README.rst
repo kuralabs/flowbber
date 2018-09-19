@@ -7,7 +7,7 @@ pipelines for data gathering, publishing and analysis.
 
 .. image:: https://build.kuralabs.io/buildStatus/icon?job=GitHub/flowbber/master
    :target: https://build.kuralabs.io/job/GitHub/job/flowbber/job/master/
-   :alt: Latest version released on PyPi
+   :alt: Build Status
 
 
 Documentation
@@ -26,6 +26,16 @@ Install
 
 Changelog
 =========
+
+1.3.1 (2018-09-19)
+------------------
+
+Fixes
+~~~~~
+
+- Source for Valgrind's memcheck will now always output the ``stack`` attribute
+  as a list.
+
 
 1.3.0 (2018-08-23)
 ------------------
@@ -155,7 +165,7 @@ License
 
 ::
 
-   Copyright (C) 2017 KuraLabs S.R.L
+   Copyright (C) 2017-2018 KuraLabs S.R.L
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
