@@ -210,6 +210,23 @@ Hostname or IP to connect to InfluxDB.
 
 - **Secret**: ``False``
 
+path
+----
+
+Path of InfluxDB on the server to connect to.
+
+- **Default**: ``N/A``
+- **Optional**: ``True``
+- **Schema**:
+
+  .. code-block:: python3
+
+     {
+         'type': 'string',
+     }
+
+- **Secret**: ``False``
+
 port
 ----
 
@@ -554,6 +571,15 @@ class InfluxDBSink(FilterSink):
         )
 
         config.add_option(
+            'path',
+            default='',
+            optional=True,
+            schema={
+                'type': 'string',
+            },
+        )
+        
+        config.add_option(
             'port',
             default=8086,
             optional=True,
@@ -675,6 +701,7 @@ class InfluxDBSink(FilterSink):
         if self.config.uri.value is None:
             client = InfluxDBClient(
                 host=self.config.host.value,
+                path=self.config.path.value,
                 port=self.config.port.value,
                 username=self.config.username.value,
                 password=self.config.password.value,
@@ -685,6 +712,7 @@ class InfluxDBSink(FilterSink):
         else:
             client = InfluxDBClient.from_dsn(
                 self.config.uri.value,
+                path=self.config.path.value,
                 database=self.config.database.value,
                 verify_ssl=self.config.verify_ssl.value,
             )
