@@ -578,7 +578,7 @@ class InfluxDBSink(FilterSink):
                 'type': 'string',
             },
         )
-        
+
         config.add_option(
             'port',
             default=8086,

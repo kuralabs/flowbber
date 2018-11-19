@@ -130,6 +130,7 @@ def namespace_git(path):
         log.debug(str(e))
         return None
     except GitNotFound as e:
+        log.debug(str(e))
         return None
 
     # Create git namespace object

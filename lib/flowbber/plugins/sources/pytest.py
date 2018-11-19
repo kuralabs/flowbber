@@ -151,6 +151,10 @@ from xml.etree import ElementTree
 from collections import OrderedDict
 
 from flowbber.components import Source
+from .logging import get_logger
+
+
+log = get_logger(__name__)
 
 
 def trycast(value):
@@ -162,6 +166,7 @@ def trycast(value):
         try:
             return cast(value)
         except ValueError as e:
+            log.debug(str(e))
             continue
     return value
 

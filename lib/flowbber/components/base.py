@@ -308,6 +308,7 @@ class Component(metaclass=NamedABCMeta):
 
             # Check if killed without executing the finally clause
             if not self._process.is_alive():
+                log.debug(str(e))
                 log.warning(
                     '{name} #{component.index} "{component.id}" driving '
                     'process with PID {process.pid} was killed '
@@ -329,6 +330,7 @@ class Component(metaclass=NamedABCMeta):
                 # Check if process hanged
                 self._process.join(0.1)
                 if self._process.is_alive():
+                    log.debug(str(e))
                     log.warning(
                         'Execution of {name} #{component.index} '
                         '"{component.id}" timed out and its driving process '

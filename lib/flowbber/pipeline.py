@@ -358,6 +358,7 @@ class Pipeline:
                         try:
                             component.stop()
                         except Exception as e:
+                            log.debug(str(e))
                             log.exception(
                                 'Component {} crashed when stopping.'.format(
                                     component

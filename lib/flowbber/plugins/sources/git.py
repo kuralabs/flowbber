@@ -134,6 +134,10 @@ from flowbber.utils.git import (
     find_name, find_email, find_subject, find_body, find_date,
     GitError,
 )
+from .logging import get_logger
+
+
+log = get_logger(__name__)
 
 
 class GitSource(Source):
@@ -157,6 +161,7 @@ class GitSource(Source):
             try:
                 return find_tag(directory=directory)
             except GitError as e:
+                log.debug(str(e))
                 return ''
 
         data = {
