@@ -129,7 +129,7 @@ def namespace_git(path):
     except GitError as e:
         log.debug(str(e))
         return None
-    except GitNotFound as e:
+    except GitNotFound:
         return None
 
     # Create git namespace object

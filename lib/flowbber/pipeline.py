@@ -357,7 +357,7 @@ class Pipeline:
                     for component in schedule:
                         try:
                             component.stop()
-                        except Exception as e:
+                        except Exception:
                             log.exception(
                                 'Component {} crashed when stopping.'.format(
                                     component

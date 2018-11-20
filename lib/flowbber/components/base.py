@@ -301,7 +301,7 @@ class Component(metaclass=NamedABCMeta):
             )
             return execution
 
-        except Empty as e:
+        except Empty:
             # In most cases the duration of the process will be unable to be
             # determined
             duration = None
