@@ -27,6 +27,20 @@ Install
 Changelog
 =========
 
+1.3.2 (2018-11-20)
+------------------
+
+New
+~~~
+
+- Add support for path in InfluxDB sink.
+
+Fixes
+~~~~~
+
+- Fixed flake8 issues shown in new version.
+
+
 1.3.1 (2018-09-19)
 ------------------
 
