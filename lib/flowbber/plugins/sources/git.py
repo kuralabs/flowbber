@@ -156,7 +156,7 @@ class GitSource(Source):
         def get_tag():
             try:
                 return find_tag(directory=directory)
-            except GitError as e:
+            except GitError:
                 return ''
 
         data = {

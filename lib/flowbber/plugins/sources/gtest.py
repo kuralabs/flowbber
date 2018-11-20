@@ -150,7 +150,7 @@ def trycast(value):
     for cast in (int, float):
         try:
             return cast(value)
-        except ValueError as e:
+        except ValueError:
             continue
     return value
 
