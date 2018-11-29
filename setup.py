@@ -369,6 +369,7 @@ setup(
         ###############
         # Aggregators #
         ###############
+        'expander': [],
         'filter': [],
 
         ###########
@@ -442,6 +443,7 @@ setup(
             'valgrind_memcheck = flowbber.plugins.sources.valgrind.memcheck:ValgrindMemcheckSource',  # noqa
         ],
         'flowbber_plugin_aggregators_1_0': [
+            'expander = flowbber.plugins.aggregators.expander:ExpanderAggregator',  # noqa
             'filter = flowbber.plugins.aggregators.filter:FilterAggregator',
         ],
         'flowbber_plugin_sinks_1_0': [
