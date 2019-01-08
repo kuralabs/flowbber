@@ -441,6 +441,8 @@ setup(
             'timestamp = flowbber.plugins.sources.timestamp:TimestampSource',
             'user = flowbber.plugins.sources.user:UserSource',
             'valgrind_memcheck = flowbber.plugins.sources.valgrind.memcheck:ValgrindMemcheckSource',  # noqa
+            'valgrind_helgrind = flowbber.plugins.sources.valgrind.helgrind:ValgrindHelgrindSource',  # noqa
+            'valgrind_drd = flowbber.plugins.sources.valgrind.drd:ValgrindDrdSource',  # noqa
         ],
         'flowbber_plugin_aggregators_1_0': [
             'expander = flowbber.plugins.aggregators.expander:ExpanderAggregator',  # noqa

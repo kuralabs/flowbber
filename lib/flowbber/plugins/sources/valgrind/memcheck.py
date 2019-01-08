@@ -175,34 +175,11 @@ Path to Valgrind's Memcheck XML output.
 
 """  # noqa
 
-from pathlib import Path
-
-from flowbber.components import Source
+from . import ValgrindBaseSource
 
 
-class ValgrindMemcheckSource(Source):
-
-    def declare_config(self, config):
-        config.add_option(
-            'xmlpath',
-            schema={
-                'type': 'string',
-                'empty': False,
-            },
-        )
-
-    def collect(self):
-        from xmltodict import parse
-
-        # Check if file exists
-        infile = Path(self.config.xmlpath.value)
-        if not infile.is_file():
-            raise FileNotFoundError(
-                'No such file {}'.format(infile)
-            )
-
-        doc = parse(infile.read_text(), force_list=('error', 'stack',))
-        return doc['valgrindoutput']
+class ValgrindMemcheckSource(ValgrindBaseSource):
+    pass
 
 
 __all__ = ['ValgrindMemcheckSource']
