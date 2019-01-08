@@ -18,3 +18,35 @@
 """
 flowbber.plugins.sources.valgrind module entry point.
 """
+
+from pathlib import Path
+
+from flowbber.components import Source
+
+
+class ValgrindBaseSource(Source):
+
+    def declare_config(self, config):
+        config.add_option(
+            'xmlpath',
+            schema={
+                'type': 'string',
+                'empty': False,
+            },
+        )
+
+    def collect(self):
+        from xmltodict import parse
+
+        # Check if file exists
+        infile = Path(self.config.xmlpath.value)
+        if not infile.is_file():
+            raise FileNotFoundError(
+                'No such file {}'.format(infile)
+            )
+
+        doc = parse(infile.read_text(), force_list=('error', 'stack',))
+        return doc['valgrindoutput']
+
+
+__all__ = ['ValgrindBaseSource']
