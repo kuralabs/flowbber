@@ -27,4 +27,4 @@ Flowbber Release
 
 #. Upload to PyPI::
 
-    twine upload --username kuralabs --sign --identity info@kuralabs.io  dist/flowbber-x.y.z-py3-none-any.whl
+    twine upload --username kuralabs dist/flowbber-x.y.z-py3-none-any.whl
