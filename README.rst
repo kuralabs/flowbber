@@ -27,6 +27,20 @@ Install
 Changelog
 =========
 
+1.4.0 (2019-01-28)
+------------------
+
+New
+~~~
+
+- Refactored Valgrind source to support loading data from Helgrind and DRD
+  tools.
+- New "Expander" aggregator that allows to move subdata to top level. This is
+  useful to load data using JSONSource or similar sources and place it in the
+  top level as if it were data from other anonymous sources. Or to replay
+  a pipeline using previously collected data.
+
+
 1.3.2 (2018-11-20)
 ------------------
 
