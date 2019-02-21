@@ -20,9 +20,10 @@
 Lcov
 ====
 
-This source calls lcov_ on a specified directory and process its result file
-with lcov_cobertura_ to create a standard Cobertura_ XML file, which in turn
-is then parsed using the flowbber Cobertura source.
+This source calls lcov_ on a specified directory to generate a tracefile or
+loads one directly, and process it with lcov_cobertura_ to create a standard
+Cobertura_ XML file, which in turn is then parsed using the flowbber Cobertura
+source.
 
 .. note::
 
@@ -78,7 +79,7 @@ is then parsed using the flowbber Cobertura source.
     id = "..."
 
         [sources.config]
-        directory = "{pipeline.dir}"
+        source = "{pipeline.dir}"
         rc_overrides = ["lcov_branch_coverage=1"]
         remove = ["*hello2*"]
 
@@ -90,7 +91,7 @@ is then parsed using the flowbber Cobertura source.
                 "type": "lcov",
                 "id": "...",
                 "config": {
-                    "directory": "{pipeline.dir}",
+                    "source": "{pipeline.dir}",
                     "rc_overrides": ["lcov_branch_coverage=1"],
                     "remove": ["*hello2*"]
                 }
@@ -98,10 +99,11 @@ is then parsed using the flowbber Cobertura source.
         ]
     }
 
-directory
----------
+source
+------
 
-Path to the directory containing gcov's ``.gcda`` files .
+Path to the directory containing gcov's ``.gcda`` files or path to a tracefile
+``.info`` file.
 
 - **Default**: ``N/A``
 - **Optional**: ``False``
@@ -181,7 +183,7 @@ class LcovSource(Source):
 
     def declare_config(self, config):
         config.add_option(
-            'directory',
+            'source',
             schema={
                 'type': 'string',
                 'empty': False,
@@ -218,52 +220,62 @@ class LcovSource(Source):
         from lcov_cobertura import LcovCobertura
 
         # Check if file exists
-        directory = Path(self.config.directory.value)
-        if not directory.is_dir():
+        source = Path(self.config.source.value)
+        if not source.exists():
             raise FileNotFoundError(
-                'No such directory {}'.format(directory)
+                'No such file or directory {}'.format(source)
             )
-        directory = directory.resolve()
+        source = source.resolve()
 
         # Check if lcov is available
         lcov = which('lcov')
         if lcov is None:
             raise FileNotFoundError('lcov executable not found.')
 
-        # Create a temporary file. Close it, we just need the name.
-        tmp_file = NamedTemporaryFile()
-        tmp_file.close()
+        if source.is_dir():
+            # Create a temporary file. Close it, we just need the name.
+            tmp_file = NamedTemporaryFile()
+            tmp_file.close()
 
-        tracefile = Path(tmp_file.name)
+            tracefile = Path(tmp_file.name)
+
+            # Transform from list to something like
+            #   --rc setting1=value1 --rc setting2=value2
+            rc_overrides = ''
+            if self.config.rc_overrides.value:
+                rc_overrides = '--rc {}'.format(
+                    ' --rc '.join(self.config.rc_overrides.value)
+                )
+
+            cmd = (
+                'lcov '
+                '{rc_overrides} '
+                '--directory {directory} --capture '
+                '--output-file {output}'.format(
+                    rc_overrides=rc_overrides,
+                    directory=source,
+                    output=tracefile
+                )
+            )
+            log.info('Gathering coverage info: "{}"'.format(cmd))
+            status = run(cmd)
+
+            if status.returncode != 0:
+                raise RuntimeError(
+                    'Lcov failed capturing data:\n{}'.format(status.stderr)
+                )
+        else:
+            # Check file extension
+            if source.suffix != '.info':
+                raise ValueError(
+                    'Unknown file extension "{}" '
+                    'for a tracefile. Must be ".info"'.format(source.suffix)
+                )
+            tracefile = source
+
         result = {
-            'tracefile': str(tracefile)
+                'tracefile': str(tracefile)
         }
-
-        # Transform from list to something like
-        #   --rc setting1=value1 --rc setting2=value2
-        rc_overrides = ''
-        if self.config.rc_overrides.value:
-            rc_overrides = '--rc {}'.format(
-                ' --rc '.join(self.config.rc_overrides.value)
-            )
-
-        cmd = (
-            'lcov '
-            '{rc_overrides} '
-            '--directory {directory} --capture '
-            '--output-file {output}'.format(
-                rc_overrides=rc_overrides,
-                directory=directory,
-                output=tracefile
-            )
-        )
-        log.info('Gathering coverage info: "{}"'.format(cmd))
-        status = run(cmd)
-
-        if status.returncode != 0:
-            raise RuntimeError(
-                'Lcov failed capturing data:\n{}'.format(status.stderr)
-            )
 
         # Remove files from patterns
         if self.config.remove.value:
@@ -296,14 +308,14 @@ class LcovSource(Source):
         with NamedTemporaryFile(delete=False) as xml:
             xml.write(cobertura_xml.encode('utf-8'))
 
-        source = CoberturaSource(
+        cobertura_src = CoberturaSource(
             self._index, 'cobertura', self._id,
             config={
                 'xmlpath': str(xml.name)
             }
         )
 
-        result.update(source.collect())
+        result.update(cobertura_src.collect())
 
         return result
 
