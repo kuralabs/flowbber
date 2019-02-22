@@ -27,6 +27,17 @@ Install
 Changelog
 =========
 
+1.5.0 (2019-02-22)
+------------------
+
+Changes
+~~~~~~~
+
+- lcov source no longer accepts ``directory`` as configuration.
+  New option ``source`` superseded it, and allows to specify a directory to
+  generate a tracefile or load one already generated.
+
+
 1.4.0 (2019-01-28)
 ------------------
 
