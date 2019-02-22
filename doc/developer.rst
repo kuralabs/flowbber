@@ -8,6 +8,32 @@ Developer Guide
 Setup Development Environment
 =============================
 
+Using Docker
+------------
+
+A ready to be used development environment with all dependencies is available
+as a Docker_ image under the name ``kuralabs/flowbber:latest``.
+
+To start the development environment, execute the following command in the
+Flowbber repository root:
+
+.. code-block:: sh
+
+   docker run -it \
+       --env http_proxy=${http_proxy} \
+       --env https_proxy=${https_proxy} \
+       --env no_proxy=${no_proxy} \
+       --volume $(pwd):/ws
+       kuralabs/flowbber:latest bash
+   cd /ws
+
+
+.. _Docker: https://hub.docker.com/search/?type=edition&offering=community&operating_system=linux
+
+
+Manually
+--------
+
 #. Install ``pip3`` and development dependencies:
 
    .. code-block:: sh
@@ -30,6 +56,13 @@ Setup Development Environment
 
       sudo pip3 install webdev
       webdev .tox/doc/tmp/html
+
+#. To run tests, you need a InfluxDB_ database and a MongoDB_ database running
+   locally.
+
+
+.. _InfluxDB: https://www.influxdata.com/
+.. _MongoDB: https://www.mongodb.com/
 
 
 Building Package
@@ -58,11 +91,11 @@ Running Test Suite
 
    tox -e test
 
-Output will be available at ``.tox/test/tmp/``.
+Output will be available at ``.tox/env/tmp/``.
 
 .. code-block:: sh
 
-   webdev .tox/doc/tmp/
+   webdev .tox/env/tmp/
 
 - Test results: ``tests.xml``.
 - Coverage results: ``coverage.xml``.
@@ -76,8 +109,8 @@ Building Documentation
 
    tox -e doc
 
-Output will be available at ``.tox/doc/tmp/html``.
+Output will be available at ``.tox/env/tmp/html``.
 
 .. code-block:: sh
 
-   webdev .tox/doc/tmp/html
+   webdev .tox/env/tmp/html
