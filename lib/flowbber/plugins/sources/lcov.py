@@ -232,20 +232,20 @@ class LcovSource(Source):
         if lcov is None:
             raise FileNotFoundError('lcov executable not found.')
 
+        # Transform from list to something like
+        #   --rc setting1=value1 --rc setting2=value2
+        rc_overrides = ''
+        if self.config.rc_overrides.value:
+            rc_overrides = '--rc {}'.format(
+                ' --rc '.join(self.config.rc_overrides.value)
+            )
+
         if source.is_dir():
             # Create a temporary file. Close it, we just need the name.
             tmp_file = NamedTemporaryFile()
             tmp_file.close()
 
             tracefile = Path(tmp_file.name)
-
-            # Transform from list to something like
-            #   --rc setting1=value1 --rc setting2=value2
-            rc_overrides = ''
-            if self.config.rc_overrides.value:
-                rc_overrides = '--rc {}'.format(
-                    ' --rc '.join(self.config.rc_overrides.value)
-                )
 
             cmd = (
                 'lcov '
