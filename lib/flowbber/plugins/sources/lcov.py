@@ -242,19 +242,20 @@ class LcovSource(Source):
 
         if source.is_dir():
             # Create a temporary file. Close it, we just need the name.
-            tmp_file = NamedTemporaryFile()
+            tmp_file = NamedTemporaryFile(suffix='.info')
             tmp_file.close()
 
             tracefile = Path(tmp_file.name)
 
             cmd = (
-                'lcov '
+                '{lcov} '
                 '{rc_overrides} '
                 '--directory {directory} --capture '
-                '--output-file {output}'.format(
+                '--output-file {tracefile}'.format(
+                    lcov=lcov,
                     rc_overrides=rc_overrides,
                     directory=source,
-                    output=tracefile
+                    tracefile=tracefile
                 )
             )
             log.info('Gathering coverage info: "{}"'.format(cmd))
@@ -274,16 +275,17 @@ class LcovSource(Source):
             tracefile = source
 
         result = {
-                'tracefile': str(tracefile)
+            'tracefile': str(tracefile),
         }
 
         # Remove files from patterns
         if self.config.remove.value:
             cmd = (
-                'lcov '
+                '{lcov} '
                 '{rc_overrides} '
                 '--remove {tracefile} {remove} '
                 '--output-file {tracefile}'.format(
+                    lcov=lcov,
                     rc_overrides=rc_overrides,
                     tracefile=tracefile,
                     remove=' '.join(
@@ -305,7 +307,7 @@ class LcovSource(Source):
         converter = LcovCobertura(tracefile.open().read())
         cobertura_xml = converter.convert()
 
-        with NamedTemporaryFile(delete=False) as xml:
+        with NamedTemporaryFile(delete=False, suffix='.xml') as xml:
             xml.write(cobertura_xml.encode('utf-8'))
 
         cobertura_src = CoberturaSource(
