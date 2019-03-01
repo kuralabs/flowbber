@@ -23,7 +23,7 @@ Flowbber repository root:
        --env http_proxy=${http_proxy} \
        --env https_proxy=${https_proxy} \
        --env no_proxy=${no_proxy} \
-       --volume $(pwd):/ws
+       --volume $(pwd):/ws \
        kuralabs/flowbber:latest bash
    cd /ws
 

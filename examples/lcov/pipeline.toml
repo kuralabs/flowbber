@@ -1,18 +1,50 @@
 [[sources]]
 type = "lcov"
-id = "lcov"
+id = "lcov_source_1"
 
     [sources.config]
-    source = "{pipeline.dir}"
+    source = "{pipeline.dir}/coverage_1/"
     rc_overrides = ["lcov_branch_coverage=1"]
-    remove = ["*hello2*"]
+
+[[sources]]
+type = "lcov"
+id = "lcov_source_2"
+
+    [sources.config]
+    source = "{pipeline.dir}/coverage_2/"
+    rc_overrides = ["lcov_branch_coverage=1"]
+
+[[aggregators]]
+type = "lcov_merger"
+id = "lcov_total"
+
+    [aggregators.config]
+    keys = ["lcov_source_1", "lcov_source_2"]
+    rc_overrides = ["lcov_branch_coverage=1"]
 
 [[sinks]]
 type = "lcov_html"
-id = "html"
+id = "html_source_1"
 
     [sinks.config]
-    key = "lcov"
+    key = "lcov_source_1"
+    output = "html_source_1"
+
+[[sinks]]
+type = "lcov_html"
+id = "html_source_2"
+
+    [sinks.config]
+    key = "lcov_source_2"
+    output = "html_source_2"
+
+[[sinks]]
+type = "lcov_html"
+id = "html_total"
+
+    [sinks.config]
+    key = "lcov_total"
+    output = "html_total"
 
 [[sinks]]
 type = "archive"
