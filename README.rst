@@ -27,6 +27,21 @@ Install
 Changelog
 =========
 
+1.6.0 (2019-03-12)
+------------------
+
+New
+~~~
+
+- New LCOV merger aggregator allows to sum multiple LCOV sources.
+
+Fixes
+~~~~~
+
+- Fix a bug that ignored ``rc_overrides`` when using a file input in LCOV
+  source.
+
+
 1.5.0 (2019-02-22)
 ------------------
 
