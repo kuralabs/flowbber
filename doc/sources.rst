@@ -17,6 +17,10 @@ The following sources plugins are included as part of Flowbber.
 
 .. automodule:: flowbber.plugins.sources.cobertura
 
+.. _sources-config:
+
+.. automodule:: flowbber.plugins.sources.config
+
 .. _sources-cpu:
 
 .. automodule:: flowbber.plugins.sources.cpu
@@ -64,6 +68,14 @@ The following sources plugins are included as part of Flowbber.
 .. _sources-user:
 
 .. automodule:: flowbber.plugins.sources.user
+
+.. _sources-valgrind-drd:
+
+.. automodule:: flowbber.plugins.sources.valgrind.drd
+
+.. _sources-valgrind-helgrind:
+
+.. automodule:: flowbber.plugins.sources.valgrind.helgrind
 
 .. _sources-valgrind-memcheck:
 
