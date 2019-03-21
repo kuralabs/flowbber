@@ -9,7 +9,7 @@ from flowbber.main import main
 from flowbber.logging import get_logger, setup_logging
 
 
-Arguments = namedtuple('Arguments', 'pipeline')
+Arguments = namedtuple('Arguments', ['pipeline', 'dry_run'])
 
 
 log = get_logger(__name__)
@@ -43,7 +43,10 @@ def test_pipelines(name, pipelinedef):
         run(['make', '-C', str(examples / name)], check=True)
 
     # Run pipeline
-    args = Arguments(examples / name / pipelinedef)
+    args = Arguments(
+        pipeline=examples / name / pipelinedef,
+        dry_run=False,
+    )
     result = main(args)
     assert result == 0
 
