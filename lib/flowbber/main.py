@@ -62,8 +62,17 @@ def main(args):
     schedule = pipeline_definition.get('schedule', None)
 
     if schedule is None:
+
+        # Everything is ready, do not run if dry run
+        if args.dry_run:
+            log.info('Dry run complete! Exiting ...')
+            return 0
+
         pipeline.run()
         return 0
+
+    # A scheduler was requested, create it
+    log.info('Creating scheduler for pipeline ...')
 
     scheduler = Scheduler(
         pipeline,
@@ -72,6 +81,12 @@ def main(args):
         start=schedule['start'],
         stop_on_failure=schedule['stop_on_failure'],
     )
+
+    # Everything is ready, do not run if dry run
+    if args.dry_run:
+        log.info('Dry run complete! Exiting ...')
+        return 0
+
     scheduler.run()
     return 0
 

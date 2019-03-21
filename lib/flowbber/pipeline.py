@@ -240,6 +240,7 @@ class Pipeline:
             mode='wt',
             encoding='utf-8',
             prefix='journal-{}-'.format(getpid()),
+            suffix='.json',
             dir=str(journal_dir),
             delete=False
         ) as jfd:

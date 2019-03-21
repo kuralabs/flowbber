@@ -84,6 +84,12 @@ def parse_args(argv=None):
     )
 
     parser.add_argument(
+        '-d', '--dry-run',
+        help='Dry run the pipeline',
+        default=False,
+        action='store_true'
+    )
+    parser.add_argument(
         'pipeline',
         help='Pipeline definition file'
     )
