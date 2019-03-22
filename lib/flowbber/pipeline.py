@@ -164,17 +164,36 @@ class Pipeline:
 
             for index, component in enumerate(defined):
                 component_type = component['type']
+                component_id = component['id']
 
                 if component_type not in available:
-                    raise ValueError('Unknown {} {}'.format(
-                        component_name, component_type
-                    ))
+                    raise ValueError(
+                        'Unknown {} of type "{}" for component #{} with id '
+                        '"{}"'.format(
+                            component_name,
+                            component_type,
+                            index,
+                            component_id,
+                        )
+                    )
 
                 clss = available[component_type]
+
+                log.info(
+                    'Creating an instance of {} for {} #{} of type "{}" with '
+                    'id "{}" ...'.format(
+                        clss.__name__,
+                        component_name,
+                        index,
+                        component_type,
+                        component_id,
+                    )
+                )
+
                 instance = clss(
                     index,
-                    component['type'],
-                    component['id'],
+                    component_type,
+                    component_id,
                     optional=component.get('optional', False),
                     timeout=component.get('timeout', None),
                     config=component.get('config', None),
