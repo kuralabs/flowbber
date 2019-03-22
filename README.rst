@@ -27,6 +27,29 @@ Install
 Changelog
 =========
 
+1.7.0 (2019-03-22)
+------------------
+
+New
+~~~
+
+- New ``--dry-run`` flag allows to parse, load, validate and build a pipeline
+  without executing it.
+
+Changes
+~~~~~~~
+
+- Improved logging when trying to instance a component to help debugging a
+  pipeline that went wrong.
+- Improved logging to show a log in higher level when things go bad.
+
+Fixes
+~~~~~
+
+- Fix for missing plugin entries in documentation.
+- Fix for documentation issue #27.
+
+
 1.6.0 (2019-03-12)
 ------------------
 
