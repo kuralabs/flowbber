@@ -190,14 +190,27 @@ class Pipeline:
                     )
                 )
 
-                instance = clss(
-                    index,
-                    component_type,
-                    component_id,
-                    optional=component.get('optional', False),
-                    timeout=component.get('timeout', None),
-                    config=component.get('config', None),
-                )
+                try:
+                    instance = clss(
+                        index,
+                        component_type,
+                        component_id,
+                        optional=component.get('optional', False),
+                        timeout=component.get('timeout', None),
+                        config=component.get('config', None),
+                    )
+                except Exception as e:
+                    log.critical(
+                        'Failed to create an instance of {} for {} #{} of '
+                        'type "{}" with id "{}" ...'.format(
+                            clss.__name__,
+                            component_name,
+                            index,
+                            component_type,
+                            component_id,
+                        )
+                    )
+                    raise e
 
                 destination.append(instance)
 
