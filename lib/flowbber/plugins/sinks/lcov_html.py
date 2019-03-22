@@ -34,7 +34,7 @@ coverage.
 
 .. code-block:: sh
 
-    pip3 install flowbber[lcov]
+    pip3 install flowbber[lcov_html]
 
 **Usage:**
 
