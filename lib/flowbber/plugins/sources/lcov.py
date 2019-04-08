@@ -81,6 +81,8 @@ source.
         [sources.config]
         source = "{pipeline.dir}"
         rc_overrides = ["lcov_branch_coverage=1"]
+        derive_func_data = false
+        extract = ["*hello1*"]
         remove = ["*hello2*"]
 
 .. code-block:: json
@@ -93,6 +95,8 @@ source.
                 "config": {
                     "source": "{pipeline.dir}",
                     "rc_overrides": ["lcov_branch_coverage=1"],
+                    "derive_func_data": false,
+                    "extract": ["*hello1*"],
                     "remove": ["*hello2*"]
                 }
             }
@@ -136,6 +140,53 @@ Elements should have the form ``SETTING=VALUE``.
          'schema': {
              'type': 'string',
              'empty': False
+         },
+     }
+
+- **Secret**: ``False``
+
+derive_func_data
+----------------
+
+Allow lcov to calculate function coverage data from line coverage data.
+
+If ``True`` then the --derive-func-data option is used on the lcov commands.
+This option is used to collect function coverage data, even when this data
+is not provided by the installed gcov tool. Instead, lcov will use line
+coverage data and information about which lines belong to a function to
+derive function coverage.
+If ``False`` then the option is not used.
+
+- **Default**: ``False``
+- **Optional**: ``True``
+- **Schema**:
+
+  .. code-block:: python3
+
+        schema={
+            'type': 'boolean',
+        },
+
+- **Secret**: ``False``
+
+extract
+-------
+
+List of patterns of files to extract from coverage computation.
+
+Patterns will be interpreted as shell wild‐card patterns.
+
+- **Default**: ``[]``
+- **Optional**: ``True``
+- **Schema**:
+
+  .. code-block:: python3
+
+     {
+         'type': 'list',
+         'schema': {
+             'type': 'string',
+             'empty': False,
          },
      }
 
@@ -216,6 +267,28 @@ class LcovSource(Source):
             },
         )
 
+        config.add_option(
+            'extract',
+            default=[],
+            optional=True,
+            schema={
+                'type': 'list',
+                'schema': {
+                    'type': 'string',
+                    'empty': False,
+                },
+            },
+        )
+
+        config.add_option(
+            'derive_func_data',
+            default=False,
+            optional=True,
+            schema={
+                'type': 'boolean',
+            },
+        )
+
     def collect(self):
         from lcov_cobertura import LcovCobertura
 
@@ -231,6 +304,11 @@ class LcovSource(Source):
         lcov = which('lcov')
         if lcov is None:
             raise FileNotFoundError('lcov executable not found.')
+
+        # Check if --derive-func-data is needed
+        derive_func_data = ''
+        if self.config.derive_func_data.value:
+            derive_func_data = '--derive-func-data'
 
         # Transform from list to something like
         #   --rc setting1=value1 --rc setting2=value2
@@ -250,10 +328,12 @@ class LcovSource(Source):
             cmd = (
                 '{lcov} '
                 '{rc_overrides} '
+                '{derive_func_data} '
                 '--directory {directory} --capture '
                 '--output-file {tracefile}'.format(
                     lcov=lcov,
                     rc_overrides=rc_overrides,
+                    derive_func_data=derive_func_data,
                     directory=source,
                     tracefile=tracefile
                 )
@@ -283,10 +363,12 @@ class LcovSource(Source):
             cmd = (
                 '{lcov} '
                 '{rc_overrides} '
+                '{derive_func_data} '
                 '--remove {tracefile} {remove} '
                 '--output-file {tracefile}'.format(
                     lcov=lcov,
                     rc_overrides=rc_overrides,
+                    derive_func_data=derive_func_data,
                     tracefile=tracefile,
                     remove=' '.join(
                         '"{}"'.format(e) for e in self.config.remove.value
@@ -299,6 +381,33 @@ class LcovSource(Source):
             if status.returncode != 0:
                 raise RuntimeError(
                     'Lcov failed removing files from coverage:\n{}'.format(
+                        status.stderr
+                    )
+                )
+
+        # Extract files from patterns
+        if self.config.extract.value:
+            cmd = (
+                '{lcov} '
+                '{rc_overrides} '
+                '{derive_func_data} '
+                '--extract {tracefile} {extract} '
+                '--output-file {tracefile}'.format(
+                    lcov=lcov,
+                    rc_overrides=rc_overrides,
+                    derive_func_data=derive_func_data,
+                    tracefile=tracefile,
+                    extract=' '.join(
+                        '"{}"'.format(e) for e in self.config.extract.value
+                    )
+                )
+            )
+            log.info('Extracting files: "{}"'.format(cmd))
+            status = run(cmd)
+
+            if status.returncode != 0:
+                raise RuntimeError(
+                    'Lcov failed extracting files from coverage:\n{}'.format(
                         status.stderr
                     )
                 )
