@@ -150,12 +150,13 @@ derive_func_data
 
 Allow lcov to calculate function coverage data from line coverage data.
 
-If ``True`` then the --derive-func-data option is used on the lcov commands.
-This option is used to collect function coverage data, even when this data
-is not provided by the installed gcov tool. Instead, lcov will use line
-coverage data and information about which lines belong to a function to
-derive function coverage.
-If ``False`` then the option is not used.
+If ``True`` then the ``--derive-func-data`` option is used on the lcov
+commands. If ``False`` then the option is not used.
+
+This option is used to collect function coverage data, even when this data is
+not provided by the installed gcov tool. Instead, lcov will use line coverage
+data and information about which lines belong to a function to derive function
+coverage.
 
 - **Default**: ``False``
 - **Optional**: ``True``
@@ -163,18 +164,20 @@ If ``False`` then the option is not used.
 
   .. code-block:: python3
 
-        schema={
-            'type': 'boolean',
-        },
+     schema={
+         'type': 'boolean',
+     },
 
 - **Secret**: ``False``
 
 extract
 -------
 
-List of patterns of files to extract from coverage computation.
+List of patterns of files to extract for coverage computation.
 
-Patterns will be interpreted as shell wild‐card patterns.
+Use this option if you want to extract coverage data for only a particular
+set of files from a tracefile. Patterns will be interpreted as shell wild‐card
+patterns.
 
 - **Default**: ``[]``
 - **Optional**: ``True``
@@ -306,9 +309,8 @@ class LcovSource(Source):
             raise FileNotFoundError('lcov executable not found.')
 
         # Check if --derive-func-data is needed
-        derive_func_data = ''
-        if self.config.derive_func_data.value:
-            derive_func_data = '--derive-func-data'
+        derive_func_data = '--derive-func-data' \
+            if self.config.derive_func_data.value else ''
 
         # Transform from list to something like
         #   --rc setting1=value1 --rc setting2=value2
