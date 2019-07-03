@@ -251,6 +251,19 @@ class GTestSource(Source):
                     ('time', float),
                 ])
 
+                # Fetch properties: the properties are no longer attributes
+                # in the testcase. After the release of gtest v1.8.1 they
+                # are saved in the format <property name='' value''> inside
+                # 'properties' under each testcase.
+                testcase.setdefault(
+                    'properties', {
+                        prop.get('name'): prop.get('value')
+                        for caseroot in subchild
+                        if 'properties' == caseroot.tag
+                        for prop in caseroot.findall('property')
+                    }
+                )
+
                 # Fetch failures
                 failures = [
                     failure.text for failure in subchild
