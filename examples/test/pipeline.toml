@@ -12,6 +12,13 @@ id = "gtest"
     [sources.config]
     xmlpath = "{pipeline.dir}/gtest.xml"
 
+[[sources]]
+type = "gtest"
+id = "new_gtest"
+
+    [sources.config]
+    xmlpath = "{pipeline.dir}/new_gtest.xml"
+
 [[sinks]]
 type = "print"
 id = "print"
