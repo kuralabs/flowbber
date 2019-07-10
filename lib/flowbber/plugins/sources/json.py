@@ -48,6 +48,7 @@ This source fetch and parses a local or remote (http, https) json file.
         encoding = "utf-8"
         ordered = true
         verify_ssl = true
+        extract = true
 
 .. code-block:: json
 
@@ -60,7 +61,8 @@ This source fetch and parses a local or remote (http, https) json file.
                     "file_uri": "file://{pipeline.dir}/file.json",
                     "encoding": "utf-8",
                     "ordered": true,
-                    "verify_ssl": true
+                    "verify_ssl": true,
+                    "extract": true
                 }
             }
         ]
@@ -159,10 +161,43 @@ schema is used.
 
 - **Secret**: ``False``
 
+extract
+-------
+
+Extract the JSON file from a Zip archive.
+
+If using extraction, the ``.zip`` extension will be automatically appended
+to the ``file_uri`` filename parameter if not present.
+
+It is expected that the file inside the archive matches the ``file_uri``
+filename without the ``.zip`` extension. For example:
+
+=====================  ==========================  ==========================  ========================
+``extract`` parameter  ``file_uri`` parameter      File loaded                 Expected file inside Zip
+=====================  ==========================  ==========================  ========================
+``True``               ``xxx://archive.json``      ``xxx://archive.json.zip``  ``archive.json``
+``True``               ``xxx://archive.json.zip``  ``xxx://archive.json.zip``  ``archive.json``
+=====================  ==========================  ==========================  ========================
+
+- **Default**: ``False``
+- **Optional**: ``True``
+- **Schema**:
+
+  .. code-block:: python3
+
+     {
+         'type': 'boolean',
+     }
+
+- **Secret**: ``False``
+
 """  # noqa
 
+from pathlib import Path
 from urllib import request
 from collections import OrderedDict
+from zipfile import ZipFile, ZIP_DEFLATED
+from urllib.parse import urlparse, urlunparse
 from ssl import create_default_context, CERT_NONE
 
 from flowbber.components import Source
@@ -203,12 +238,21 @@ class JSONSource(Source):
                 'type': 'boolean'
             },
         )
+        config.add_option(
+            'extract',
+            default=False,
+            optional=True,
+            schema={
+                'type': 'boolean',
+            },
+        )
 
     def collect(self):
 
         # Get config
         file_uri = self.config.file_uri.value
         encoding = self.config.encoding.value
+        extract = self.config.extract.value
 
         # Get decoding function
         ordered = self.config.ordered.value
@@ -224,22 +268,35 @@ class JSONSource(Source):
             def loads(text):
                 return srcloads(text)
 
-        # Determine schema
-        if '://' in file_uri:
-            schema, resource = file_uri.split('://', 1)
-        else:
-            schema = 'file'
-            resource = file_uri
+        def decode(fd, filename):
+            if extract:
+                with ZipFile(fd, mode='r', compression=ZIP_DEFLATED) as zfd:
+                    content = zfd.read(filename)
+            else:
+                content = fd.read()
+            return content.decode(encoding)
+
+        # Parse URI
+        parsed_uri = urlparse(file_uri)
+        scheme = parsed_uri.scheme or 'file'
+        filename = Path(parsed_uri.path)
+
+        # Check if extraction is specified and extension is right
+        if extract and filename.suffix != '.zip':
+            filename = Path(
+                filename.parent / '{}.zip'.format(filename.name)
+            )
+            file_uri = urlunparse(parsed_uri._replace(
+                path='{}.zip'.format(parsed_uri.path),
+            ))
 
         # Get source file from the file system
-        if schema == 'file':
-            with open(resource, 'rb') as fd:
-                return loads(
-                    fd.read().decode(encoding)
-                )
+        if scheme == 'file':
+            with filename.open(mode='rb') as fd:
+                return loads(decode(fd, filename.stem))
 
         # Get file from an HTTP URL
-        elif schema in ['http', 'https']:
+        elif scheme in ['http', 'https']:
 
             # Disable SSL verification if requested
             context = create_default_context()
@@ -248,11 +305,9 @@ class JSONSource(Source):
                 context.verify_mode = CERT_NONE
 
             with request.urlopen(file_uri, context=context) as fd:
-                return loads(
-                    fd.read().decode(encoding)
-                )
+                return loads(decode(fd, filename.stem))
 
-        raise ValueError('Unsupported schema {}'.format(schema))
+        raise ValueError('Unsupported scheme {}'.format(scheme))
 
 
 __all__ = ['JSONSource']

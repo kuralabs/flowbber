@@ -1,0 +1,21 @@
+[[sources]]
+type = "json"
+id = "extract"
+
+    [sources.config]
+    file_uri = "file://{pipeline.dir}/data.json.zip"
+    encoding = "utf-8"
+    ordered = true
+    verify_ssl = false
+    extract = true
+
+[[sinks]]
+type = "archive"
+id = "archive"
+
+    [sinks.config]
+    output = "data.json"
+    override = true
+    create_parents = true
+    pretty = true
+    compress = false

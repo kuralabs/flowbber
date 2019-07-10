@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2017-2018 KuraLabs S.R.L
+# Copyright (C) 2017-2019 KuraLabs S.R.L
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -38,9 +38,11 @@ This sink writes all collected data to a JSON file.
 
         [sinks.config]
         output = "data.json"
+        encoding = "utf-8"
         override = true
         create_parents = true
         pretty = false
+        compress = false
 
 .. code-block:: json
 
@@ -51,9 +53,11 @@ This sink writes all collected data to a JSON file.
                 "id": "...",
                 "config": {
                     "output": "data.json",
+                    "encoding": "utf-8",
                     "override": true,
                     "create_parents": true,
-                    "pretty": false
+                    "pretty": false,
+                    "compress": false
                 }
             }
         ]
@@ -66,6 +70,24 @@ Path to JSON file to write the collected data.
 
 - **Default**: ``N/A``
 - **Optional**: ``False``
+- **Schema**:
+
+  .. code-block:: python3
+
+     {
+         'type': 'string',
+         'empty': False,
+     }
+
+- **Secret**: ``False``
+
+encoding
+--------
+
+Encoding to use to encode the file.
+
+- **Default**: ``utf-8``
+- **Optional**: ``True``
 - **Schema**:
 
   .. code-block:: python3
@@ -128,9 +150,43 @@ Pretty output.
 
 - **Secret**: ``False``
 
+compress
+--------
+
+Compress the JSON output file in a Zip archive.
+
+If using compression, the ``.zip`` extension will be automatically appended
+to the ``output`` filename parameter if not present.
+
+The created archive will contain a JSON file named as the ``output`` parameter
+without the ``.zip`` extension. For example:
+
+======================  ====================  ====================  ================
+``compress`` parameter  ``output`` parameter  Saved as              File inside Zip
+======================  ====================  ====================  ================
+``True``                ``archive.json``      ``archive.json.zip``  ``archive.json``
+``True``                ``archive.json.zip``  ``archive.json.zip``  ``archive.json``
+======================  ====================  ====================  ================
+
+Compression uses Python's ``ZipFile`` module using the ``ZIP_DEFLATED`` option,
+thus requiring the ``zlib`` module.
+
+- **Default**: ``False``
+- **Optional**: ``True``
+- **Schema**:
+
+  .. code-block:: python3
+
+     {
+         'type': 'boolean',
+     }
+
+- **Secret**: ``False``
+
 """  # noqa
 
 from pathlib import Path
+from zipfile import ZipFile, ZIP_DEFLATED
 
 from flowbber.components import FilterSink
 from flowbber.logging import get_logger
@@ -150,7 +206,15 @@ class ArchiveSink(FilterSink):
                 'empty': False,
             },
         )
-
+        config.add_option(
+            'encoding',
+            default='utf-8',
+            optional=True,
+            schema={
+                'type': 'string',
+                'empty': False,
+            },
+        )
         config.add_option(
             'override',
             default=False,
@@ -159,7 +223,6 @@ class ArchiveSink(FilterSink):
                 'type': 'boolean',
             },
         )
-
         config.add_option(
             'create_parents',
             default=True,
@@ -168,9 +231,16 @@ class ArchiveSink(FilterSink):
                 'type': 'boolean',
             },
         )
-
         config.add_option(
             'pretty',
+            default=False,
+            optional=True,
+            schema={
+                'type': 'boolean',
+            },
+        )
+        config.add_option(
+            'compress',
             default=False,
             optional=True,
             schema={
@@ -184,6 +254,7 @@ class ArchiveSink(FilterSink):
         # Allow to filter data
         super().distribute(data)
 
+        encoding = self.config.encoding.value
         outfile = Path(self.config.output.value)
 
         # Re-check no file exists, in case it was created during execution
@@ -209,8 +280,22 @@ class ArchiveSink(FilterSink):
         if self.config.pretty.value:
             kwargs['indent'] = 4
 
-        log.info('Archiving data to {}'.format(outfile))
-        outfile.write_text(dumps(data, **kwargs), encoding='utf-8')
+        content = dumps(data, **kwargs)
+
+        # Write plain file
+        if not self.config.compress.value:
+            log.info('Archiving data to {}'.format(outfile))
+            outfile.write_text(content, encoding=encoding)
+            return
+
+        # Write compressed file
+        if outfile.suffix != '.zip':
+            outfile = Path(outfile.parent / '{}.zip'.format(outfile.name))
+
+        log.info('Archiving compressed data to {}'.format(outfile))
+        with outfile.open(mode='wb') as fd:
+            with ZipFile(fd, mode='w', compression=ZIP_DEFLATED) as zfd:
+                zfd.writestr(outfile.stem, content.encode(encoding))
 
 
 __all__ = ['ArchiveSink']

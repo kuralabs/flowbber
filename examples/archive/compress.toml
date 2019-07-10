@@ -1,0 +1,29 @@
+[[sources]]
+type = "timestamp"
+id = "timestamp"
+
+    [sources.config]
+    epochf = true
+    iso8601 = true
+    strftime = "%Y-%m-%d %H:%M:%S"
+
+[[sources]]
+type = "timestamp"
+id = "timestamp_utc"
+
+    [sources.config]
+    timezone = 0
+    epochf = true
+    iso8601 = true
+    strftime = "%Y-%m-%d %H:%M:%S"
+
+[[sinks]]
+type = "archive"
+id = "compress"
+
+    [sinks.config]
+    output = "data.json"
+    override = true
+    create_parents = true
+    pretty = false
+    compress = true
