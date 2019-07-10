@@ -31,6 +31,8 @@ def setup_module(module):
     ['lcov', 'pipeline.toml'],
     ['valgrind', 'pipeline.toml'],
     ['config', 'pipeline.toml'],
+    ['archive', 'compress.toml'],
+    ['archive', 'extract.toml'],
 ])
 def test_pipelines(name, pipelinedef):
     # Exceptions ...
