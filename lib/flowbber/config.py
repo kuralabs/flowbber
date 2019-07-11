@@ -65,9 +65,10 @@ class Configurator:
         self._configtype = None
 
     def add_option(
-            self, key,
-            default=None, optional=False,
-            schema=None, secret=False):
+        self, key,
+        default=None, optional=False,
+        schema=None, secret=False,
+    ):
         """
         Declare an option.
 

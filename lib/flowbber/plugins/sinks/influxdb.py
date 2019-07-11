@@ -24,6 +24,12 @@ This sink writes all collected data to a InfluxDB_ time series database.
 
 .. _InfluxDB: https://www.influxdata.com/time-series-platform/influxdb/
 
+.. important::
+
+   This class inherits several inclusion and exclusion configuration options
+   for filtering data before using it. See :ref:`filter-sink-options` for more
+   information.
+
 In order to be able to track in time the complex data collected by the sources
 this sink requires to "flatten" the data first. The process will transform an
 arbitrarily deep dictionary tree into a fixed depth dictionary that maps the

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2017 KuraLabs S.R.L
+# Copyright (C) 2017-2019 KuraLabs S.R.L
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 Utilities for filtering data.
 """
 
+from pathlib import Path
 from fnmatch import fnmatch
 
 
@@ -78,8 +79,47 @@ def filter_dict(data, include, exclude, joinchar='.'):
     return filter_dict_recursive([], data)
 
 
+def load_filter_file(filepath, encoding='utf-8'):
+    """
+    Load a ".gitignore"-like file describing excluding (or including) fnmatch
+    patterns.
+
+    Empty lines and comments (#) are supported. Patterns returned are unique
+    and in the same order as described in the file.
+
+    :param str filepath: Path to the file. Path objects are also supported
+     (and preferred).
+    :param str encoding: Encoding to use to decode the file.
+
+    :return: List of unique patterns in the file.
+    :rtype: list
+    """
+
+    if not isinstance(filepath, Path):
+        filepath = Path(filepath)
+
+    if not filepath.exists():
+        raise FileNotFoundError(
+            'No such file {}'.format(filepath)
+        )
+
+    patterns = []
+
+    with filepath.open(mode='rt', encoding=encoding) as fd:
+        for raw_line in fd:
+            line = raw_line.strip()
+
+            if not line or line.startswith('#') or line in patterns:
+                continue
+
+            patterns.append(line)
+
+    return patterns
+
+
 __all__ = [
     'included_in',
     'is_wanted',
     'filter_dict',
+    'load_filter_file',
 ]

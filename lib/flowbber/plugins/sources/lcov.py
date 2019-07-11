@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2017-2018 KuraLabs S.R.L
+# Copyright (C) 2017-2019 KuraLabs S.R.L
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -81,9 +81,17 @@ source.
         [sources.config]
         source = "{pipeline.dir}"
         rc_overrides = ["lcov_branch_coverage=1"]
-        derive_func_data = false
-        extract = ["*hello1*"]
         remove = ["*hello2*"]
+        remove_files = [
+            "/file/with/remove/patterns",
+            ".removepatterns"
+        ]
+        extract = ["*hello1*"]
+        extract_files = [
+            "/file/with/extract/patterns",
+            ".extractpatterns"
+        ]
+        derive_func_data = false
 
 .. code-block:: json
 
@@ -95,9 +103,17 @@ source.
                 "config": {
                     "source": "{pipeline.dir}",
                     "rc_overrides": ["lcov_branch_coverage=1"],
-                    "derive_func_data": false,
-                    "extract": ["*hello1*"],
                     "remove": ["*hello2*"]
+                    "remove_files": [
+                        "/file/with/remove/patterns",
+                        ".removepatterns"
+                    ],
+                    "extract": ["*hello1*"],
+                    "extract_files": [
+                        "/file/with/extract/patterns",
+                        ".extractpatterns"
+                    ],
+                    "derive_func_data": false,
                 }
             }
         ]
@@ -145,28 +161,53 @@ Elements should have the form ``SETTING=VALUE``.
 
 - **Secret**: ``False``
 
-derive_func_data
-----------------
+remove
+------
 
-Allow lcov to calculate function coverage data from line coverage data.
+List of patterns of files to remove from coverage computation.
 
-If ``True`` then the ``--derive-func-data`` option is used on the lcov
-commands. If ``False`` then the option is not used.
+Patterns will be interpreted as shell wild‐card patterns.
 
-This option is used to collect function coverage data, even when this data is
-not provided by the installed gcov tool. Instead, lcov will use line coverage
-data and information about which lines belong to a function to derive function
-coverage.
-
-- **Default**: ``False``
+- **Default**: ``[]``
 - **Optional**: ``True``
 - **Schema**:
 
   .. code-block:: python3
 
-     schema={
-         'type': 'boolean',
-     },
+     {
+         'type': 'list',
+         'schema': {
+             'type': 'string',
+             'empty': False,
+         },
+     }
+
+- **Secret**: ``False``
+
+remove_files
+------------
+
+List of paths to files containing patterns of files to remove from coverage
+computation.
+
+Patterns will be interpreted as shell wild‐card patterns.
+
+All unique patterns parsed from these files will be added to the ones defined
+in the ``remove`` configuration option.
+
+- **Default**: ``[]``
+- **Optional**: ``True``
+- **Schema**:
+
+  .. code-block:: python3
+
+     {
+         'type': 'list',
+         'schema': {
+             'type': 'string',
+             'empty': False,
+         },
+     }
 
 - **Secret**: ``False``
 
@@ -195,12 +236,16 @@ patterns.
 
 - **Secret**: ``False``
 
-remove
-------
+extract_files
+-------------
 
-List of patterns of files to remove from coverage computation.
+List of paths to files containing patterns of files to extract for coverage
+computation.
 
 Patterns will be interpreted as shell wild‐card patterns.
+
+All unique patterns parsed from these files will be added to the ones defined
+in the ``extract`` configuration option.
 
 - **Default**: ``[]``
 - **Optional**: ``True``
@@ -218,6 +263,31 @@ Patterns will be interpreted as shell wild‐card patterns.
 
 - **Secret**: ``False``
 
+derive_func_data
+----------------
+
+Allow lcov to calculate function coverage data from line coverage data.
+
+If ``True`` then the ``--derive-func-data`` option is used on the lcov
+commands. If ``False`` then the option is not used.
+
+This option is used to collect function coverage data, even when this data is
+not provided by the installed gcov tool. Instead, lcov will use line coverage
+data and information about which lines belong to a function to derive function
+coverage.
+
+- **Default**: ``False``
+- **Optional**: ``True``
+- **Schema**:
+
+  .. code-block:: python3
+
+     schema={
+         'type': 'boolean',
+     },
+
+- **Secret**: ``False``
+
 """
 
 from shutil import which
@@ -227,6 +297,7 @@ from tempfile import NamedTemporaryFile
 from flowbber.components import Source
 from flowbber.utils.command import run
 from flowbber.logging import get_logger
+from flowbber.utils.filter import load_filter_file
 from flowbber.plugins.sources.cobertura import CoberturaSource
 
 
@@ -271,7 +342,33 @@ class LcovSource(Source):
         )
 
         config.add_option(
+            'remove_files',
+            default=[],
+            optional=True,
+            schema={
+                'type': 'list',
+                'schema': {
+                    'type': 'string',
+                    'empty': False,
+                },
+            },
+        )
+
+        config.add_option(
             'extract',
+            default=[],
+            optional=True,
+            schema={
+                'type': 'list',
+                'schema': {
+                    'type': 'string',
+                    'empty': False,
+                },
+            },
+        )
+
+        config.add_option(
+            'extract_files',
             default=[],
             optional=True,
             schema={
@@ -308,10 +405,6 @@ class LcovSource(Source):
         if lcov is None:
             raise FileNotFoundError('lcov executable not found.')
 
-        # Check if --derive-func-data is needed
-        derive_func_data = '--derive-func-data' \
-            if self.config.derive_func_data.value else ''
-
         # Transform from list to something like
         #   --rc setting1=value1 --rc setting2=value2
         rc_overrides = ''
@@ -319,6 +412,24 @@ class LcovSource(Source):
             rc_overrides = '--rc {}'.format(
                 ' --rc '.join(self.config.rc_overrides.value)
             )
+
+        # Load remove patterns
+        remove = self.config.remove.value
+        for remove_file in self.config.remove_files.value:
+            for pattern in load_filter_file(remove_file):
+                if pattern not in remove:
+                    remove.append(pattern)
+
+        # Load extract patterns
+        extract = self.config.extract.value
+        for extract_file in self.config.extract_files.value:
+            for pattern in load_filter_file(extract_file):
+                if pattern not in extract:
+                    extract.append(pattern)
+
+        # Check if --derive-func-data is needed
+        derive_func_data = '--derive-func-data' \
+            if self.config.derive_func_data.value else ''
 
         if source.is_dir():
             # Create a temporary file. Close it, we just need the name.
@@ -361,7 +472,7 @@ class LcovSource(Source):
         }
 
         # Remove files from patterns
-        if self.config.remove.value:
+        if remove:
             cmd = (
                 '{lcov} '
                 '{rc_overrides} '
@@ -373,7 +484,7 @@ class LcovSource(Source):
                     derive_func_data=derive_func_data,
                     tracefile=tracefile,
                     remove=' '.join(
-                        '"{}"'.format(e) for e in self.config.remove.value
+                        '"{}"'.format(e) for e in remove
                     )
                 )
             )
@@ -388,7 +499,7 @@ class LcovSource(Source):
                 )
 
         # Extract files from patterns
-        if self.config.extract.value:
+        if extract:
             cmd = (
                 '{lcov} '
                 '{rc_overrides} '
@@ -400,7 +511,7 @@ class LcovSource(Source):
                     derive_func_data=derive_func_data,
                     tracefile=tracefile,
                     extract=' '.join(
-                        '"{}"'.format(e) for e in self.config.extract.value
+                        '"{}"'.format(e) for e in extract
                     )
                 )
             )

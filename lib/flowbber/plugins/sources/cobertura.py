@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2017-2018 KuraLabs S.R.L
+# Copyright (C) 2017-2019 KuraLabs S.R.L
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -147,6 +147,34 @@ Matching is performed using Python's fnmatch_.
 
 - **Secret**: ``False``
 
+include_files
+-------------
+
+List of paths to files containing patterns of files to include.
+
+Matching is performed using Python's fnmatch_.
+
+.. _fnmatch: https://docs.python.org/3/library/fnmatch.html#fnmatch.fnmatch
+
+All unique patterns parsed from these files will be added to the ones defined
+in the ``include`` configuration option.
+
+- **Default**: ``[]``
+- **Optional**: ``True``
+- **Schema**:
+
+  .. code-block:: python3
+
+     {
+         'type': 'list',
+         'schema': {
+             'type': 'string',
+             'empty': False,
+         },
+     }
+
+- **Secret**: ``False``
+
 exclude
 -------
 
@@ -171,6 +199,34 @@ Matching is performed using Python's fnmatch_.
 
 - **Secret**: ``False``
 
+exclude_files
+-------------
+
+List of paths to files containing patterns of files to exclude.
+
+Matching is performed using Python's fnmatch_.
+
+.. _fnmatch: https://docs.python.org/3/library/fnmatch.html#fnmatch.fnmatch
+
+All unique patterns parsed from these files will be added to the ones defined
+in the ``exclude`` configuration option.
+
+- **Default**: ``[]``
+- **Optional**: ``True``
+- **Schema**:
+
+  .. code-block:: python3
+
+     {
+         'type': 'list',
+         'schema': {
+             'type': 'string',
+             'empty': False,
+         },
+     }
+
+- **Secret**: ``False``
+
 """  # noqa
 
 from pathlib import Path
@@ -178,7 +234,7 @@ from functools import reduce
 
 from flowbber.components import Source
 from flowbber.logging import get_logger
-from flowbber.utils.filter import is_wanted
+from flowbber.utils.filter import is_wanted, load_filter_file
 
 
 log = get_logger(__name__)
@@ -208,6 +264,19 @@ class CoberturaSource(Source):
         )
 
         config.add_option(
+            'include_files',
+            default=[],
+            optional=True,
+            schema={
+                'type': 'list',
+                'schema': {
+                    'type': 'string',
+                    'empty': False,
+                },
+            },
+        )
+
+        config.add_option(
             'exclude',
             default=[],
             optional=True,
@@ -215,6 +284,19 @@ class CoberturaSource(Source):
                 'type': 'list',
                 'schema': {
                     'type': 'string',
+                },
+            },
+        )
+
+        config.add_option(
+            'exclude_files',
+            default=[],
+            optional=True,
+            schema={
+                'type': 'list',
+                'schema': {
+                    'type': 'string',
+                    'empty': False,
                 },
             },
         )
@@ -234,7 +316,16 @@ class CoberturaSource(Source):
 
         # Filter files
         include = self.config.include.value
+        for include_file in self.config.include_files.value:
+            for pattern in load_filter_file(include_file):
+                if pattern not in include:
+                    include.append(pattern)
+
         exclude = self.config.exclude.value
+        for exclude_file in self.config.exclude_files.value:
+            for pattern in load_filter_file(exclude_file):
+                if pattern not in exclude:
+                    exclude.append(pattern)
 
         original = cobertura.files()
         relevant = [

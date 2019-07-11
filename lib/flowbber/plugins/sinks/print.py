@@ -27,6 +27,12 @@ large data structures.
 
 .. _pprintpp: https://github.com/wolever/pprintpp
 
+.. important::
+
+   This class inherits several inclusion and exclusion configuration options
+   for filtering data before using it. See :ref:`filter-sink-options` for more
+   information.
+
 **Dependencies:**
 
 .. code-block:: sh

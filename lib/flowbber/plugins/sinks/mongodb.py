@@ -24,6 +24,12 @@ This sink writes all collected data to a MongoDB_ NoSQL database.
 
 .. _MongoDB: https://www.mongodb.com/
 
+.. important::
+
+   This class inherits several inclusion and exclusion configuration options
+   for filtering data before using it. See :ref:`filter-sink-options` for more
+   information.
+
 The collected data is mostly unaltered from its original form, except that
 MongoDB document keys cannot contain ``.`` (dot) characters and cannot start
 with a ``$`` (dollar) sign.

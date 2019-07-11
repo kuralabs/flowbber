@@ -1,0 +1,6 @@
+# We repeat this value from the pipeline
+input.exclude0
+
+# New values
+input.exclude1.excludethis
+input.exclude1.andthese*
