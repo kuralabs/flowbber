@@ -1,0 +1,7 @@
+input.exclude2.*excludethese*
+
+# Repeated
+input.exclude2.*excludethese*
+
+# Doesn't exists
+input.exclude2.inexistent*

@@ -1,0 +1,19 @@
+{
+    "exclude0": true,
+    "exclude1": {
+        "excludethis": false,
+        "andthese1": 1,
+        "andthese2": 2,
+        "andthese3": 3,
+        "butnotthis": {
+            "some": "data",
+            "andsome": "more"
+        }
+    },
+    "exclude2": {
+        "mayexcludethese": true,
+        "alsoexcludethese": true,
+        "excludethese1": true,
+        "neverthese": false
+    }
+}

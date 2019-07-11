@@ -1,0 +1,23 @@
+[[sources]]
+type = "json"
+id = "input"
+
+    [sources.config]
+    file_uri = "file://{pipeline.dir}/input.json"
+
+
+[[sinks]]
+type = "archive"
+id = "exclude"
+
+    [sinks.config]
+    output = "{pipeline.dir}/data.json"
+    override = true
+    create_parents = true
+    pretty = true
+
+    exclude = ["input.exclude0"]
+    exclude_files = [
+        "{pipeline.dir}/exclude1",
+        "{pipeline.dir}/exclude2",
+    ]

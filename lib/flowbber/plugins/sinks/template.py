@@ -23,6 +23,12 @@ Template
 This sink will render specified Jinja2_ template using the collected data as
 payload.
 
+.. important::
+
+   This class inherits several inclusion and exclusion configuration options
+   for filtering data before using it. See :ref:`filter-sink-options` for more
+   information.
+
 For the following collected data:
 
 .. code-block:: python3

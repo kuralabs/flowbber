@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2017 KuraLabs S.R.L
+# Copyright (C) 2017-2019 KuraLabs S.R.L
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,15 +16,128 @@
 # under the License.
 
 """
-Module implementating the Sink base class.
+Module implementating the Sink and FilterSink base classes.
 
 All custom Flowbber sinks must extend from the Sink class.
+
+.. _filter-sink-options:
+
+FilterSink Options
+==================
+
+Any Sink that inherits from the FilterSink class will have available the
+following configuration options:
+
+include
+-------
+
+List of patterns of data to include.
+
+Matching is performed using Python's fnmatch_.
+
+.. _fnmatch: https://docs.python.org/3/library/fnmatch.html#fnmatch.fnmatch
+
+- **Default**: ``['*']``
+- **Optional**: ``True``
+- **Schema**:
+
+  .. code-block:: python3
+
+     {
+         'type': 'list',
+         'schema': {
+             'type': 'string',
+         },
+     }
+
+- **Secret**: ``False``
+
+include_files
+-------------
+
+List of paths to files containing patterns of data to include.
+
+Matching is performed using Python's fnmatch_.
+
+.. _fnmatch: https://docs.python.org/3/library/fnmatch.html#fnmatch.fnmatch
+
+All unique patterns parsed from these files will be added to the ones defined
+in the ``include`` configuration option.
+
+- **Default**: ``[]``
+- **Optional**: ``True``
+- **Schema**:
+
+  .. code-block:: python3
+
+     {
+         'type': 'list',
+         'schema': {
+             'type': 'string',
+             'empty': False,
+         },
+     }
+
+- **Secret**: ``False``
+
+exclude
+-------
+
+List of patterns of data to exclude.
+
+Matching is performed using Python's fnmatch_.
+
+.. _fnmatch: https://docs.python.org/3/library/fnmatch.html#fnmatch.fnmatch
+
+- **Default**: ``[]``
+- **Optional**: ``True``
+- **Schema**:
+
+  .. code-block:: python3
+
+     {
+         'type': 'list',
+         'schema': {
+             'type': 'string',
+         },
+     }
+
+- **Secret**: ``False``
+
+exclude_files
+-------------
+
+List of paths to files containing patterns of data to exclude.
+
+Matching is performed using Python's fnmatch_.
+
+.. _fnmatch: https://docs.python.org/3/library/fnmatch.html#fnmatch.fnmatch
+
+All unique patterns parsed from these files will be added to the ones defined
+in the ``exclude`` configuration option.
+
+- **Default**: ``[]``
+- **Optional**: ``True``
+- **Schema**:
+
+  .. code-block:: python3
+
+     {
+         'type': 'list',
+         'schema': {
+             'type': 'string',
+             'empty': False,
+         },
+     }
+
+- **Secret**: ``False``
+
 """
 
 from abc import abstractmethod
 
 from .base import Component
-from ..utils.filter import filter_dict
+from ..utils.filter import filter_dict, load_filter_file
 
 
 class Sink(Component):
@@ -67,8 +180,10 @@ class Sink(Component):
 
 class FilterSink(Sink):
     """
-    Common sink base class that adds a include and exclude configuration
-    options and filters the data before using it.
+    Common sink base class that adds several inclusion and exclusion
+    configuration options for filtering data before using it.
+
+    See :ref:`filter-sink-options` for more information.
     """
 
     def declare_config(self, config):
@@ -85,6 +200,19 @@ class FilterSink(Sink):
         )
 
         config.add_option(
+            'include_files',
+            default=[],
+            optional=True,
+            schema={
+                'type': 'list',
+                'schema': {
+                    'type': 'string',
+                    'empty': False,
+                },
+            },
+        )
+
+        config.add_option(
             'exclude',
             default=[],
             optional=True,
@@ -96,10 +224,32 @@ class FilterSink(Sink):
             },
         )
 
+        config.add_option(
+            'exclude_files',
+            default=[],
+            optional=True,
+            schema={
+                'type': 'list',
+                'schema': {
+                    'type': 'string',
+                    'empty': False,
+                },
+            },
+        )
+
     @abstractmethod
     def distribute(self, data):
         include = self.config.include.value
+        for include_file in self.config.include_files.value:
+            for pattern in load_filter_file(include_file):
+                if pattern not in include:
+                    include.append(pattern)
+
         exclude = self.config.exclude.value
+        for exclude_file in self.config.exclude_files.value:
+            for pattern in load_filter_file(exclude_file):
+                if pattern not in exclude:
+                    exclude.append(pattern)
 
         # Optimization when no filter is requested to the input data
         if include == ['*'] and not exclude:
