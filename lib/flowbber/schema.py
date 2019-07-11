@@ -57,7 +57,7 @@ COMPONENT_SCHEMA = {
         'type': 'dict',
         'default': None,
         'nullable': True,
-        'keyschema': {
+        'keysrules': {
             'type': 'string',
             'regex': SLUG_REGEX,
         },
