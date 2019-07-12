@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2017-2018 KuraLabs S.R.L
+# Copyright (C) 2017-2019 KuraLabs S.R.L
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -140,6 +140,10 @@ from xml.etree import ElementTree
 from collections import OrderedDict
 
 from flowbber.components import Source
+from flowbber.logging import get_logger
+
+
+log = get_logger(__name__)
 
 
 def trycast(value):
@@ -254,15 +258,43 @@ class GTestSource(Source):
                 # Fetch properties: the properties are no longer attributes
                 # in the testcase. After the release of gtest v1.8.1 they
                 # are saved in the format <property name='' value''> inside
-                # 'properties' under each testcase.
-                testcase.setdefault(
-                    'properties', {
-                        prop.get('name'): prop.get('value')
-                        for caseroot in subchild
-                        if 'properties' == caseroot.tag
-                        for prop in caseroot.findall('property')
-                    }
-                )
+                # <properties> under each testcase.
+                propertiesnode = subchild.find('properties')
+                if propertiesnode:  # We are dealing with a 1.8.1+ XML format
+
+                    properties = testcase.setdefault('properties', {})
+                    if properties:
+                        log.warning(
+                            'File {} has old style (pre-1.8.1) '
+                            'properties ({}) and new style properties '
+                            '(post 1.8.1)'.format(
+                                infile, ', '.join(
+                                    map(str, properties.keys())
+                                ),
+                            )
+                        )
+
+                    for propertynode in propertiesnode:
+                        assert propertynode.tag == 'property', \
+                            'Malformed XML properties element'
+
+                        attributes = propertynode.attrib
+                        assert (
+                            'name' in attributes and 'value' in attributes
+                        ), 'Malformed XML property element'
+
+                        name = attributes['name']
+                        value = trycast(attributes['value'])
+
+                        if name in properties:
+                            log.warning(
+                                'Overriding property '
+                                '"{}" from "{}" to "{}"'.format(
+                                    name, properties[name], value,
+                                )
+                            )
+
+                        properties[name] = value
 
                 # Fetch failures
                 failures = [
