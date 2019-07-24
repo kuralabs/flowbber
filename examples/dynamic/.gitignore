@@ -1,0 +1,3 @@
+.pipeline-*.json
+.pipeline-*.toml
+.pipeline-*.yaml

@@ -392,7 +392,7 @@ setup(
         # PrintSink
         'print': [],
         # TemplateSink
-        'template': ['jinja2'],
+        'template': [],
     },
 
     # Data files

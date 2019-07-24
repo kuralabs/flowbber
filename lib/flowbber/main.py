@@ -25,6 +25,7 @@ from .pipeline import Pipeline
 from .logging import get_logger
 from .scheduler import Scheduler
 from .inputs import load_pipeline
+from .dynamic import load_values, render_pipeline
 from .local import load_configuration
 
 
@@ -50,6 +51,15 @@ def main(args):
         args.pipeline.parent
     ))
     load_configuration(args.pipeline.parent)
+
+    # Render pipeline in case of a dynamic / template pipeline
+    if args.pipeline.suffix == '.tpl':
+        log.info('Dynamic pipeline identified at {} ...'.format(
+            args.pipeline
+        ))
+
+        values = load_values(args.values_files, args.values)
+        args.pipeline = render_pipeline(args.pipeline, values)
 
     # Load pipeline
     log.info('Loading pipeline definition from {} ...'.format(

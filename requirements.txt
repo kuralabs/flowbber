@@ -1,6 +1,7 @@
 toml
 ujson
 pyyaml
+jinja2
 colorlog
 pprintpp
 cerberus>=1.3.1

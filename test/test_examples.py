@@ -42,6 +42,7 @@ def run_pipeline(name, pipelinedef):
     ['basic', 'pipeline.yaml'],
     ['config', 'pipeline.toml'],
     ['cpu', 'pipeline.toml'],
+    ['dynamic', 'pipeline.toml.tpl'],
     ['local', 'pipeline.toml'],
     ['sloc', 'pipeline.toml'],
     ['test', 'pipeline.toml'],

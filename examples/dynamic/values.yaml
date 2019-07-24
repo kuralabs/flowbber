@@ -1,0 +1,6 @@
+sources:
+    timestamps: 10
+
+sinks:
+    prints: 5
+    archives: 5

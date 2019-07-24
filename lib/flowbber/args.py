@@ -20,9 +20,13 @@ Argument management module.
 """
 
 from pathlib import Path
-from argparse import ArgumentParser
+from collections import OrderedDict
+from argparse import Action, ArgumentParser
+
+from pprintpp import pformat
 
 from . import __version__
+from .utils.types import autocast
 from .logging import get_logger, setup_logging
 
 
@@ -35,6 +39,42 @@ class InvalidArguments(Exception):
     without quiting the process.
     """
     pass
+
+
+class ExtendAction(Action):
+    """
+    Action that allows to combine nargs='+' with the action='append' behavior
+    but generating a flat list.
+
+    This allow to specify in a argument parser class an action that allows
+    to specify multiple values per argument and multiple arguments.
+
+    Usage::
+
+        parser = ArgumentParser(...)
+        parser.register('action', 'extend', ExtendAction)
+
+        parser.add_argument(
+            '-o', '--option',
+            nargs='+',
+            dest='options',
+            action='extend',
+            help='Some description'
+        )
+
+    Then, in CLI::
+
+        executable --option var1=var1 var2=var2 --option var3=var3
+
+    And this generates a::
+
+        Namespace(options=['var1=var1', 'var2=var2', 'var3=var3'])
+    """
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        items = getattr(namespace, self.dest) or []
+        items.extend(values)
+        setattr(namespace, self.dest, items)
 
 
 def validate_args(args):
@@ -60,6 +100,58 @@ def validate_args(args):
 
     args.pipeline = args.pipeline.resolve()
 
+    # Check if values are provided
+    is_dynamic = args.pipeline.suffix == '.tpl'
+
+    if args.values_files:
+        if is_dynamic:
+
+            args.values_files = [
+                Path(values_file)
+                for values_file in args.values_files
+            ]
+
+            missing = [
+                values_file
+                for values_file in args.values_files
+                if not values_file.is_file()
+            ]
+            if missing:
+                raise InvalidArguments(
+                    'No such files {}'.format(', '.join(map(str, missing)))
+                )
+
+            args.values_files = [
+                values_file.resolve()
+                for values_file in args.values_files
+            ]
+        else:
+            log.warning(
+                'Passing --values-file on a non-dynamic pipeline does nothing'
+            )
+
+    if args.values:
+        if is_dynamic:
+            values = OrderedDict()
+
+            for pair in args.values:
+
+                if '=' not in pair:
+                    raise InvalidArguments(
+                        'Invalid value "{}"'.format(pair)
+                    )
+
+                key, value = pair.split('=', 1)
+                values[key] = autocast(value)
+
+            args.values = values
+            log.debug('Values given:\n{}'.format(pformat(values)))
+
+        else:
+            log.warning(
+                'Passing --values on a non-dynamic pipeline does nothing'
+            )
+
     return args
 
 
@@ -80,6 +172,7 @@ def parse_args(argv=None):
             'custom pipelines for data gathering, publishing and analysis.'
         )
     )
+    parser.register('action', 'extend', ExtendAction)
 
     # Standard options
     parser.add_argument(
@@ -100,6 +193,25 @@ def parse_args(argv=None):
         help='Dry run the pipeline',
         default=False,
         action='store_true'
+    )
+
+    # Dynamic pipelines
+    parser.add_argument(
+        '-a', '--values',
+        nargs='+',
+        action='extend',
+        metavar='KEY=VALUE',
+        help='Values to render dynamic pipelines with'
+    )
+    parser.add_argument(
+        '-f', '--values-file',
+        dest='values_files',
+        action='append',
+        metavar='VALUES_FILE',
+        help=(
+            'One or more paths to files with values to render dynamic '
+            'pipelines with. Must be a .toml, .yaml or .json'
+        ),
     )
 
     parser.add_argument(
