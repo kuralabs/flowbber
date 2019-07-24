@@ -1,0 +1,19 @@
+sources:
+  - type: timestamp
+    id: timestamp1
+    config:
+      epoch: false
+      epochf: true
+
+  - type: timestamp
+    id: timestamp2
+    config:
+      epoch: false
+      epochf: true
+
+  - type: user
+    id: user1
+
+sinks:
+- type: print
+  id: print1

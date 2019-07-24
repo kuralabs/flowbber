@@ -35,9 +35,11 @@ def run_pipeline(name, pipelinedef):
 @mark.parametrize(['name', 'pipelinedef'], [
     ['sloc', 'pipeline.toml'],
     ['basic', 'pipeline.toml'],
+    ['basic', 'pipeline.yaml'],
     ['local', 'pipeline.toml'],
     ['advanced', 'pipeline.json'],
     ['advanced', 'pipeline.toml'],
+    ['advanced', 'pipeline.yaml'],
     ['test', 'pipeline.toml'],
     ['valgrind', 'pipeline.toml'],
     ['config', 'pipeline.toml'],

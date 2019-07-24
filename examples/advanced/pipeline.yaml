@@ -1,0 +1,106 @@
+schedule:
+  frequency: 10 seconds
+  samples: 4
+
+sources:
+  - type: timestamp
+    id: timestamp
+    config:
+      epochf: true
+      iso8601: true
+      strftime: '%Y-%m-%d %H:%M:%S'
+
+  - type: git
+    id: git
+    config:
+      directory: '{git.root}'
+
+  - type: my_source
+    id: my_source
+
+  - type: user
+    id: user
+
+  - type: env
+    id: env
+    config:
+      include:
+      - LANG
+      exclude: []
+      lowercase: false
+
+  - type: env
+    id: env_lower
+    config:
+      include:
+      - PYTHONHASHSEED
+      exclude: []
+      lowercase: true
+
+  - type: cobertura
+    id: coverage
+    config:
+      xmlpath: '{pipeline.dir}/coverage.xml'
+
+aggregators:
+  - type: filter
+    id: filter
+    config:
+      include:
+      - '*'
+      exclude:
+      - coverage.files.plugins/sinks/*.py
+      - git.body
+
+sinks:
+  - type: print
+    id: print
+
+  - type: archive
+    id: archive
+    config:
+      output: data.json
+      override: true
+      create_parents: true
+      pretty: true
+
+  - type: template
+    id: template1
+    config:
+      template: file://{pipeline.dir}/template.tpl
+      output: render1.html
+      override: true
+      create_parents: true
+
+      payload:
+        project: Project Template 1
+      filters:
+        coverage_class: flowconf.filter_coverage_class
+
+  - type: template
+    id: template2
+    config:
+      template: python://flowconf.get_template:template.tpl
+      output: render2.html
+      override: true
+      create_parents: true
+
+      payload:
+        project: Project Template 1
+      filters:
+        coverage_class: flowconf.filter_coverage_class
+
+  - type: mongodb
+    id: mongodb
+    config:
+      uri: mongodb://localhost:27017/
+      database: flowbber
+      collection: pipeline1data
+      key: timestamp.epoch
+
+  - type: influxdb
+    id: influxdb
+    config:
+      uri: influxdb://localhost:8086/
+      database: flowbber
+      key: timestamp.iso8601

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2017 KuraLabs S.R.L
+# Copyright (C) 2017-2019 KuraLabs S.R.L
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -119,6 +119,19 @@ def load_pipeline_toml(path):
     return loads(path.read_text(encoding='utf-8'))
 
 
+def load_pipeline_yaml(path):
+    """
+    Load pipeline definition file in YAML format.
+
+    :param Path path: Path to the YAML file.
+
+    :return: A dictionary data structure with the pipeline definition.
+    :rtype: dict
+    """
+    from yaml import load, FullLoader
+    return load(path.read_text(encoding='utf-8'), Loader=FullLoader)
+
+
 def load_pipeline(path):
     """
     Load, replace and validate the pipeline definition file.
@@ -135,6 +148,7 @@ def load_pipeline(path):
     supported_formats = {
         '.toml': load_pipeline_toml,
         '.json': load_pipeline_json,
+        '.yaml': load_pipeline_yaml,
     }
 
     extension = path.suffix
