@@ -66,7 +66,7 @@ Development
    :maxdepth: 2
 
    developer
-   Reference Documentation <flowbber/flowbber>
+   API Reference <flowbber/flowbber>
    Source Code <https://github.com/kuralabs/flowbber>
 
 

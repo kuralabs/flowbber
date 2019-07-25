@@ -72,8 +72,8 @@ As a :term:`pipeline executor <Pipeline Executor>`, Flowbber provides the
 textual :term:`pipeline definition <Pipeline Definition>` and execute the data
 **collection**, **analysis** and **publishing** routines as defined.
 
-The pipeline definition can be written in a simple JSON_ or TOML_ format, and
-specifies the stages of your pipeline:
+The pipeline definition can be written in a simple TOML_, YAML_ or JSON_
+format, and specifies the stages of your pipeline:
 
 - :term:`Sources <Source>`: what data to collect and how.
 - :term:`Aggregators <Aggregator>`: how to accumulate or process the collected
@@ -148,7 +148,7 @@ And execute it with:
     $ flowbber pipeline1.toml
     OrderedDict([('timestamp1', {'epoch': 1503697771})])
 
-As you can see, the collected data is composed of an
+As shown above, the collected data is composed of an
 :py:class:`collections.OrderedDict` that maps the ``id`` of a source to the
 data it collected.
 
@@ -293,71 +293,18 @@ As we can see, a lot of information is provided, including configuration and
 duration of each source, plugins available, PIDs, etc.
 
 At this point we have covered the basics. In this example we used TOML_ to
-define the pipeline, but JSON_ can also be used, as explained in the following
-section.
-
-
-Optional Execution and Timeout
-==============================
-
-.. versionadded:: 1.1.0
-
-**Synopsis:**
-
-.. code-block:: toml
-
-   [[sources]]
-   type = "mytype"
-   id = "myid"
-   optional = true
-   timeout = "2 min"
-
-In some situations some components of a pipeline may fail. By default, if any
-component fails to perform its programming the pipeline will fail right away.
-
-Nevertheless, any component can be marked as **optional** (allowed or expected
-to fail), which means that if it fails or crashes, a warning will be logged and
-the pipeline can continue executing.
-
-For sources, this means that the following stages (aggregators and sinks) must
-be able to handle the possible absence of the data provided by the failed
-source. For example, in a template sink, the template should ask first if the
-id of the optional source is present in the final bundle before plotting its
-data.
-
-For aggregators, this means that the input data for the next aggregator will be
-unmodified from the one received by the failed aggregator.
-
-For sinks, it just means that if a sink fails, the pipeline won't crash right
-away. In many cases, it is recommended to mark all your sinks as optional,
-at least to retain most of the data even if the pipeline failed to submit it in
-one form.
-
-In the same way, in some situations the gathering of data from a particular
-data store, the processing of such data or the publication of the final bundle
-can take a lot of time. In some sources, it doesn't even make sense to wait for
-the data to be collected as it has lost its relevance because it wasn't
-collected in a particular time frame.
-
-For this use cases, and to avoid pipeline deadlocks, any component can be setup
-to execute in a specific timeframe. This **timeout** is either a time
-expression (str) or seconds (float) (see :ref:`frequency <frequency>` for
-format) that marks the maximum time the component is allowed to run.
-
-If the component exceeds its allowed time frame the pipeline executor will kill
-the driving process and mark the component as failed. Depending on the
-**optional** value the pipeline will then crash or continue executing.
+define the pipeline, but YAML_ and JSON_ are also supported, as explained in
+the following section.
 
 
 Pipeline Definition Format
 ==========================
 
-Flowbber supports both TOML_ and JSON_ formats for pipeline definition. For the
-format to be recognized by Flowbber, use either a ``.toml`` or ``.json`` file
-extension.
+Flowbber supports TOML_, YAML_ and JSON_ formats for pipeline definition. For
+the format to be recognized by Flowbber, use ``.toml``, ``.yaml`` or ``.json``
+file extension accordingly.
 
-In both formats, what is expected is that the pipeline is described in terms
-of:
+In all formats, it is expected that the pipeline is described in terms of:
 
 - A list of :term:`sources <Source>`.
 - An optional list of :term:`aggregators <Aggregator>`.
@@ -377,6 +324,8 @@ And optionally:
 - An execution **timeout** for this component, either a time expression (str)
   or seconds (float) (see :ref:`frequency <frequency>` for format).
 
+See :ref:`optional` for more information.
+
 All keys, and in particular those of the configuration options must be able to
 be used as Python variables, so they are checked against the following regular
 expression:
@@ -385,60 +334,13 @@ expression:
 
     r'^[a-zA-Z][a-zA-Z0-9_]*$'
 
-JSON
-----
-
-.. code-block:: json
-
-  {
-      "sources": [
-          {
-              "type": "type1",
-              "id": "id1",
-              "config": {
-                  "opt1": true,
-                  "opt2": "string",
-                  "opt3": 1000
-              }
-          },
-          {
-              "type": "type2",
-              "id": "id2",
-              "config": {},
-              "optional": true,
-              "timeout": 60
-          }
-      ],
-      "aggregators": [
-          {
-              "type": "type1",
-              "id": "id1",
-              "timeout": "1.5 min"
-          }
-      ],
-      "sinks": [
-          {
-              "type": "type1",
-              "id": "id1",
-              "config": {}
-          },
-          {
-              "type": "type2",
-              "id": "id2",
-              "config": {
-                  "opt1": true,
-                  "opt2": "string",
-                  "opt3": 1000
-              }
-          }
-      ]
-  }
-
 TOML
 ----
 
 Please note that in TOML, lists of objects are represented with a double square
-bracket ``[[ElementInList]]``.
+bracket ``[[ElementInList]]``. Also, as TOML_ doesn't support a ``null`` type,
+to ``null`` an option the option needs to be removed from the pipeline
+altogether.
 
 .. code-block:: toml
 
@@ -475,6 +377,90 @@ bracket ``[[ElementInList]]``.
         opt2 = "string"
         opt3 = 1000
 
+YAML
+----
+
+.. code-block:: yaml
+
+    sources:
+    - type: type1
+      id: id1
+      config:
+        opt1: true
+        opt2: string
+        opt3: 1000
+
+    - type: type2
+      id: id2
+      optional: true
+      timeout: 60
+
+    aggregators:
+    - type: type1
+      id: id1
+      timeout: 1.5 min
+
+    sinks:
+    - type: type1
+      id: id1
+
+    - type: type2
+      id: id2
+      config:
+        opt1: true
+        opt2: string
+        opt3: 1000
+
+
+JSON
+----
+
+.. code-block:: json
+
+    {
+        "sources": [
+            {
+                "type": "type1",
+                "id": "id1",
+                "config": {
+                    "opt1": true,
+                    "opt2": "string",
+                    "opt3": 1000
+                }
+            },
+            {
+                "type": "type2",
+                "id": "id2",
+                "config": {},
+                "optional": true,
+                "timeout": 60
+            }
+        ],
+        "aggregators": [
+            {
+                "type": "type1",
+                "id": "id1",
+                "timeout": "1.5 min"
+            }
+        ],
+        "sinks": [
+            {
+                "type": "type1",
+                "id": "id1",
+                "config": {}
+            },
+            {
+                "type": "type2",
+                "id": "id2",
+                "config": {
+                    "opt1": true,
+                    "opt2": "string",
+                    "opt3": 1000
+                }
+            }
+        ]
+    }
+
 
 .. _substitutions:
 
@@ -486,6 +472,27 @@ value substitution through the ``{namespace.value}`` string-substitution
 pattern. Substitutions can only be applied to **strings**.
 
 For example:
+
+In TOML:
+
+.. code-block:: toml
+
+    [[sinks]]
+    type = "template"
+    id = "template1"
+
+        [sinks.config]
+        template = "file://{pipeline.dir}/template1.tpl"
+
+In YAML:
+
+.. code-block:: yaml
+
+    sources:
+    - type: template
+      id: template1
+      config:
+        template: "file://{pipeline.dir}/template1.tpl"
 
 In JSON:
 
@@ -502,17 +509,6 @@ In JSON:
             }
         ]
     }
-
-In TOML:
-
-.. code-block:: toml
-
-    [[sinks]]
-    type = "template"
-    id = "template1"
-
-        [sinks.config]
-        template = "file://{pipeline.dir}/template1.tpl"
 
 If the ``{`` or ``}`` characters are required they can be escaped using a
 double bracket. For example ``{{{env.HOME}}}{{`` will result in
@@ -540,7 +536,7 @@ Available Namespaces
     .. warning::
 
         From a security perspective, if secrets are passed as environment
-        variables this namespace may constitutes a way to expose them.
+        variables this namespace may constitute a way to expose them.
 
 ``pipeline``
     Information related to the input :term:`Pipeline Definition` file. This is
@@ -621,6 +617,60 @@ Available Namespaces
             git -C pipeline.parent rev-parse --short --verify HEAD
 
 
+.. _optional:
+
+Optional Execution and Timeout
+==============================
+
+.. versionadded:: 1.1.0
+
+**Synopsis:**
+
+.. code-block:: toml
+
+   [[sources]]
+   type = "mytype"
+   id = "myid"
+   optional = true
+   timeout = "2 min"
+
+In some situations some components of a pipeline may fail. By default, if any
+component fails to perform its programming the pipeline will fail right away.
+
+Nevertheless, any component can be marked as **optional** (allowed or expected
+to fail), which means that if it fails or crashes, a warning will be logged and
+the pipeline can continue executing.
+
+For sources, this means that the following stages (aggregators and sinks) must
+be able to handle the possible absence of the data provided by the failed
+source. For example, in a template sink, the template should ask first if the
+id of the optional source is present in the final bundle before plotting its
+data.
+
+For aggregators, this means that the input data for the next aggregator will be
+unmodified from the one received by the failed aggregator.
+
+For sinks, it just means that if a sink fails, the pipeline won't crash right
+away. In many cases, it is recommended to mark all your sinks as optional,
+at least to retain most of the data even if the pipeline failed to submit it in
+one form.
+
+In the same way, in some situations the gathering of data from a particular
+data store, the processing of such data or the publication of the final bundle
+can take a lot of time. In some sources, it doesn't even make sense to wait for
+the data to be collected as it has lost its relevance because it wasn't
+collected in a particular time frame.
+
+For this use cases, and to avoid pipeline deadlocks, any component can be setup
+to execute in a specific timeframe. This **timeout** is either a time
+expression (str) or seconds (float) (see :ref:`frequency <frequency>` for
+format) that marks the maximum time the component is allowed to run.
+
+If the component exceeds its allowed time frame the pipeline executor will kill
+the driving process and mark the component as failed. Depending on the
+**optional** value the pipeline will then crash or continue executing.
+
+
 .. _scheduling:
 
 Scheduling
@@ -650,6 +700,16 @@ In TOML:
     start = 1503741210
     samples = 4
     stop_on_failure = true
+
+In YAML:
+
+.. code-block:: yaml
+
+    schedule:
+      frequency: 10 seconds
+      start: 1503741210
+      samples: 4
+      stop_on_failure: true
 
 In JSON:
 
@@ -747,5 +807,6 @@ Glossary
         an :term:`Aggregator` or a :term:`Sink`.
 
 
-.. _JSON: http://www.json.org/
+.. _YAML: https://yaml.org/
 .. _TOML: https://github.com/toml-lang/toml
+.. _JSON: http://www.json.org/
