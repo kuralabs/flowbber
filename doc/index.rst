@@ -39,6 +39,7 @@ custom pipelines for data collection, analysis and publishing.
    :maxdepth: 3
 
    implementation
+   dynamic
 
 .. toctree::
    :maxdepth: 2

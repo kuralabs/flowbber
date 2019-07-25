@@ -50,7 +50,9 @@ Help is available using the ``--help`` flag:
 .. code-block:: console
 
     $ flowbber --help
-    usage: flowbber [-h] [-v] [--version] pipeline
+    usage: flowbber [-h] [-v] [--version] [-d] [-a KEY=VALUE [KEY=VALUE ...]]
+                    [-f VALUES_FILE]
+                    pipeline
 
     Flowbber is a generic tool and framework that allows to execute custom
     pipelines for data gathering, publishing and analysis.
@@ -59,9 +61,16 @@ Help is available using the ``--help`` flag:
       pipeline       Pipeline definition file
 
     optional arguments:
-      -h, --help     show this help message and exit
-      -v, --verbose  Increase verbosity level
-      --version      show program's version number and exit
+      -h, --help            show this help message and exit
+      -v, --verbose         Increase verbosity level
+      --version             show program's version number and exit
+      -d, --dry-run         Dry run the pipeline
+      -a KEY=VALUE [KEY=VALUE ...], --values KEY=VALUE [KEY=VALUE ...]
+                            Values to render dynamic pipelines with
+      -f VALUES_FILE, --values-file VALUES_FILE
+                            One or more paths to files with values to render
+                            dynamic pipelines with. Must be a .toml, .yaml or
+                            .json
 
 
 Key Concepts
