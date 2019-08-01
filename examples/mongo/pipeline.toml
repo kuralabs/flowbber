@@ -1,0 +1,25 @@
+[[sources]]
+type = "config"
+id = "config1"
+
+    [sources.config.data]
+    name = "this is a name"
+
+    [sources.config.data.embedded]
+    somefield = 123
+
+    [sources.config.data.embedded.morefields]
+    comment = "This could go forever"
+
+
+
+[[sinks]]
+type = "mongodb"
+id = "mongodb"
+
+    [sinks.config]
+    uri = "mongodb://localhost:27017/"
+    overwrite = true
+    database = "flowbber"
+    collection = "pipeline1data"
+    key = "config1.name"
