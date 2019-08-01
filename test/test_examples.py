@@ -100,3 +100,12 @@ def test_pipeline_filter():
 ])
 def test_daemons(script):
     run(str(examples / script), check=True)
+
+
+def test_pipeline_mongo():
+    """
+    Test the mongo sink
+    """
+    # Run the pipeline twice to verify the "overwrite" flag works
+    run_pipeline('mongo', 'pipeline.toml')
+    run_pipeline('mongo', 'pipeline.toml')

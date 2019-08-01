@@ -57,6 +57,7 @@ used to perform this transformation.
         database = "flowbber"
         collection = "pipeline1data"
         key = "timestamp.epoch"
+        overwrite = true
 
 .. code-block:: json
 
@@ -383,6 +384,23 @@ the following:
 
 - **Secret**: ``False``
 
+overwrite
+---------
+
+Indicates if mongo should allow an entry overwrite.
+
+- **Default**: ``False``
+- **Optional**: ``True``
+- **Schema**:
+
+  .. code-block:: python3
+
+     {
+         'type': 'boolean',
+     }
+
+- **Secret**: ``False``
+
 dotreplace
 ----------
 
@@ -550,6 +568,15 @@ class MongoDBSink(FilterSink):
         )
 
         config.add_option(
+            'overwrite',
+            default=False,
+            optional=True,
+            schema={
+                'type': 'boolean',
+            },
+        )
+
+        config.add_option(
             'dotreplace',
             default=':',
             optional=True,
@@ -645,8 +672,16 @@ class MongoDBSink(FilterSink):
         # Insert data
         for dbcollection, bundle in bundles:
             bundle.update(document_id)
+            if document_id and self.config.overwrite.value:
+                inserted_id = dbcollection.replace_one(
+                    document_id,
+                    bundle,
+                    upsert=True
+                ).upserted_id or key  # this is annoying, mongo returns the id
+                # on upserted_id only on "insert", on "replace" it returns None
+            else:
+                inserted_id = dbcollection.insert_one(bundle).inserted_id
 
-            inserted_id = dbcollection.insert_one(bundle).inserted_id
             log.info(
                 'Inserted document with id {} in {}.{}'.format(
                     inserted_id, database.name, dbcollection.name
