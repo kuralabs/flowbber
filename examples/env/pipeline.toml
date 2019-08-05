@@ -1,0 +1,50 @@
+# This pipeline expects the following environment:
+#
+# TESTENV_INT = 1
+# TESTENV_FLOAT = 0.5
+# TESTENV_BOOL1 = TRUE
+# TESTENV_BOOL2 = yes
+# TESTENV_BOOL3 = False
+# TESTENV_BOOL4 = NO
+# TESTENV_ISO8601 = 2019-08-05T14:38:13
+[[sources]]
+type = "env"
+id = "testenvs"
+
+    [sources.config]
+    include = [
+        "TESTENV_INT",
+        "TESTENV_FLOAT",
+        "TESTENV_BOOL1",
+        "TESTENV_BOOL2",
+        "TESTENV_BOOL3",
+        "TESTENV_BOOL4",
+        "TESTENV_ISO8601",
+    ]
+    lowercase = false
+
+    [sources.config.types]
+    TESTENV_INT = "integer"
+    TESTENV_FLOAT = "float"
+    TESTENV_BOOL1 = "boolean"
+    TESTENV_BOOL2 = "boolean"
+    TESTENV_BOOL3 = "auto"
+    TESTENV_BOOL4 = "boolean"
+    TESTENV_ISO8601 = "auto"
+
+
+[[sinks]]
+type = "print"
+id = "print"
+
+
+[[sinks]]
+type = "archive"
+id = "archive"
+
+    [sinks.config]
+    output = "env-data.json"
+    override = true
+    create_parents = true
+    pretty = true
+    compress = false
