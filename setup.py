@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2017 KuraLabs S.R.L
+# Copyright (C) 2017-2019 KuraLabs S.R.L
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ Usage:
 
 """
 
-from os import environ
 from setuptools import setup
 
 
@@ -422,7 +421,7 @@ setup(
     # Sphinx autodoc cannot extract the documentation of zipped eggs with the
     # ``.. autodata::`` directive, causing chaos in AutoAPI. This disables zip
     # installation for correct AutoAPI generation.
-    zip_safe='READTHEDOCS' not in environ,
+    zip_safe=False,
 
     # Entry points
     entry_points={

@@ -109,3 +109,26 @@ def test_pipeline_mongo():
     # Run the pipeline twice to verify the "overwrite" flag works
     run_pipeline('mongo', 'pipeline.toml')
     run_pipeline('mongo', 'pipeline.toml')
+
+
+def test_pipeline_env():
+    run_pipeline('env', 'pipeline.toml')
+
+    actual = loads(
+        Path('env-data.json').read_text(encoding='utf-8')
+    )
+    expected = {
+        'testenvs': {
+            'TESTENV_INT': 1,
+            'TESTENV_FLOAT': 0.5,
+            'TESTENV_BOOL1': True,
+            'TESTENV_BOOL2': True,
+            'TESTENV_BOOL3': False,
+            'TESTENV_BOOL4': False,
+            # This loads as an integer because the archive sink decides that
+            # timestamps will be serialized as posix time.
+            'TESTENV_ISO8601': 1565015893,
+        },
+    }
+    differences = DeepDiff(actual, expected)
+    assert not differences
