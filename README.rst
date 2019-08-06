@@ -9,6 +9,14 @@ pipelines for data gathering, publishing and analysis.
    :target: https://build.kuralabs.io/job/GitHub/job/flowbber/job/master/
    :alt: Build Status
 
+.. image:: https://img.shields.io/pypi/v/flowbber
+   :target: https://pypi.org/project/flowbber/
+   :alt: PyPI
+
+.. image:: https://img.shields.io/github/license/kuralabs/flowbber
+   :target: https://choosealicense.com/licenses/apache-2.0/
+   :alt: License
+
 
 Documentation
 =============
