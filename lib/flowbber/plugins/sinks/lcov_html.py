@@ -143,7 +143,7 @@ from pathlib import Path
 
 from flowbber.components import Sink
 from flowbber.utils.command import run
-
+from shutil import which
 
 class LcovHTMLSink(Sink):
     def declare_config(self, config):
@@ -200,9 +200,14 @@ class LcovHTMLSink(Sink):
                 'No such directory {}'.format(outdir.parent)
             )
 
+        # Find genhtml executable
+        genhtml = which('genhtml')
+        if genhtml is None:
+            raise RuntimeError('genhtml executable not found')
+
         status = run(
-            'genhtml --branch-coverage --output-directory {} {}'.format(
-                outdir, data[self.config.key.value]['tracefile']
+            '{} --branch-coverage --output-directory {} {}'.format(
+                genhtml, outdir, data[self.config.key.value]['tracefile']
             )
         )
 
