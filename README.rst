@@ -35,6 +35,69 @@ Install
 Changelog
 =========
 
+1.9.0 (2019-08-12)
+------------------
+
+New
+~~~
+
+- Add option to Mongo sink to allow key overwrite.
+
+  This allows a pipeline to override an entry in the database using the same
+  key.
+
+  .. code-block:: toml
+
+     [sinks.config]
+     overwrite = true
+
+- Add type parsing in env source.
+
+  A type can be specified for each environment variable, so that it is parsed
+  and collected with the expected datatype. Types available are:
+
+  :integer: Using Python's ``int()`` function.
+  :float: Using Python's ``float()`` function.
+  :string: Using Python's ``str()`` function.
+  :auto: Using Flowbber's ``flowbber.utils.types.autocast``.
+  :boolean: Using Flowbber's ``flowbber.utils.types.booleanize``.
+  :iso8601: Using Flowbber's ``flowbber.utils.iso8601.iso8601_to_datetime``.
+
+  Usage:
+
+  .. code-block:: toml
+
+     [sources.config]
+     include = [
+         "TESTENV_INT",
+     ]
+
+     [sources.config.types]
+     TESTENV_INT = "integer"
+
+- Pipelines can now be defined in YAML format.
+
+  For example:
+
+  .. code-block:: yaml
+
+     sources:
+       - type: timestamp
+         id: timestamp
+         config:
+           epochf: true
+           iso8601: true
+           strftime: '%Y-%m-%d %H:%M:%S'
+
+Fixes
+~~~~~
+
+- Use which genhtml to find executable on lcov_html sink.
+
+  This fixes an issue where the executable could not be found if a custom
+  ``PATH`` was used.
+
+
 1.8.0 (2019-07-12)
 ------------------
 
