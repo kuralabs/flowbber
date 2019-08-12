@@ -200,7 +200,7 @@ def find_name(git=None, directory='.'):
 
 def find_email(git=None, directory='.'):
     """
-    Email of the author of the current revision.
+    Find the email of the author of the current revision.
 
     :param str git: Path to git executable.
      If None, the default, will try to find it using :func:`find_git`.
@@ -228,7 +228,7 @@ def find_email(git=None, directory='.'):
 
 def find_subject(git=None, directory='.'):
     """
-    Commit message subject of current revision.
+    Find the commit message subject of current revision.
 
     :param str git: Path to git executable.
      If None, the default, will try to find it using :func:`find_git`.
@@ -256,7 +256,7 @@ def find_subject(git=None, directory='.'):
 
 def find_body(git=None, directory='.'):
     """
-    Commit message body of current revision.
+    Find the commit message body of current revision.
 
     :param str git: Path to git executable.
      If None, the default, will try to find it using :func:`find_git`.
@@ -284,7 +284,7 @@ def find_body(git=None, directory='.'):
 
 def find_date(git=None, directory='.'):
     """
-    Commit date in strict ISO 8601 format.
+    Find the commit date in strict ISO 8601 format.
 
     :param str git: Path to git executable.
      If None, the default, will try to find it using :func:`find_git`.

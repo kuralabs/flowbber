@@ -27,6 +27,8 @@ Usage:
 
 """
 
+from pathlib import Path
+
 from setuptools import setup
 
 
@@ -37,12 +39,15 @@ def check_directory():
     including and excluding files from the MANIFEST.in, defining the library
     path, etc, if not.
     """
-    from os import getcwd
-    from os.path import dirname, abspath
-    return getcwd() == abspath(dirname(__file__))
+    from os import chdir
+
+    here = Path(__file__).parent.resolve()
+    if Path.cwd().resolve() != here:
+        print('Changing path to {}'.format(here))
+        chdir(str(here))
 
 
-assert check_directory(), 'Call setup.py from its parent directory'
+check_directory()
 
 
 #####################

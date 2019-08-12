@@ -93,7 +93,7 @@ def validate_definition(definition):
     return validated
 
 
-def load_pipeline_json(path):
+def load_json(path):
     """
     Load pipeline definition file in JSON format.
 
@@ -106,7 +106,7 @@ def load_pipeline_json(path):
     return loads(path.read_text(encoding='utf-8'))
 
 
-def load_pipeline_toml(path):
+def load_toml(path):
     """
     Load pipeline definition file in TOML format.
 
@@ -119,7 +119,7 @@ def load_pipeline_toml(path):
     return loads(path.read_text(encoding='utf-8'))
 
 
-def load_pipeline_yaml(path):
+def load_yaml(path):
     """
     Load pipeline definition file in YAML format.
 
@@ -130,6 +130,42 @@ def load_pipeline_yaml(path):
     """
     from yaml import load, FullLoader
     return load(path.read_text(encoding='utf-8'), Loader=FullLoader)
+
+
+def load_file(path):
+    """
+    Load any file format supported by Flowbber and perform replacement on its
+    content.
+
+    :param Path path: File to load.
+
+    :return: The content of file with its values replaced.
+    :rtype: dict
+    """
+    extension = path.suffix
+    if extension not in load_file.supported_formats:
+        raise RuntimeError(
+            'Unknown file format "{}" for file {}. '
+            'Supported formats are :{}.'.format(
+                extension, path,
+                ', '.join(sorted(load_file.supported_formats.keys())),
+            )
+        )
+
+    # Load file
+    content = load_file.supported_formats[extension](path)
+
+    # Replace string values that required replacement
+    content = replace_values(content, path)
+
+    return content
+
+
+load_file.supported_formats = {
+    '.toml': load_toml,
+    '.json': load_json,
+    '.yaml': load_yaml,
+}
 
 
 def load_pipeline(path):
@@ -145,28 +181,11 @@ def load_pipeline(path):
     :return: A dictionary data structure with the pipeline definition.
     :rtype: dict
     """
-    supported_formats = {
-        '.toml': load_pipeline_toml,
-        '.json': load_pipeline_json,
-        '.yaml': load_pipeline_yaml,
-    }
-
-    extension = path.suffix
-    if extension not in supported_formats:
-        raise RuntimeError(
-            'Unknown pipeline format "{}". Supported formats are :{}.'.format(
-                extension, sorted(supported_formats.keys())
-            )
-        )
-
     try:
-        definition = supported_formats[extension](path)
+        definition = load_file(path)
     except Exception as e:
         log.critical('Unable to parse pipeline definition {}'.format(path))
         raise e
-
-    # Replace string values that required replacement
-    definition = replace_values(definition, path)
 
     # Validate data structure
     validated = validate_definition(definition)
@@ -179,5 +198,6 @@ def load_pipeline(path):
 __all__ = [
     'replace_values',
     'validate_definition',
+    'load_file',
     'load_pipeline'
 ]

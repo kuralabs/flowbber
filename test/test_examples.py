@@ -33,39 +33,22 @@ def run_pipeline(name, pipelinedef):
 
 
 @mark.parametrize(['name', 'pipelinedef'], [
-    ['sloc', 'pipeline.toml'],
-    ['basic', 'pipeline.toml'],
-    ['basic', 'pipeline.yaml'],
-    ['local', 'pipeline.toml'],
     ['advanced', 'pipeline.json'],
     ['advanced', 'pipeline.toml'],
     ['advanced', 'pipeline.yaml'],
-    ['test', 'pipeline.toml'],
-    ['valgrind', 'pipeline.toml'],
-    ['config', 'pipeline.toml'],
     ['archive', 'compress.toml'],
     ['archive', 'extract.toml'],
+    ['basic', 'pipeline.toml'],
+    ['basic', 'pipeline.yaml'],
+    ['config', 'pipeline.toml'],
+    ['cpu', 'pipeline.toml'],
+    ['local', 'pipeline.toml'],
+    ['sloc', 'pipeline.toml'],
+    ['test', 'pipeline.toml'],
+    ['valgrind', 'pipeline.toml'],
 ])
 def test_pipeline(name, pipelinedef):
     run_pipeline(name, pipelinedef)
-
-
-@mark.skipif(
-    'GITHUB_TOKEN' not in environ,
-    reason='Missing GITHUB_TOKEN environment variable'
-)
-def test_pipeline_github():
-    run_pipeline('github', 'pipeline.toml')
-
-
-@mark.skipif(
-    not which('make'),
-    reason='"make" is unavailable in your environment'
-)
-def test_pipeline_lcov():
-    # Create coverage files
-    run([which('make'), '-C', str(examples / 'lcov')], check=True)
-    run_pipeline('lcov', 'pipeline.toml')
 
 
 def test_pipeline_filter():
@@ -91,6 +74,24 @@ def test_pipeline_filter():
 
     differences = DeepDiff(actual, expected)
     assert not differences
+
+
+@mark.skipif(
+    'GITHUB_TOKEN' not in environ,
+    reason='Missing GITHUB_TOKEN environment variable'
+)
+def test_pipeline_github():
+    run_pipeline('github', 'pipeline.toml')
+
+
+@mark.skipif(
+    not which('make'),
+    reason='"make" is unavailable in your environment'
+)
+def test_pipeline_lcov():
+    # Create coverage files
+    run([which('make'), '-C', str(examples / 'lcov')], check=True)
+    run_pipeline('lcov', 'pipeline.toml')
 
 
 @mark.parametrize(['script'], [

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2017 KuraLabs S.R.L
+# Copyright (C) 2017-2019 KuraLabs S.R.L
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,12 +20,21 @@ Argument management module.
 """
 
 from pathlib import Path
+from argparse import ArgumentParser
 
 from . import __version__
 from .logging import get_logger, setup_logging
 
 
 log = get_logger(__name__)
+
+
+class InvalidArguments(Exception):
+    """
+    Typed exception that allows to fail in argument parsing and verification
+    without quiting the process.
+    """
+    pass
 
 
 def validate_args(args):
@@ -45,8 +54,9 @@ def validate_args(args):
     args.pipeline = Path(args.pipeline)
 
     if not args.pipeline.is_file():
-        log.error('No such file {}'.format(args.pipeline))
-        exit(1)
+        raise InvalidArguments(
+            'No such file {}'.format(args.pipeline)
+        )
 
     args.pipeline = args.pipeline.resolve()
 
@@ -63,7 +73,6 @@ def parse_args(argv=None):
     :return: A parsed and verified arguments namespace.
     :rtype: :py:class:`argparse.Namespace`
     """
-    from argparse import ArgumentParser
 
     parser = ArgumentParser(
         description=(
@@ -71,6 +80,8 @@ def parse_args(argv=None):
             'custom pipelines for data gathering, publishing and analysis.'
         )
     )
+
+    # Standard options
     parser.add_argument(
         '-v', '--verbose',
         help='Increase verbosity level',
@@ -83,19 +94,27 @@ def parse_args(argv=None):
         version='Flowbber v{}'.format(__version__)
     )
 
+    # Dry run
     parser.add_argument(
         '-d', '--dry-run',
         help='Dry run the pipeline',
         default=False,
         action='store_true'
     )
+
     parser.add_argument(
         'pipeline',
         help='Pipeline definition file'
     )
 
     args = parser.parse_args(argv)
-    args = validate_args(args)
+
+    try:
+        args = validate_args(args)
+    except InvalidArguments as e:
+        log.critical(e)
+        raise e
+
     return args
 
 

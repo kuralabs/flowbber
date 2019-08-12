@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2017 KuraLabs S.R.L
+# Copyright (C) 2017-2019 KuraLabs S.R.L
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -41,11 +41,11 @@ class PluginLoader(object):
     This class allows to load plugins using Python entry points.
 
     :param str component: Name of the component.
-    :param class base_class: Base class to check against. Any class specified
-     here must comply with the :class:`Component`.
     :param str api_version: Version of the API.
     """
 
+    # Base class to check against. Any class specified here must comply with
+    # the Component class.
     _base_class = None
     _locally_registered = None
 
@@ -105,12 +105,12 @@ class PluginLoader(object):
 
     def load_plugins(self, cache=True):
         """
-        List all available plugins.
+        Load all available plugins.
 
-        This function lists all available plugins by discovering installed
+        This function load all available plugins by discovering installed
         plugins registered in the entry point. This can be costly or error
-        prone if a plugin misbehave. Because of this a cache is stored after
-        the first call.
+        prone if the package that declared the entrypoint misbehave. Because of
+        this a cache is stored after the first call.
 
         :param bool cache: If ``True`` return the cached result. If ``False``
          force reload of all plugins registered for the entry point.
