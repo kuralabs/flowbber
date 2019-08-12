@@ -15,6 +15,9 @@
 # specific language governing permissions and limitations
 # under the License.
 
+"""
+Utilities to convert string to other data types.
+"""
 
 from .iso8601 import iso8601_to_datetime
 

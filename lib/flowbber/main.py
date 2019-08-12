@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2017 KuraLabs S.R.L
+# Copyright (C) 2017-2019 KuraLabs S.R.L
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -45,16 +45,19 @@ def main(args):
         getpid()
     ))
 
-    log.info('Loading pipeline definition from {} ...'.format(
-        args.pipeline
-    ))
-    pipeline_definition = load_pipeline(args.pipeline)
-
+    # Load user's flowconf.py
     log.info('Loading local configuration from {} ...'.format(
         args.pipeline.parent
     ))
     load_configuration(args.pipeline.parent)
 
+    # Load pipeline
+    log.info('Loading pipeline definition from {} ...'.format(
+        args.pipeline
+    ))
+    pipeline_definition = load_pipeline(args.pipeline)
+
+    # Instance pipeline
     log.info('Creating pipeline ...')
     pipeline = Pipeline(pipeline_definition, args.pipeline.stem)
 

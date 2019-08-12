@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2017 KuraLabs S.R.L
+# Copyright (C) 2017-2019 KuraLabs S.R.L
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,8 +28,11 @@ def run():
     setproctitle('flowbber')
 
     # Parse arguments
-    from .args import parse_args
-    args = parse_args()
+    from .args import InvalidArguments, parse_args
+    try:
+        args = parse_args()
+    except InvalidArguments:
+        exit(1)
 
     # Run program
     from .main import main
