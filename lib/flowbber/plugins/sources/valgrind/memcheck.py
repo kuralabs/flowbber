@@ -38,6 +38,9 @@ Such XML file can be generated with:
 
 **Data collected:**
 
+Sadly, the XML format doesn't include a total number of issues, just an array of issues.
+A "total_issues' field is injected to allow the user to have much more efficient database queries.
+
 .. code-block:: json
 
     {
@@ -73,6 +76,7 @@ Such XML file can be generated with:
         "protocoltool":"memcheck",
         "protocolversion":"4",
         "tool":"memcheck",
+        "total_issues": 1,
         "error":[
             {
                 "kind":"Leak_DefinitelyLost",
