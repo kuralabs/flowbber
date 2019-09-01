@@ -46,6 +46,14 @@ class ValgrindBaseSource(Source):
             )
 
         doc = parse(infile.read_text(), force_list=('error', 'stack',))
+        # Safe check. Check the documention of why this field is injected into
+        # the collected data.
+        if 'error' in doc['valgrindoutput']:
+            doc['valgrindoutput']['total_issues'] = len(
+                doc['valgrindoutput']['error']
+            )
+        else:
+            doc['valgrindoutput']['total_issues'] = 0
         return doc['valgrindoutput']
 
 
