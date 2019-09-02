@@ -45,16 +45,18 @@ class ValgrindBaseSource(Source):
                 'No such file {}'.format(infile)
             )
 
-        doc = parse(infile.read_text(), force_list=('error', 'stack',))
-        # Safe check. Check the documention of why this field is injected into
-        # the collected data.
-        if 'error' in doc['valgrindoutput']:
-            doc['valgrindoutput']['total_issues'] = len(
-                doc['valgrindoutput']['error']
-            )
-        else:
-            doc['valgrindoutput']['total_issues'] = 0
-        return doc['valgrindoutput']
+        doc = parse(
+            infile.read_text(),
+            force_list=('error', 'stack',),
+        )['valgrindoutput']
+
+        # Sadly, Valgrind's XML format doesn't include a field with the total
+        # number of errors, just an array of which errors were found. A
+        # ``total_errors`` field is injected to allow the user to easily track
+        # the evolution of the amount of errors.
+        doc['total_errors'] = len(doc.get('error', []))
+
+        return doc
 
 
 __all__ = ['ValgrindBaseSource']
