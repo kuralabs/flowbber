@@ -78,7 +78,6 @@ def main():
         validated,
         'speedd',
         app='speedd',
-        save_journal=False,
     )
 
     # Build and run scheduler

@@ -94,6 +94,13 @@ def parse_args(argv=None):
         version='Flowbber v{}'.format(__version__)
     )
 
+    # Journal
+    parser.add_argument(
+        '-j', '--journal',
+        help='Path to save the journal',
+        default=None,
+    )
+
     # Dry run
     parser.add_argument(
         '-d', '--dry-run',

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2017 KuraLabs S.R.L
+# Copyright (C) 2017-2019 KuraLabs S.R.L
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ from sched import scheduler
 from time import time, sleep
 from datetime import timedelta
 from traceback import format_exc
+from collections import OrderedDict
 
 from .logging import get_logger
 
@@ -70,6 +71,7 @@ class Scheduler:
         self._runs_failed = 0
         self._runs_missed = 0
         self._last_run = None
+        self._journal = None
         self._scheduler = scheduler(time, sleep)
 
         log.info('Scheduler created for pipeline :\n{}'.format(self._pipeline))
@@ -154,15 +156,23 @@ class Scheduler:
         Execute the work function and schedule the next no matter what.
         """
         try:
-            self._pipeline.run()
+            journal = self._pipeline.run()
+            self._journal.update(journal)
             self._runs_passed += 1
 
         except Exception as e:
+            exception = format_exc()
             log.error(
                 'Pipeline "{}" failed:\n{}'.format(
-                    self._pipeline.name, format_exc()
+                    self._pipeline.name, exception,
                 )
             )
+            self.journal.update(OrderedDict((
+                (self._pipeline.executed, OrderedDict((
+                    ('status', 'crashed'),
+                    ('exception', exception),
+                ))),
+            )))
             self._runs_failed += 1
 
             if self._stop_on_failure:
@@ -174,6 +184,8 @@ class Scheduler:
         """
         Start the scheduler.
         """
+        self._journal = OrderedDict()
+
         now = time()
 
         if self._start is not None:
@@ -201,6 +213,8 @@ class Scheduler:
 
         self._last_run = event.time
         self._scheduler.run()
+
+        return self._journal
 
 
 __all__ = ['Scheduler']

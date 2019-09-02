@@ -672,7 +672,6 @@ A basic and naive implementation of such daemon could looks like this:
             validated,
             'cpud',
             app='cpud',
-            save_journal=False,
         )
 
         # Build and run scheduler

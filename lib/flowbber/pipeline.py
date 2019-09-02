@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2017 KuraLabs S.R.L
+# Copyright (C) 2017-2019 KuraLabs S.R.L
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,12 +19,9 @@
 Base class for Flowbber pipeline.
 """
 
-from os import getpid
-from pathlib import Path
+from time import time
 from collections import OrderedDict
-from tempfile import NamedTemporaryFile, gettempdir
 
-from ujson import dumps
 from setproctitle import setproctitle
 
 from .logging import get_logger
@@ -50,17 +47,14 @@ class Pipeline:
     :param str name: Name of the pipeline. Used only for pretty printing only.
     :param str app: Name of the application running the pipeline. This name
      is used mainly to set the process name and the journals directory.
-    :param bool save_journal: Save the journal to a temporal location when the
-     pipeline execution ends.
     """
 
-    def __init__(self, pipeline, name, app='flowbber', save_journal=True):
+    def __init__(self, pipeline, name, app='flowbber'):
         super().__init__()
 
         self._pipeline = pipeline
         self._name = name
         self._app = app
-        self._save_journal = save_journal
 
         self._executed = 0
         self._data = OrderedDict()
@@ -224,6 +218,34 @@ class Pipeline:
 
             setattr(self, '_{}s'.format(component_name), destination)
 
+    def _categorize_log(self, log):
+        """
+        Categorize and summarize component entries by their status.
+
+        :param list log: List of component execution entries.
+
+        :return: The number of components, which component, and the sum of
+         their execution time indexed by their status.
+        :rtype: OrderedDict
+        """
+        categories = OrderedDict()
+
+        for entry in log:
+            category = categories.setdefault(
+                entry['status'], OrderedDict(),
+            )
+
+            category.setdefault('how_many', 0)
+            category['how_many'] += 1
+
+            category.setdefault('it_took', 0.0)
+            category['it_took'] += entry['duration']
+
+            which_ones = category.setdefault('which_ones', [])
+            which_ones.append(entry['id'])
+
+        return categories
+
     def run(self):
         """
         Execute pipeline.
@@ -234,6 +256,8 @@ class Pipeline:
         :return: The journal of the execution.
         :rtype: dict
         """
+        begin = time()
+
         if self._executed > 0:
             log.info('Re-running pipeline ...')
             self._data = OrderedDict()
@@ -242,44 +266,51 @@ class Pipeline:
 
         self._executed += 1
 
-        journal = OrderedDict((
-            ('sources', []),
-            ('aggregators', []),
-            ('sinks', []),
-        ))
+        sourceslog = []
+        aggregatorslog = []
+        sinkslog = []
 
         setproctitle('{} - running sources'.format(self._app))
         log.info('Running sources ...')
-        self._run_sources(journal['sources'])
+        self._run_sources(sourceslog)
 
         setproctitle('{} - running aggregators'.format(self._app))
         log.info('Running aggregators ...')
-        self._run_aggregators(journal['aggregators'])
+        self._run_aggregators(aggregatorslog)
 
         setproctitle('{} - running sinks'.format(self._app))
         log.info('Running sinks ...')
-        self._run_sinks(journal['sinks'])
+        self._run_sinks(sinkslog)
 
-        if not self._save_journal:
-            return journal
+        setproctitle('{} - done'.format(self._app))
+        end = time()
 
-        setproctitle('{} - saving journal'.format(self._app))
-        log.info('Saving journal ...')
-        journal_dir = Path(gettempdir()) / '{}-journals'.format(self._app)
-        journal_dir.mkdir(parents=True, exist_ok=True)
-
-        with NamedTemporaryFile(
-            mode='wt',
-            encoding='utf-8',
-            prefix='journal-{}-'.format(getpid()),
-            suffix='.json',
-            dir=str(journal_dir),
-            delete=False
-        ) as jfd:
-            jfd.write(dumps(journal, indent=4, ensure_ascii=False))
-        log.info('Journal saved to {}'.format(jfd.name))
-
-        return journal
+        return OrderedDict((
+            (self._executed, OrderedDict((
+                ('status', 'succeeded'),
+                ('sources', sourceslog),
+                ('aggregators', aggregatorslog),
+                ('sinks', sinkslog),
+                ('digest', OrderedDict((
+                    ('begin', begin),
+                    ('end', end),
+                    ('duration', end - begin),
+                    ('distribution', OrderedDict((
+                        ('sources', self._categorize_log(sourceslog)),
+                        ('aggregators', self._categorize_log(aggregatorslog)),
+                        ('sinks', self._categorize_log(sinkslog)),
+                    ))),
+                    ('execution', OrderedDict((
+                        ('total', sum(map(len, (
+                            sourceslog, aggregatorslog, sinkslog,
+                        )))),
+                        ('sources', len(sourceslog)),
+                        ('aggregators', len(aggregatorslog)),
+                        ('sinks', len(sinkslog)),
+                    ))),
+                ))),
+            ))),
+        ))
 
     def _run_components(
         self, name, components, journal,
@@ -412,7 +443,9 @@ class Pipeline:
             journal_entry = {
                 'index': component.index,
                 'id': component.id,
-                name: str(component),
+                'type': component.type,
+                'class': component.__class__.__name__,
+                'name': str(component),
                 'pid': execution.pid,
                 'status': execution.status,
                 'exitcode': execution.exitcode,

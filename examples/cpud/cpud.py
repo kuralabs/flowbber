@@ -94,7 +94,6 @@ def main():
         validated,
         'cpud',
         app='cpud',
-        save_journal=False,
     )
 
     # Build and run scheduler

@@ -12,7 +12,11 @@ from flowbber.main import main
 from flowbber.logging import get_logger, setup_logging
 
 
-Arguments = namedtuple('Arguments', ['pipeline', 'dry_run'])
+Arguments = namedtuple(
+    'Arguments', [
+        'pipeline', 'dry_run', 'journal',
+    ],
+)
 
 
 log = get_logger(__name__)
@@ -27,6 +31,7 @@ def run_pipeline(name, pipelinedef):
     args = Arguments(
         pipeline=examples / name / pipelinedef,
         dry_run=False,
+        journal='journal-{}.json'.format(pipelinedef),
     )
     result = main(args)
     assert result == 0

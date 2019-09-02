@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2017-2018 KuraLabs S.R.L
+# Copyright (C) 2017-2019 KuraLabs S.R.L
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -156,6 +156,13 @@ class Component(metaclass=NamedABCMeta):
         Index of this component in the stage.
         """
         return self._index
+
+    @property
+    def type(self):
+        """
+        Type of this component.
+        """
+        return self._type_
 
     @property
     def id(self):

@@ -20,6 +20,10 @@ Application entry point module.
 """
 
 from os import getpid
+from pathlib import Path
+from tempfile import gettempdir, NamedTemporaryFile
+
+from ujson import dumps
 
 from .pipeline import Pipeline
 from .logging import get_logger
@@ -65,32 +69,53 @@ def main(args):
     schedule = pipeline_definition.get('schedule', None)
 
     if schedule is None:
+        runner = pipeline
 
-        # Everything is ready, do not run if dry run
-        if args.dry_run:
-            log.info('Dry run complete! Exiting ...')
-            return 0
+    else:
+        # A scheduler was requested, create it
+        log.info('Creating scheduler for pipeline ...')
 
-        pipeline.run()
-        return 0
-
-    # A scheduler was requested, create it
-    log.info('Creating scheduler for pipeline ...')
-
-    scheduler = Scheduler(
-        pipeline,
-        schedule['frequency'],
-        samples=schedule['samples'],
-        start=schedule['start'],
-        stop_on_failure=schedule['stop_on_failure'],
-    )
+        runner = Scheduler(
+            pipeline,
+            schedule['frequency'],
+            samples=schedule['samples'],
+            start=schedule['start'],
+            stop_on_failure=schedule['stop_on_failure'],
+        )
 
     # Everything is ready, do not run if dry run
     if args.dry_run:
         log.info('Dry run complete! Exiting ...')
         return 0
 
-    scheduler.run()
+    # Run pipeline
+    journal = runner.run()
+
+    # Save journal
+    log.info('Saving journal ...')
+    if args.journal:
+        journalfile = Path(args.journal)
+        journalfile.parent.mkdir(parents=True, exist_ok=True)
+        journalfile.write_text(
+            dumps(journal, indent=4, ensure_ascii=False),
+            encoding='utf-8',
+        )
+    else:
+        journaldir = Path(gettempdir()) / 'flowbber' / 'journals'
+        journaldir.mkdir(parents=True, exist_ok=True)
+        with NamedTemporaryFile(
+            mode='wt',
+            encoding='utf-8',
+            prefix='journal-{}-'.format(getpid()),
+            suffix='.json',
+            dir=str(journaldir),
+            delete=False
+        ) as jfd:
+            jfd.write(dumps(journal, indent=4, ensure_ascii=False))
+        journalfile = Path(jfd.name)
+
+    log.info('Journal saved to {}'.format(journalfile))
+
     return 0
 
 
