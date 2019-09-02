@@ -38,8 +38,12 @@ Such XML file can be generated with:
 
 **Data collected:**
 
-Sadly, the XML format doesn't include a total number of issues, just an array of issues.
-A "total_issues' field is injected to allow the user to have much more efficient database queries.
+.. important::
+
+   Sadly, Valgrind's XML format doesn't include a field with the total number
+   of errors, just an array of which errors were found. A ``total_errors``
+   field is injected to allow the user to easily track the evolution of the
+   amount of errors.
 
 .. code-block:: json
 
@@ -76,7 +80,7 @@ A "total_issues' field is injected to allow the user to have much more efficient
         "protocoltool":"memcheck",
         "protocolversion":"4",
         "tool":"memcheck",
-        "total_issues": 1,
+        "total_errors": 1,
         "error":[
             {
                 "kind":"Leak_DefinitelyLost",
