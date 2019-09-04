@@ -383,6 +383,8 @@ setup(
 
         # ArchiveSink
         'archive': [],
+        # DataSplitterSink
+        'data_splitter': [],
         # InfluxDBSink
         'influx': ['influxdb'],
         # LcovHTMLSink
@@ -456,6 +458,7 @@ setup(
         ],
         'flowbber_plugin_sinks_1_0': [
             'archive = flowbber.plugins.sinks.archive:ArchiveSink',
+            'data_splitter = flowbber.plugins.sinks.data_splitter:DataSplitterSink',  # noqa
             'influxdb = flowbber.plugins.sinks.influxdb:InfluxDBSink',
             'lcov_html = flowbber.plugins.sinks.lcov_html:LcovHTMLSink',
             'mongodb = flowbber.plugins.sinks.mongodb:MongoDBSink',
