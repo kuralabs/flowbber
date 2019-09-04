@@ -17,6 +17,10 @@ The following sinks plugins are included as part of Flowbber.
 
 .. automodule:: flowbber.plugins.sinks.archive
 
+.. _sinks-data-splitter:
+
+.. automodule:: flowbber.plugins.sinks.data_splitter
+
 .. _sinks-influxdb:
 
 .. automodule:: flowbber.plugins.sinks.influxdb

@@ -18,3 +18,47 @@ id = "archive"
     override = true
     create_parents = true
     pretty = true
+
+[[sinks]]
+type = "data_splitter"
+id = "data_splitter_str"
+
+    [sinks.config]
+    create_parents = true
+    output = "splitter_test/logs/memcheck_errors/{{id}}.txt"
+    id_selector = "memcheck.error.*"
+    data_selector = "memcheck.error.*"
+    format = "str"
+
+[[sinks]]
+type = "data_splitter"
+id = "data_splitter_json"
+
+    [sinks.config]
+    create_parents = true
+    output = "splitter_test/logs/memcheck_errors/{{id}}.json"
+    id_selector = "memcheck.error.*"
+    data_selector = "memcheck.error.*"
+    format = "json"
+
+[[sinks]]
+type = "data_splitter"
+id = "data_splitter_toml"
+
+    [sinks.config]
+    create_parents = true
+    output = "splitter_test/logs/memcheck_errors/{{id}}.toml"
+    id_selector = "memcheck.error.*"
+    data_selector = "memcheck.error.*"
+    format = "toml"
+
+[[sinks]]
+type = "data_splitter"
+id = "data_splitter_yaml"
+
+    [sinks.config]
+    create_parents = true
+    output = "splitter_test/logs/memcheck_errors/{{id}}.yaml"
+    id_selector = "memcheck.error.*"
+    data_selector = "memcheck.error.*"
+    format = "yaml"
