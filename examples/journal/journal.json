@@ -1,0 +1,92 @@
+{
+    "1":{
+        "status":"succeeded",
+        "sources":[
+            {
+                "index":0,
+                "id":"timestamp1",
+                "type":"timestamp",
+                "class":"TimestampSource",
+                "name":"#0 TimestampSource.timestamp.timestamp1",
+                "pid":25490,
+                "status":"succeeded",
+                "exitcode":0,
+                "duration":0.0000889301
+            },
+            {
+                "index":1,
+                "id":"timestamp2",
+                "type":"timestamp",
+                "class":"TimestampSource",
+                "name":"#1 TimestampSource.timestamp.timestamp2",
+                "pid":25492,
+                "status":"succeeded",
+                "exitcode":0,
+                "duration":0.0001118183
+            },
+            {
+                "index":2,
+                "id":"user1",
+                "type":"user",
+                "class":"UserSource",
+                "name":"#2 UserSource.user.user1",
+                "pid":25494,
+                "status":"succeeded",
+                "exitcode":0,
+                "duration":0.0011379719
+            }
+        ],
+        "aggregators":[
+
+        ],
+        "sinks":[
+            {
+                "index":0,
+                "id":"print1",
+                "type":"print",
+                "class":"PrintSink",
+                "name":"#0 PrintSink.print.print1",
+                "pid":25496,
+                "status":"succeeded",
+                "exitcode":0,
+                "duration":0.0013890266
+            }
+        ],
+        "digest":{
+            "begin":1568116704.3084597588,
+            "end":1568116704.3233172894,
+            "duration":0.0148575306,
+            "distribution":{
+                "sources":{
+                    "succeeded":{
+                        "how_many":3,
+                        "it_took":0.0013387203,
+                        "which_ones":[
+                            "timestamp1",
+                            "timestamp2",
+                            "user1"
+                        ]
+                    }
+                },
+                "aggregators":{
+
+                },
+                "sinks":{
+                    "succeeded":{
+                        "how_many":1,
+                        "it_took":0.0013890266,
+                        "which_ones":[
+                            "print1"
+                        ]
+                    }
+                }
+            },
+            "execution":{
+                "total":4,
+                "sources":3,
+                "aggregators":0,
+                "sinks":1
+            }
+        }
+    }
+}

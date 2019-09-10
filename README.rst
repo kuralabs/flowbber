@@ -35,6 +35,42 @@ Install
 Changelog
 =========
 
+1.10.0 (2019-09-10)
+-------------------
+
+New
+~~~
+
+- New Data Splitter Sink.
+
+  The new DataSplitterSink allows users to extract branches of the data tree
+  and dynamically create files with that data using other parts of the data
+  tree as ID.
+
+  Check the `documentation <https://docs.kuralabs.io/flowbber/sinks.html#data-splitter-sink>`_
+  for more information.
+
+- Adds new field total_issues to Valgrind source.
+
+  Now the Valgrind XML sources will have a new field called ``total_errors``.
+  The idea of this field is to have a count of the amount of errors that
+  ocurred. Users won't need to calculate the length of the errors list
+  manually.
+
+- Allow to save the journal in a specific location.
+
+  The journal is a JSON file that reports all details about the execution of
+  the pipeline including how many times the pipeline was run, when, which
+  components passed or failed, among others.
+
+  The journal was a debug tool but now its user consumable. To accommodate this
+  the format of the journal changed to have more information.
+
+  To save the journal issue the flag ``--journal myjournal.json``.
+
+  See ``examples/journal/journal.json`` for an example.
+
+
 1.9.0 (2019-08-12)
 ------------------
 
