@@ -50,11 +50,11 @@ New
   Check the `documentation <https://docs.kuralabs.io/flowbber/sinks.html#data-splitter-sink>`_
   for more information.
 
-- Adds new field total_issues to Valgrind source.
+- Adds new field ``total_errors`` to Valgrind sources.
 
   Now the Valgrind XML sources will have a new field called ``total_errors``.
   The idea of this field is to have a count of the amount of errors that
-  ocurred. Users won't need to calculate the length of the errors list
+  occurred. Users won't need to calculate the length of the errors list
   manually.
 
 - Allow to save the journal in a specific location.
