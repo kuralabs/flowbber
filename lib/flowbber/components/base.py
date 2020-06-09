@@ -339,7 +339,7 @@ class Component(metaclass=NamedABCMeta):
                     log.warning(
                         'Execution of {name} #{component.index} '
                         '"{component.id}" timed out and its driving process '
-                        'with PID {component.pid} seems to have hanged'.format(
+                        'with PID {process.pid} seems to have hanged'.format(
                             name=self.__class__.__name__.lower(),
                             component=self,
                             process=self._process,
