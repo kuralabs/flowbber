@@ -30,5 +30,5 @@ RUN apt-get update && apt-get install --yes \
 
 # Configure and start supervisord
 COPY supervisord/*.conf /etc/supervisor/conf.d/
-COPY entrypoint.sh /usr/local/bin/
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+COPY entrypoint.sh /usr/local/bin/flowbber-entrypoint
+ENTRYPOINT ["/usr/local/bin/flowbber-entrypoint"]

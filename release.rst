@@ -23,7 +23,7 @@ Flowbber Release
 #. Push new revision and tag::
 
     git push
-    git push --tags
+    git push origin x.y.z
 
 #. Upload to PyPI::
 
