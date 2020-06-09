@@ -189,6 +189,11 @@ class PytestSource(Source):
 
         tree = ElementTree.parse(str(infile))
         root = tree.getroot()
+        if root.tag == 'testsuites':
+            # Starting on pytest 4.6.7 adds a <testsuites> root element
+            # We can get the first child and keep on.
+            root = next(iter(root))
+
         assert root.tag == 'testsuite', 'Malformed XML root element'
 
         # Create top level suite object
@@ -197,11 +202,15 @@ class PytestSource(Source):
             for key, cast in [
                 ('errors', int),
                 ('failures', int),
-                ('skips', int),
                 ('tests', int),
                 ('time', float),
             ]
         }
+
+        # skips was changed to skipped on newer pytest, support both options
+        testsuite['skips'] = int(
+            root.attrib.get('skipped', root.attrib.get('skips'))
+        )
 
         testcases = OrderedDict()
         testsuite['cases'] = testcases
