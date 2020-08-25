@@ -35,6 +35,17 @@ Install
 Changelog
 =========
 
+1.11.0 (2020-25-08)
+-------------------
+
+New
+~~~
+
+- Addapt pytest source to latest pytest.
+  Starting on pytest 4.6.7 adds a <testsuites> root element.
+  Also, "skips" was changed to "skipped" on newer pytest, support both options.
+
+
 1.10.0 (2019-09-10)
 -------------------
 

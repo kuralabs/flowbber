@@ -6,6 +6,6 @@
     "doc_url": "https://docs.kuralabs.io/flowbber/",
     "project_name": "Flowbber",
     "short_description": "Flowbber is a generic tool and framework that allows to execute custom pipelines for data gathering, publishing and analysis.",
-    "year": "2017-2019",
-    "version": "1.10.0"
+    "year": "2017-2020",
+    "version": "1.11.0"
 }
