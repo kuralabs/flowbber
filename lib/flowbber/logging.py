@@ -215,9 +215,10 @@ class LoggingManager:
 
             register(self.stop_logging)
 
-        # Check that no call to loggers have been made
+        # Clear any pre-existing handlers (e.g., from pytest's log capture)
         root = logging.getLogger()
-        assert not root.hasHandlers()
+        for handler in root.handlers[:]:
+            root.removeHandler(handler)
 
         # Create handler for main process and all subsequent subprocesses
         level = self.LEVELS.get(self._verbosity, logging.DEBUG)
