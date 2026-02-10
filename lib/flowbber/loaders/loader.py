@@ -21,11 +21,11 @@ Base class to load Flowbber plugins.
 All Flowbber component loaders extend from the PluginLoader class.
 """
 
+import packagedata as pkgdata
+
 from copy import copy
 from inspect import isclass
 from collections import OrderedDict
-
-from pkg_resources import iter_entry_points
 
 from ..logging import get_logger
 from ..components.base import Component
@@ -131,7 +131,7 @@ class PluginLoader(object):
         # Iterate over entry points
         log.debug('Loading entrypoint {}'.format(self.entrypoint))
 
-        for ep in iter_entry_points(group=self.entrypoint):
+        for ep in pkgdata.entry_points(group=self.entrypoint):
 
             name = ep.name
 
