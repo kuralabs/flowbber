@@ -229,13 +229,42 @@ Registering Components
 Entrypoints
 -----------
 
-Flowbber uses setuptools' entrypoints_ to perform dynamic discovery of
+Flowbber uses entrypoints_ to perform dynamic discovery of
 :term:`plugins <Plugin>`.
 
-.. _entrypoints: http://setuptools.readthedocs.io/en/latest/setuptools.html#dynamic-discovery-of-services-and-plugins
+.. _entrypoints: https://packaging.python.org/en/latest/guides/creating-and-discovering-plugins/#using-package-metadata
 
-Asumming your package is called ``mypackage``, add an ``entry_points`` keyword
-argument to your package ``setup.py``'s ``setup()`` function as follows:
+Assuming your package is called ``mypackage``, register the entry points in
+your package configuration. Use one of the following entry point group names:
+
+:Sources: ``flowbber_plugin_sources_1_0``
+:Aggregators: ``flowbber_plugin_aggregators_1_0``
+:Sinks: ``flowbber_plugin_sinks_1_0``
+
+The elements associated with those entry points have the following structure:
+
+.. code-block:: text
+
+    <your_new_type> = <yourpackage>.<submodule>.<submodule>:<YourComponentClass>
+
+Please note the ``:`` (colon) after the module path. Once installed alongside
+Flowbber, your package will be available for use using ``type = your_new_type``
+in your pipeline definition file.
+
+**Using pyproject.toml:**
+
+.. code-block:: toml
+
+    [project.entry-points."flowbber_plugin_sources_1_0"]
+    mysource = "mypackage.sources.mycustom:MyCustomSource"
+
+    [project.entry-points."flowbber_plugin_aggregators_1_0"]
+    myaggregator = "mypackage.aggregators.mycustom:MyCustomAggregator"
+
+    [project.entry-points."flowbber_plugin_sinks_1_0"]
+    mysink = "mypackage.sinks.mycustom:MyCustomSink"
+
+**Using setup.py:**
 
 .. code-block:: python3
 
@@ -254,23 +283,6 @@ argument to your package ``setup.py``'s ``setup()`` function as follows:
             ]
         }
     )
-
-As key, use one of the following entrypoints:
-
-:Sources: ``flowbber_plugin_sources_1_0``
-:Aggregators: ``flowbber_plugin_aggregators_1_0``
-:Sinks: ``flowbber_plugin_sinks_1_0``
-
-The elements in the list associated with those entrypoints have the following
-structure:
-
-.. code-block:: text
-
-    <your_new_type> = <yourpackage>.<submodule>.<submodule>:<YourComponentClass>
-
-Please note the ``:`` (colon) after the module path. Once installed alongside
-Flowbber, your package will be available for use using ``type = your_new_type``
-in your pipeline definition file.
 
 
 Pipeline's flowconf

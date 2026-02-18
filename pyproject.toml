@@ -1,3 +1,94 @@
 [build-system]
 requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "flowbber"
+description = "Flowbber is a generic tool and framework that allows to execute custom pipelines for data gathering, publishing and analysis."
+dynamic = ["version"]
+readme = {file = "README.rst", content-type = "text/x-rst"}
+license = {text = "Apache-2.0"}
+authors = [
+    {name = "KuraLabs S.R.L", email = "info@kuralabs.io"}
+]
+keywords = ["flowbber"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Natural Language :: English",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+]
+dependencies = [
+    "toml",
+    "ujson",
+    "pyyaml",
+    "colorlog",
+    "pprintpp",
+    "cerberus>=1.3.1",
+    "packagedata",
+    "pytimeparse",
+    "setproctitle",
+]
+
+[project.optional-dependencies]
+cobertura = ["pycobertura"]
+cpu = ["psutil"]
+github = ["pygithub"]
+lcov = ["lcov_cobertura"]
+lcov_merger = ["lcov_cobertura"]
+sloc = ["pygount"]
+speed = ["pyspeedtest"]
+valgrind_memcheck = ["xmltodict"]
+influx = ["influxdb"]
+mongo = ["pymongo"]
+template = ["jinja2"]
+
+[project.urls]
+Homepage = "https://docs.kuralabs.io/flowbber/"
+
+[project.scripts]
+flowbber = "flowbber.__main__:run"
+
+[project.entry-points."flowbber_plugin_sources_1_0"]
+cobertura = "flowbber.plugins.sources.cobertura:CoberturaSource"
+config = "flowbber.plugins.sources.config:ConfigSource"
+cpu = "flowbber.plugins.sources.cpu:CPUSource"
+env = "flowbber.plugins.sources.env:EnvSource"
+git = "flowbber.plugins.sources.git:GitSource"
+github = "flowbber.plugins.sources.github:GitHubSource"
+json = "flowbber.plugins.sources.json:JSONSource"
+gtest = "flowbber.plugins.sources.gtest:GTestSource"
+lcov = "flowbber.plugins.sources.lcov:LcovSource"
+pytest = "flowbber.plugins.sources.pytest:PytestSource"
+sloc = "flowbber.plugins.sources.sloc:SLOCSource"
+speed = "flowbber.plugins.sources.speed:SpeedSource"
+timestamp = "flowbber.plugins.sources.timestamp:TimestampSource"
+user = "flowbber.plugins.sources.user:UserSource"
+valgrind_memcheck = "flowbber.plugins.sources.valgrind.memcheck:ValgrindMemcheckSource"
+valgrind_helgrind = "flowbber.plugins.sources.valgrind.helgrind:ValgrindHelgrindSource"
+valgrind_drd = "flowbber.plugins.sources.valgrind.drd:ValgrindDrdSource"
+
+[project.entry-points."flowbber_plugin_aggregators_1_0"]
+expander = "flowbber.plugins.aggregators.expander:ExpanderAggregator"
+filter = "flowbber.plugins.aggregators.filter:FilterAggregator"
+lcov_merger = "flowbber.plugins.aggregators.lcov_merger:LcovMergerAggregator"
+
+[project.entry-points."flowbber_plugin_sinks_1_0"]
+archive = "flowbber.plugins.sinks.archive:ArchiveSink"
+data_splitter = "flowbber.plugins.sinks.data_splitter:DataSplitterSink"
+influxdb = "flowbber.plugins.sinks.influxdb:InfluxDBSink"
+lcov_html = "flowbber.plugins.sinks.lcov_html:LcovHTMLSink"
+mongodb = "flowbber.plugins.sinks.mongodb:MongoDBSink"
+print = "flowbber.plugins.sinks.print:PrintSink"
+template = "flowbber.plugins.sinks.template:TemplateSink"
+
+[tool.setuptools.dynamic]
+version = {attr = "flowbber.__version__"}
+
+[tool.setuptools.packages.find]
+where = ["lib"]
+
+[tool.setuptools.package-data]
+flowbber = ["data/*"]
