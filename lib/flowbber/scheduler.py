@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
-#
-# Copyright (C) 2017-2019 KuraLabs S.R.L
+# Copyright (C) 2017-2026 KuraLabs S.R.L
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -167,7 +165,7 @@ class Scheduler:
                     self._pipeline.name, exception,
                 )
             )
-            self.journal.update(OrderedDict((
+            self._journal.update(OrderedDict((
                 (self._pipeline.executed, OrderedDict((
                     ('status', 'crashed'),
                     ('exception', exception),

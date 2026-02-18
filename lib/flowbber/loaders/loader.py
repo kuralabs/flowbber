@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
-#
-# Copyright (C) 2017-2019 KuraLabs S.R.L
+# Copyright (C) 2017-2026 KuraLabs S.R.L
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,14 +19,14 @@ Base class to load Flowbber plugins.
 All Flowbber component loaders extend from the PluginLoader class.
 """
 
-import packagedata as pkgdata
-
 from copy import copy
 from inspect import isclass
 from collections import OrderedDict
 
 from ..logging import get_logger
 from ..components.base import Component
+
+import packagedata as pkgdata
 
 
 log = get_logger(__name__)
